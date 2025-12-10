@@ -1,4 +1,4 @@
-import './Navbar.css';
+import './navbar.css';
 import { navbarLinks } from './navbarLinks';
 import logoSF from '../../assets/images/logoSF.png'
 
