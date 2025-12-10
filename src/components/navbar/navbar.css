@@ -1,16 +1,27 @@
 .navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 1920px;
-  height: 180px;
-  padding: 10px;
-  background-color: #ffffff;
-  border-radius: 30px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
   position: sticky;
   top: 0;
   z-index: 100;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center; /* centra el inner */
+  padding: 8px 0;
+  background: transparent;
+}
+
+/* Nuevo contenedor interno para limitar ancho y mantener sombra/estética */
+.navbar__inner {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
 /* Logo */
@@ -18,20 +29,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 248px;
+  width: auto;
   height: 100%;
+  padding-right: 8px;
 }
 
 .navbar__logo-img {
-  width: 248px;
-  height: 222px;
+  max-width: 140px;
+  width: auto;
+  height: auto;
   object-fit: contain;
 }
 
 /* Navigation Links */
 .navbar__links {
   display: flex;
-  gap: 40px;
+  gap: 20px;
   align-items: center;
   flex: 1;
   justify-content: center;
@@ -41,44 +54,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 240px;
-  height: 45px;
+  width: auto;
+  height: auto;
+  padding: 6px 12px;
   text-decoration: none;
   background-color: transparent;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .navbar__link-text {
   font-family: "Inter", sans-serif;
-  font-size: 30px;
-  font-weight: 400;
+  font-size: clamp(14px, 1.5vw, 18px);
+  font-weight: 500;
   color: #000000;
   white-space: nowrap;
-}
-
-.navbar__link:hover {
-  background-color: rgba(53, 200, 190, 0.1);
-  color: #35c8be;
-}
-
-.navbar__link:hover .navbar__link-text {
-  color: #35c8be;
 }
 
 /* Actions (Publish Button + User Icon) */
 .navbar__actions {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-right: 20px;
+  gap: 12px;
+  margin-left: 8px;
 }
 
 /* Publish Button */
 .navbar__publish-btn {
-  width: 220px;
-  height: 80px;
-  border-radius: 32px;
+  padding: 8px 14px;
+  border-radius: 20px;
   border: none;
   background: linear-gradient(
     to right,
@@ -89,70 +93,63 @@
   );
   color: #ffffff;
   font-family: "Bolt", sans-serif;
-  font-size: 44px;
+  font-size: clamp(14px, 1.8vw, 18px);
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: -7px 4px 4px rgba(0, 0, 0, 0.25);
-}
-
-.navbar__publish-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: -7px 6px 8px rgba(0, 0, 0, 0.3);
-}
-
-.navbar__publish-btn:active {
-  transform: translateY(0);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: -5px 3px 6px rgba(0, 0, 0, 0.12);
 }
 
 /* User Icon Button */
 .navbar__user-btn {
-  width: 80px;
-  height: 80px;
+  padding: 6px;
+  min-width: 40px;
+  min-height: 40px;
   border-radius: 50%;
   border: 2px solid #35c8be;
   background-color: #f0f0f0;
-  font-size: 40px;
+  font-size: clamp(14px, 1.8vw, 18px);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.navbar__user-btn:hover {
-  background-color: #35c8be;
-  color: #ffffff;
+  transition: all 0.2s ease;
 }
 
 /* Responsive */
-@media (max-width: 1920px) {
-  .navbar {
-    width: 100%;
-    padding: 10px 20px;
+@media (max-width: 1200px) {
+  .navbar__inner {
+    max-width: 1000px;
+    padding: 8px 12px;
+  }
+
+  .navbar__logo-img {
+    max-width: 120px;
   }
 
   .navbar__links {
-    gap: 20px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar__inner {
+    border-radius: 0;
+    padding: 8px 10px;
   }
 
-  .navbar__link {
-    width: auto;
+  .navbar__logo-img {
+    max-width: 100px;
+  }
+
+  .navbar__links {
+    gap: 8px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-left: 8px;
   }
 
   .navbar__publish-btn {
-    width: 180px;
-    height: 60px;
-    font-size: 32px;
-  }
-
-  .navbar__user-btn {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
+    display: none; /* ocultar si hace falta espacio en móviles */
   }
 }
-/*
-*{
-  border: 1px solid firebrick;
-}*/

@@ -4,15 +4,18 @@
   color: #ffffff;
   padding: 60px 20px 40px;
   margin-top: 80px;
+  box-sizing: border-box;
 }
 
 .footer__container {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: 80px;
-  max-width: 1920px;
+  gap: 32px;
+  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   margin-bottom: 60px;
+  padding: 0 20px;
 }
 
 /* Left Section */
@@ -25,31 +28,27 @@
 .footer__logo-section {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 .footer__logo {
-  width: 70.61px;
-  height: 50px;
+  max-width: 64px;
+  width: 100%;
+  height: auto;
   object-fit: contain;
 }
 
 .footer__title {
   font-family: "Inter", sans-serif;
-  font-size: 28px;
+  font-size: clamp(18px, 1.8vw, 22px);
   font-weight: 700;
   color: #ffffff;
   margin: 0;
 }
 
 .footer__description {
-  font-family: "Inter", sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #b0b8c1;
-  line-height: 1.6;
-  margin: 0;
-  max-width: 400px;
+  font-size: 14px;
+  max-width: none;
 }
 
 .footer__contact {
@@ -87,7 +86,7 @@
 .footer__center {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
+  gap: 16px;
 }
 
 .footer__section {
@@ -98,7 +97,7 @@
 
 .footer__section-title {
   font-family: "Inter", sans-serif;
-  font-size: 28px;
+  font-size: clamp(16px, 1.8vw, 20px);
   font-weight: 700;
   color: #ffffff;
   margin: 0;
@@ -114,16 +113,7 @@
 }
 
 .footer__link {
-  font-family: "Inter", sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #7c828c;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer__link:hover {
-  color: #35c8be;
+  font-size: 14px;
 }
 
 /* Countries Section */
@@ -133,9 +123,9 @@
   gap: 20px;
   align-items: center;
   margin-bottom: 40px;
-  padding: 40px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .footer__countries-label {
@@ -177,9 +167,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1920px;
+  max-width: 1200px;
+  width: 100%;
   margin: 0 auto 30px;
-  gap: 40px;
+  gap: 12px;
+  padding: 0 20px;
 }
 
 .footer__social {
@@ -262,44 +254,19 @@
 
 /* Responsive */
 @media (max-width: 1200px) {
-  .footer__container {
-    grid-template-columns: 1fr;
-    gap: 60px;
-  }
-
   .footer__center {
     grid-template-columns: repeat(2, 1fr);
-    gap: 40px;
-  }
-
-  .footer__bottom {
-    flex-direction: column;
+    gap: 20px;
   }
 }
 
 @media (max-width: 768px) {
   .footer {
-    padding: 40px 15px 30px;
-    margin-top: 60px;
-  }
-
-  .footer__center {
-    grid-template-columns: 1fr;
+    padding: 40px 12px 30px;
   }
 
   .footer__section-title {
-    font-size: 20px;
-  }
-
-  .footer__legal {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-
-  .footer__countries {
-    flex-direction: column;
-    align-items: center;
+    font-size: 18px;
   }
 
   .footer__country-btn {
