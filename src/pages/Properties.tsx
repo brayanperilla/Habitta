@@ -1,4 +1,5 @@
 import Navbar from "../components/navbar/Navbar";
+import Footer from "../components/footer/Footer";
 
 function Properties() {
     return (
@@ -6,9 +7,8 @@ function Properties() {
         <Navbar>
         </Navbar>
         
-        <div>
-            <h1>hola mundo</h1>
-        </div>
+        <Footer>
+        </Footer>
         </>
     )
 }

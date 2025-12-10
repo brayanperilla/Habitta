@@ -1,10 +1,13 @@
 import "./App.css";
-import ""
+import "./pages/Properties"
+import Properties from "./pages/Properties";
 
 function App() {
   return (
-    <>a
-    <
+    <>
+    <Properties>
+      
+    </Properties>
     
       
     </>
