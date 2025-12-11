@@ -35,7 +35,7 @@ export const footerSections = [
 export const countries = ["México", "Colombia", "Chile", "Perú", "Argentina"];
 
 export const socialMedia = [
-  { name: "facebook", url: "https://facebook.com", icon: "../../assets/icons/facebook.svg" },
+  { name: "facebook", url: "https://facebook.com"},
   { name: "instagram", url: "https://instagram.com" },
   { name: "youtube", url: "https://youtube.com" },
 ];
