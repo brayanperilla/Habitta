@@ -7,6 +7,9 @@ function Properties() {
         <Navbar>
         </Navbar>
         
+        <h1>Propiedades</h1>
+        <p>Encuentra tu hogar ideal entre miles de opciones verificadas</p>
+
         <Footer>
         </Footer>
         </>

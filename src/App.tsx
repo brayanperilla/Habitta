@@ -1,12 +1,12 @@
 import "./App.css";
-import RegisterPropeties from "./pages/registerpropeties/RegisterPropeties";
+import Properties from "./pages/properties/Properties";
 
 function App() {
   return (
     <>
-    <RegisterPropeties>
+    <Properties>
       
-    </RegisterPropeties>
+    </Properties>
     </>
   );
 }
