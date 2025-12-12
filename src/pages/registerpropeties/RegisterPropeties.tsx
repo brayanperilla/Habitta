@@ -1,10 +1,8 @@
-import Navbar from "../../components/navbar/Navbar";
 import Footer from "../../components/footer/Footer";
 
 function RegisterPropeties() {
   return (
     <>
-      <Navbar></Navbar>
       
       {/* formulario de registro de propiedades */}
       <h1>Publicar Propriedades</h1>

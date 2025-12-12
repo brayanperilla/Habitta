@@ -50,18 +50,6 @@
   justify-content: center;
 }
 
-.navbar__link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  height: auto;
-  padding: 6px 12px;
-  text-decoration: none;
-  background-color: transparent;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
 
 .navbar__link-text {
   font-family: "Inter", sans-serif;

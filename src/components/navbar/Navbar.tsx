@@ -1,6 +1,6 @@
-import './navbar.css';
-import { navbarLinks } from './navbarLinks';
-import logoSF from '../../assets/images/logoSF.png'
+import "./navbar.css";
+import logoSF from "../../assets/images/logoSF.png";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
@@ -10,21 +10,29 @@ function Navbar() {
         <div className="navbar__logo">
           <img src={logoSF} alt="Habitta logo" className="navbar__logo-img" />
         </div>
-
         {/* Navigation Links */}
-        <div className="navbar__links">
-          {navbarLinks.map((link) => (
-            <a key={link.label} href={link.href} className="navbar__link">
-              <span className="navbar__link-text">{link.label}</span>
-            </a>
-          ))}
-        </div>
+        <nav className="navbar__links">
+          <ul>
+            <li>
+              <Link to="/">Inicio</Link>
+            </li>
+            <li>
+              <Link to="/properties">Propiedades</Link>
+            </li>
+            <li>
+              <Link to="/favorites">Favoritos</Link>
+            </li>
+            <li>
+              <Link to="/tools">Herramientas</Link>
+            </li>
+          </ul>
+        </nav>
 
         {/* Publish and User Icons */}
         <div className="navbar__actions">
-          <button className="navbar__publish-btn">
-            <span>+ Publicar</span>
-          </button>
+          <Link to="/registerpropeties" className="navbar__publish-btn">
+            +Publicar
+          </Link>
           <button className="navbar__user-btn">
             <span>👤</span>
           </button>
