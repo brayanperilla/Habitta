@@ -1,0 +1,188 @@
+/* Global reset and base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+/* HERO */
+.heroSection {
+  width: 100%;
+  padding: 100px 100px 100px;
+  background: linear-gradient(135deg, #35d2db 0%, #35c8be 50%, #33bb9d);
+  color: #ffffff;
+  text-align: center;
+  
+}
+.heroSection h1 {
+  font-size: clamp(28px, 4.6vw, 48px);
+  font-weight: 800;
+  margin-bottom: 12px;
+  line-height: 1.05;
+}
+.heroSection h3 {
+  font-size: clamp(14px, 1.6vw, 20px);
+  font-weight: 600;
+  opacity: 0.95;
+  margin-bottom: 28px;
+}
+
+/* Filter box */
+.filterProperties {
+  max-width: 920px;
+  margin: 0 auto 28px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 18px;
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+}
+.filterProperties button {
+  background: #ffffff;
+  color: #0b0b0b;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.filterProperties input[type="text"] {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: none;
+}
+
+/* Stats row under hero */
+.stats {
+  width: 100%;
+  max-width: 1100px;
+  margin: 22px auto 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  color: #ffffff;
+}
+.stats > div {
+  text-align: center;
+}
+.stats > div:first-child {
+  font-weight: 800;
+  font-size: 20px;
+}
+.stats > div p {
+  opacity: 0.9;
+}
+
+/* Prominent section headings */
+.prominentSection {
+  max-width: 1100px;
+  margin: 48px auto 18px;
+  text-align: center;
+}
+.prominentSection h4 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.prominentSection h5 {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Cards container */
+.cardsProperties {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 12px 28px;
+}
+
+/* Link/button to view all */
+.publishBtn {
+  display: inline-block;
+  margin: 12px auto;
+  background: linear-gradient(90deg, #35d2db, #33bb9d);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* Why section cards (stats block) */
+.whyGrid {
+  max-width: 1100px;
+  margin: 28px auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  padding: 12px;
+}
+.whyGrid div {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+}
+
+/* Certifications */
+section.certifications {
+  max-width: 1100px;
+  margin: 18px auto;
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  color: #6b7280;
+}
+
+/* Final CTA hero */
+.heroSection--cta {
+  width: 100%;
+  padding: 56px 20px;
+  background: linear-gradient(135deg, #22bfae 0%, #2aa794 50%);
+  color: #fff;
+  text-align: center;
+}
+.heroSection--cta h1 {
+  font-size: clamp(24px, 4.6vw, 40px);
+  margin-bottom: 12px;
+}
+.heroSection--cta h3 {
+  opacity: 0.95;
+}
+.heroSection--cta button {
+  margin: 10px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .stats {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .whyGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .heroSection h1 {
+    font-size: 26px;
+  }
+  .filterProperties {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .whyGrid {
+    grid-template-columns: 1fr;
+  }
+}
