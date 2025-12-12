@@ -1,4 +1,3 @@
-import Footer from "../../components/footer/Footer";
 
 function RegisterPropeties() {
   return (
@@ -201,7 +200,6 @@ function RegisterPropeties() {
         <button>Publicar Propiedad</button>
       </div>
       {/* FALTAN DESCARGAR Y PONER LOS ICONOS CORRESPONDIENTES */}
-      <Footer></Footer>
     </>
   );
 }

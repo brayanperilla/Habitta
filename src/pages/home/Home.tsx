@@ -1,6 +1,6 @@
-import Footer from "../../components/footer/Footer";
 import CardPropetie from "../../components/cardPropetie/Card_propietie";
-import "./home.css"
+import "./home.css";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
@@ -42,14 +42,24 @@ function Home() {
       </section>
       <div className="prominentSection">
         <h4>Propiedades destacadas</h4>
-        <h5>Descubre las mejores oportunidades inmobiliarias seleccionadas especialmente para ti</h5>
+        <h5>
+          Descubre las mejores oportunidades inmobiliarias seleccionadas
+          especialmente para ti
+        </h5>
       </div>
       <section className="clardsPropieties">
         <CardPropetie></CardPropetie>
-        
       </section>
-
-      <Footer></Footer>
+      <Link to="/properties" className="navbar__publish-btn">
+        Ver todas las propiedades
+      </Link>
+      <div className="prominentSection">
+        <h4>¿Por qué elegir Habitta?</h4>
+        <h5>
+          La plataforma inmobiliaria más confiable de Latinoamérica, respaldada
+          por tecnología y experiencia
+        </h5>
+      </div>
     </>
   );
 }
