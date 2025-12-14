@@ -14,7 +14,7 @@
   background: linear-gradient(135deg, #35d2db 0%, #35c8be 50%, #33bb9d);
   color: #ffffff;
   text-align: center;
-  
+  height: 100%;
 }
 .heroSection h1 {
   font-size: clamp(28px, 4.6vw, 48px);
