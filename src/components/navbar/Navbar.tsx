@@ -14,7 +14,7 @@ function Navbar() {
         <nav className="navbar__links">
           <ul>
             <li>
-              <Link to="/" className="navbar__link">Inicio</Link>
+              <Link to="/" className="navbar__link" id="initButton">Inicio</Link>
             </li>
             <li>
               <Link to="/properties" className="navbar__link">Propiedades</Link>
