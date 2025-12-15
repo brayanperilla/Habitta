@@ -1,5 +1,6 @@
 import Navbar from "../../components/navbar/Navbar";
 import Footer from "../../components/footer/Footer";
+import './styleRegisterP.css';
 
 function RegisterPropeties() {
   return (
@@ -209,7 +210,7 @@ function RegisterPropeties() {
       <div>
         <h4>Fotos de la Propiedad</h4>
         <p>Sube hasta 15 imagenes de la propiedad</p>
-        <input type="file"
+        <input type="file" placeholder="Elegir archivos"
          multiple accept="image/*" 
          />
       </div>
