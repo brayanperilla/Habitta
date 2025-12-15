@@ -19,13 +19,18 @@ function Home() {
             <option value="" disabled>
               Selecciona
             </option>
-            <option value="null">tipo de propiedad</option>
             <option value="apartment">Apartamento</option>
             <option value="house">Casa</option>
             <option value="lot">Lote</option>
           </select>
           <input type="text" placeholder="Ciudad, zona o código" />
           <button>Buscar</button>
+          <br />
+          <label htmlFor="" id="labelBusquedasP">
+            Búsquedas populares:
+          </label>
+          <button>Aaprtamentos en Bogotá</button>
+          <button>Casas en Medellín</button>
         </div>
         <div></div>
         {/* informacion de stats */}
@@ -89,8 +94,8 @@ function Home() {
           Nuestro equipo está disponible las 24 horas para resolver tus dudas
         </div>
       </section>
-      <div>Certificaciones y reconocimientos</div>
-      <section>
+      <div className="certification">Certificaciones y reconocimientos</div>
+      <section id="certifications">
         <div>ISO 27001</div>
         <div>SSL Secured</div>
         <div>GDPR Compliant</div>
@@ -105,16 +110,16 @@ function Home() {
         <Link to="/properties" className="">
           <button>Crear cuenta gratis</button>
           <button>Ver propiedades</button>
-        </Link>stats
+        </Link>
         <div className="stats">
-        <div>
-          Versión web <br />
-          Accede desde cualquier navegador
-        </div>
-        <div>
-          App móvil <br />
-          Próximamente en App Store y Google Play
-        </div>
+          <div>
+            Versión web <br />
+            Accede desde cualquier navegador
+          </div>
+          <div>
+            App móvil <br />
+            Próximamente en App Store y Google Play
+          </div>
         </div>
       </section>
     </>
