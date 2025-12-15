@@ -6,8 +6,10 @@ import './styleProperties.css';
 function Properties() {
     return (
         <>
+        <Navbar>
+        </Navbar> 
         <h1>Propiedades</h1>
-        <p>Encuentra tu hogar ideal entre miles de opciones verificadas</p>
+        <p id="descripcionPropiedades">Encuentra tu hogar ideal entre miles de opciones verificadas</p>
          <div className="properties-page">
             <section className="search-bar">
                 <div className="search-input">
@@ -140,11 +142,21 @@ function Properties() {
                     {/* Las tarjetas de propiedades irán aquí */}
                      <CardPropetie>
                           </CardPropetie>
+                          <br />
+                          <div className="button-page">
+                            <button className="page-btn">« Anterior</button>
+                            <button className="page-btn">1</button>
+                            <button className="page-btn">2</button>
+                            <button className="page-btn">3</button>
+                            <button className="page-btn">Siguiente »</button>
+                          </div>
                           
 
                 </main>
             </div>
         </div>
+        <Footer>
+        </Footer>
 
         </>
     )
