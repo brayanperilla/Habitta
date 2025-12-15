@@ -5,6 +5,7 @@ import Home from "./pages/home/Home";
 import Properties from "./pages/properties/Properties";
 import RegisterPropeties from "./pages/registerpropeties/RegisterPropeties";
 import "./pages/registerpropeties/StyleRegisterP.css";
+import Promotion from "./pages/Promotion/Promotion";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="properties" element={<Properties />} />
           <Route path="registerpropeties" element={<RegisterPropeties />} />
+          <Route path="Promotion" element={<Promotion />} />
         </Route>
       </Routes>
     </>

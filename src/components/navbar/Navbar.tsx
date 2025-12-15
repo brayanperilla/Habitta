@@ -25,6 +25,9 @@ function Navbar() {
             <li>
               <Link to="/tools" className="navbar__link">Herramientas</Link>
             </li>
+            <li>
+              <Link to="/promotion" className="navbar__link">Promociones</Link>
+            </li>
           </ul>
         </nav>
 

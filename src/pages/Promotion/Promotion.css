@@ -1,0 +1,90 @@
+.promotion-container {
+  text-align: center;
+  padding: 2rem;
+  font-family: sans-serif;
+}
+
+.promotion-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.promotion-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.promotion-cards {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.promotion-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  width: 300px;
+  text-align: left;
+}
+
+.promotion-card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
+}
+
+.price {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.feature-list {
+  list-style: none; /* elimina los puntos */
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.check {
+  font-weight: bold;
+  color: #87CEEB; /* azul cielo para todos los chulos */
+}
+
+/* Si quieres, puedes borrar estas dos reglas o dejarlas,
+   pero ya no harán diferencia porque .check tiene el color */
+.check.basic {
+  color: #87CEEB;
+}
+
+.check.featured {
+  color: #87CEEB;
+}
+
+/* Botones */
+.select-button {
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.select-button.orange {
+  background-color: #f57c00;
+  color: white;
+}
+
+.select-button.teal {
+  background-color: #009688;
+  color: white;
+}
