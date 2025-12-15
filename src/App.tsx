@@ -14,6 +14,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="properties" element={<Properties />} />
           <Route path="registerpropeties" element={<RegisterPropeties />} />
+          <Route path="Promotion" element={<Promotion />} />
         </Route>
       </Routes>    </>
   );

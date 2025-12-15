@@ -1,3 +1,4 @@
+import "./properties.css";
 
 function Properties() {
     return (
