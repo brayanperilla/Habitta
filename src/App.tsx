@@ -4,7 +4,7 @@ import Layout from "./components/layout/Layout";
 import Home from "./pages/home/Home";
 import Properties from "./pages/properties/Properties";
 import RegisterPropeties from "./pages/registerpropeties/RegisterPropeties";
-import Promotion from "./pages/promotion/Promotion";
+import Promotion from "./pages/promotion_tmp/Promotion";
 function App() {
   return (
     <>
