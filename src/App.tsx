@@ -5,7 +5,7 @@ import Home from "./pages/home/Home";
 import Properties from "./pages/properties/Properties";
 import RegisterPropeties from "./pages/registerpropeties/RegisterPropeties";
 import "./pages/registerpropeties/styleRegisterP.css";
-import Promotion from "./pages/Promotion/Promotion";
+import Promotion from "./pages/promotion/Promotion";
 
 function App() {
   return (
