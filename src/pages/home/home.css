@@ -161,7 +161,7 @@ body {
 }
 
 #location {
-  border-radius: var(--radius-xl.2);
+  border-radius: var(--radius-xl);
   border: solid #e5e7eb;
   padding: 12px;
 }
