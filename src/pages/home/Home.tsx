@@ -1,56 +1,18 @@
-import { useState, useEffect } from "react";
 import CardPropetie from "../../components/cardPropetie/Card_propietie";
 import "./home.css";
 import { Link } from "react-router-dom";
 import starIcon from "../../assets/icons/star-alt-4-svgrepo-com.svg";
-import homeIcon from "../../assets/icons/house-01-svgrepo-com.svg";
+import homeIcon from "../../assets/icons/home-1393-svgrepo-com.svg";
 import searchIcon from "../../assets/icons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg";
 
-// Imágenes de fondo para el slideshow (las mismas del Auth)
-import img1 from "../../assets/images/auth/dream_home_1.png";
-import img2 from "../../assets/images/auth/dream_home_2.png";
-import img3 from "../../assets/images/auth/dream_home_3.png";
-
-const backgroundImages = [
-  img1,
-  img2,
-  img3,
-  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80",
-];
-
 function Home() {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentImageIndex(
-        (prevIndex) => (prevIndex + 1) % backgroundImages.length,
-      );
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <>
       <main className="home-container">
         {/* HERO SECTION */}
         <section className="hero-section">
-          {/* Background Slideshow */}
-          <div className="hero-slideshow">
-            {backgroundImages.map((image, index) => (
-              <div
-                key={index}
-                className={`hero-slide ${index === currentImageIndex ? "active" : ""}`}
-                style={{ backgroundImage: `url(${image})` }}
-              />
-            ))}
-            <div className="hero-overlay"></div>
-          </div>
-
           <div className="hero-content">
-            <h1>Encuentra tu <span className="text-primary">hogar ideal</span> en Latinoamérica</h1>
+            <h1>Encuentra tu hogar ideal en Latinoamérica</h1>
             <h3>
               Miles de propiedades esperándote. Compra, vende o alquila con la
               confianza que mereces.
@@ -238,18 +200,6 @@ function Home() {
 
         {/* CTA SECTION */}
         <section className="cta-section">
-          {/* Background Slideshow */}
-          <div className="cta-slideshow">
-            {backgroundImages.map((image, index) => (
-              <div
-                key={`cta-${index}`}
-                className={`cta-slide ${index === currentImageIndex ? "active" : ""}`}
-                style={{ backgroundImage: `url(${image})` }}
-              />
-            ))}
-            <div className="cta-overlay"></div>
-          </div>
-
           <div className="cta-content">
             <h1>¿Listo para encontrar tu próximo hogar?</h1>
             <h3>

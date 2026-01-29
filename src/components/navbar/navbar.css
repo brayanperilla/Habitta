@@ -97,39 +97,18 @@
   cursor: pointer;
 }
 
-/* Estilo para enlace activo */
-.navbar_link.active {
-  border-radius: 15px;
-  background: #35d2db;
-  color: #ffffff;
-}
-
-.navbar_link.active .navbar_icon {
-  filter: brightness(0) invert(1);
-}
-
 /*notification button*/
 #notificationButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  border-radius: 12px;
+  border-radius: 50%;
   cursor: pointer;
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
-}
+    box-shadow 0.2s ease;
 
-#notificationButton:hover {
-  background-color: #f08248;
-  transform: scale(1.05);
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-#notificationButton:hover #notificationIcon {
-  filter: brightness(0) invert(1);
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* Actions (Publish Button + User Icon) */

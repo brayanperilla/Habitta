@@ -1,10 +1,8 @@
 import "./navbar.css";
 import logoSF from "../../assets/images/logoSF.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Navbar() {
-  const location = useLocation();
-
   return (
     <nav className="navbar">
       <div className="navbar__inner">
@@ -19,23 +17,17 @@ function Navbar() {
         <nav className="navbar__links">
           <ul>
             <li>
-              <Link
-                className={`navbar_link ${location.pathname === "/" ? "active" : ""}`}
-                to="/"
-              >
+              <Link className="navbar_link" to="/">
                 <img
                   className="navbar_icon"
-                  src="/src/assets/icons/house-01-svgrepo-com.svg"
+                  src="/src/assets/icons/home-1393-svgrepo-com.svg"
                   alt=""
                 />
                 Inicio
               </Link>
             </li>
             <li>
-              <Link
-                className={`navbar_link ${location.pathname === "/properties" ? "active" : ""}`}
-                to="/properties"
-              >
+              <Link className="navbar_link" to="/properties">
                 <img
                   className="navbar_icon"
                   src="/src/assets/icons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg"
@@ -45,10 +37,7 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <Link
-                className={`navbar_link ${location.pathname === "/favorites" ? "active" : ""}`}
-                to="/favorites"
-              >
+              <Link className="navbar_link" to="/favorites">
                 <img
                   className="navbar_icon"
                   src="/src/assets/icons/hearth-svgrepo-com.svg"
@@ -58,10 +47,7 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <Link
-                className={`navbar_link ${location.pathname === "/tools" ? "active" : ""}`}
-                to="/tools"
-              >
+              <Link className="navbar_link" to="/tools">
                 <img
                   className="navbar_icon"
                   src="/src/assets/icons/calculator-svgrepo-com.svg"
@@ -71,10 +57,7 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <Link
-                className={`navbar_link ${location.pathname === "/promotion" ? "active" : ""}`}
-                to="/promotion"
-              >
+              <Link className="navbar_link" to="/promotion">
                 <img
                   className="navbar_icon"
                   src="/src/assets/icons/star-alt-4-svgrepo-com.svg"
@@ -87,13 +70,13 @@ function Navbar() {
         </nav>
 
         {/* Notification Icon */}
-        <div id="notificationButton">
+        <li id="notificationButton">
           <img
             id="notificationIcon"
             src="/src/assets/icons/notification-9-svgrepo-com.svg"
-            alt="Notificaciones"
+            alt=""
           />
-        </div>
+        </li>
 
         {/* Publish and User Icons */}
         <div className="navbar__actions">
