@@ -6,7 +6,7 @@ export const propertyService = {
     return await propertyApi.getAll();
   },
   createProperty: async (property: Omit<Property, "id">): Promise<Property> => {
-    // Here we could add business logic validation
+    // Aquí agregamos validación de lógica de negocios.
     return await propertyApi.create(property);
   },
 };
