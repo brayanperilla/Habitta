@@ -1,9 +1,9 @@
 import "./cardStyle.css";
-import heartIcon from "../../assets/icons/UI/navbaricons/hearth-svgrepo-com.svg";
-import homeIcon from "../../assets/icons/UI/navbaricons/house-01-svgrepo-com.svg";
-import house1 from "../../assets/images/auth/dream_home_1.png";
-import house2 from "../../assets/images/auth/dream_home_2.png";
-import house3 from "../../assets/images/auth/dream_home_3.png";
+const heartIcon = "/icons/UI/navbaricons/hearth-svgrepo-com.svg";
+const homeIcon = "/icons/UI/navbaricons/house-01-svgrepo-com.svg";
+const house1 = "/images/auth/dream_home_1.png";
+const house2 = "/images/auth/dream_home_2.png";
+const house3 = "/images/auth/dream_home_3.png";
 
 function CardPropetie() {
   return (

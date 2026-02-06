@@ -2,16 +2,15 @@ import { useState, useEffect } from "react";
 import CardPropetie from "../../components/cardPropetie/Card_propietie";
 import "./home.css";
 import { Link } from "react-router-dom";
-import shieldIcon from "../../assets/icons/UI/shield-alt-1-svgrepo-com.svg";
-import medallIcon from "../../assets/icons/UI/medal-ribbon-svgrepo-com.svg";
-import peopleIcon from "../../assets/icons/UI/peoples-svgrepo-com.svg";
-import timerIcon from "../../assets/icons/UI/timer-svgrepo-com.svg";
-import searchIcon from "../../assets/icons/UI/navbaricons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg";
-import img1 from "../../assets/images/auth/dream_home_1.png";
-import img2 from "../../assets/images/auth/dream_home_2.png";
-import img3 from "../../assets/images/auth/dream_home_3.png";
-
-
+const shieldIcon = "/icons/UI/shield-alt-1-svgrepo-com.svg";
+const medallIcon = "/icons/UI/medal-ribbon-svgrepo-com.svg";
+const peopleIcon = "/icons/UI/peoples-svgrepo-com.svg";
+const timerIcon = "/icons/UI/timer-svgrepo-com.svg";
+const searchIcon =
+  "/icons/UI/navbaricons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg";
+const img1 = "/images/auth/dream_home_1.png";
+const img2 = "/images/auth/dream_home_2.png";
+const img3 = "/images/auth/dream_home_3.png";
 
 // Imágenes de fondo para el carrusel
 const backgroundImages = [
@@ -275,7 +274,6 @@ function Home() {
             ))}
             <div className="cta-overlay"></div>
           </div>
-
           <div className="cta-content">
             <h1>¿Listo para encontrar tu próximo hogar?</h1>
             <h3>

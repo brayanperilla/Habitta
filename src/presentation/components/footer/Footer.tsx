@@ -5,7 +5,8 @@ import {
   socialMedia,
   contactInfo,
 } from "./footerData";
-import logoHabitta from "../../assets/images/logoCF.png";
+// import logoHabitta from "../../assets/images/logoCF.png";
+const logoHabitta = "/images/logoCF.png";
 
 // Footer Component
 function Footer() {

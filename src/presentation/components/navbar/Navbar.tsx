@@ -1,7 +1,9 @@
 import "./navbar.css";
-import logoSF from "../../assets/images/logoSF.png";
+// import logoSF from "../../assets/images/logoSF.png";
+const logoSF = "/images/logoSF.png";
 import { Link, useLocation } from "react-router-dom";
-import notificationIcon from "/public/notification-9-svgrepo-com.svg";
+// import notificationIcon from "/public/notification-9-svgrepo-com.svg";
+const notificationIcon = "/notification-9-svgrepo-com.svg";
 
 // Navbar Component
 function Navbar() {
@@ -33,7 +35,7 @@ function Navbar() {
               >
                 <img
                   className="navbar_icon"
-                  src="/src/presentation/assets/icons/UI/navbaricons/house-01-svgrepo-com.svg"
+                  src="/icons/UI/navbaricons/house-01-svgrepo-com.svg"
                   alt="Icono de inicio"
                 />
                 Inicio
@@ -48,7 +50,7 @@ function Navbar() {
               >
                 <img
                   className="navbar_icon"
-                  src="/src/presentation/assets/icons/UI/navbaricons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg"
+                  src="/icons/UI/navbaricons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg"
                   alt="Icono de buscar propiedades"
                 />
                 Propiedades
@@ -63,7 +65,7 @@ function Navbar() {
               >
                 <img
                   className="navbar_icon"
-                  src="/src/presentation/assets/icons/UI/navbaricons/hearth-svgrepo-com.svg"
+                  src="/icons/UI/navbaricons/hearth-svgrepo-com.svg"
                   alt="Icono de favoritos"
                 />
                 Favoritos
@@ -78,7 +80,7 @@ function Navbar() {
               >
                 <img
                   className="navbar_icon"
-                  src="/src/presentation/assets/icons/UI/navbaricons/calculator-svgrepo-com.svg"
+                  src="/icons/UI/navbaricons/calculator-svgrepo-com.svg"
                   alt="Icono de herramientas"
                 />
                 Herramientas
@@ -93,7 +95,7 @@ function Navbar() {
               >
                 <img
                   className="navbar_icon"
-                  src="/src/presentation/assets/icons/UI/navbaricons/star-alt-4-svgrepo-com.svg"
+                  src="/icons/UI/navbaricons/star-alt-4-svgrepo-com.svg"
                   alt="Icono de promociones"
                 />
                 Promociones
