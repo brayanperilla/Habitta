@@ -6,6 +6,7 @@ import PropertiesPage from "@presentation/pages/properties/PropertiesPage";
 import RegisterPropertyPage from "@presentation/pages/registerpropeties/RegisterPropertyPage";
 import Promotion from "@presentation/pages/promotion/Promotion";
 import Auth from "@presentation/pages/auth/Auth";
+import "./presentation/pages/registerpropeties/styleRegisterP.css";
 
 // Componente Principal de la Aplicación
 function App() {
