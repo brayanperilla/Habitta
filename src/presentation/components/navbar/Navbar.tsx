@@ -105,13 +105,18 @@ function Navbar() {
         </nav>
 
         {/* Notifications */}
-        <div id="notificationButton">
+        
+        
+        <Link to="/ModalN" >
+             <div id="notificationButton">
           <img
             id="notificationIcon"
             src={notificationIcon}
             alt="Notificaciones"
           />
         </div>
+            </Link>
+        
 
         {/* Actions */}
         <div className="navbar__actions">

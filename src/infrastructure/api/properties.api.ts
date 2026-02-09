@@ -17,3 +17,4 @@ export const propertyApi = {
     return { ...property, id: Math.random().toString() };
   },
 };
+
