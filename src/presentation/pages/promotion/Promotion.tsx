@@ -1,13 +1,18 @@
 import "../promotion/promotion.css";
 import { useState } from "react";
 import PublicationBasic from "./modals/publicationBasic/PublicationBasic";
+import PublicationOutstanding from "./modals/publicationOutstanding/PublicationOutstanding";
 
 // Componente de Promoción
 function Promotion() {
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
+  const [isOutstandingModalOpen, setIsOutstandingModalOpen] = useState(false);
 
   const openBasicModal = () => setIsBasicModalOpen(true);
   const closeBasicModal = () => setIsBasicModalOpen(false);
+  
+  const openOutstandingModal = () => setIsOutstandingModalOpen(true);
+  const closeOutstandingModal = () => setIsOutstandingModalOpen(false);
 
   return (
     <div className="promotion-container">
@@ -58,11 +63,12 @@ function Promotion() {
               <span className="check featured">✔</span> Etiqueta de destacado
             </li>
           </ul>
-          <button className="select-button teal">Seleccionar Plan</button>
+          <button className="select-button teal" onClick={openOutstandingModal}>Seleccionar Plan</button>
         </div>
       </div>
 
       <PublicationBasic isOpen={isBasicModalOpen} onClose={closeBasicModal} />
+      <PublicationOutstanding isOpen={isOutstandingModalOpen} onClose={closeOutstandingModal} />
     </div>
   );
 }
