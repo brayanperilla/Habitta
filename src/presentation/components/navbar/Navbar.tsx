@@ -6,7 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 const notificationIcon = "/notification-9-svgrepo-com.svg";
 
 // Navbar Component
-function Navbar() {
+function Navbar({ onToggleNotifications }: { onToggleNotifications?: () => void }) {
   const location = useLocation();
 
   // Renderizamos la estructura visual de la barra de navegación.
@@ -107,15 +107,18 @@ function Navbar() {
         {/* Notifications */}
         
         
-        <Link to="/ModalN" >
-             <div id="notificationButton">
+        <div
+          id="notificationButton"
+          role="button"
+          onClick={() => onToggleNotifications?.()}
+          style={{ cursor: "pointer" }}
+        >
           <img
             id="notificationIcon"
             src={notificationIcon}
             alt="Notificaciones"
           />
         </div>
-            </Link>
         
 
         {/* Actions */}

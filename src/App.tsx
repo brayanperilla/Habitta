@@ -7,8 +7,7 @@ import RegisterPropertyPage from "@presentation/pages/registerpropeties/Register
 import Promotion from "@presentation/pages/promotion/Promotion";
 import ToolsPage from "@presentation/pages/tools/ToolsPage";
 import Auth from "@presentation/pages/auth/Auth";
-import ModalN from "@presentation/pages/notification/Modal/ModalN"; 
-import Notification from "@presentation/pages/notification/Notification";
+import Notification from "@presentation/pages/notification/NotificationPage/Notification";
 
 // Componente Principal de la Aplicación
 function App() {
@@ -33,8 +32,6 @@ function App() {
 
           {/* Autenticación */}
           <Route path="auth" element={<Auth />} />
-
-          <Route path="ModalN" element={<ModalN />} />
 
           <Route path="Notification" element={<Notification />} />
         </Route>

@@ -1,0 +1,133 @@
+/* Basic modal styles */
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.4);
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+  padding-top: 100px;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  width: 380px;
+  max-width: calc(100% - 32px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 2px solid #e0e0e0;
+  background: #fafafa;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+  font-family: "Bolt", sans-serif;
+}
+
+.modal-body {
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Notification Cards */
+.notification-card {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e8e8e8;
+  border-left: 4px solid #ddd;
+}
+
+.notification-card:last-child {
+  border-bottom: none;
+}
+
+.notification-card--property {
+  background: #d4f1f7;
+  border-left-color: #35d2db;
+}
+
+.notification-card--message {
+  background: #d9f2e8;
+  border-left-color: #35c8be;
+}
+
+.notification-title {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  font-family: "Bolt", sans-serif;
+}
+
+.notification-description {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.notification-time {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+}
+
+.modal-footer {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #e8e8e8;
+}
+
+.modal-view-all-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #f08248 0%, #e87140 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Bolt", sans-serif;
+  width: 100%;
+}
+
+.modal-view-all-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(240, 130, 72, 0.3);
+}
+
+/* Scrollbar estilos */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
