@@ -4,9 +4,10 @@ import "./publicationBasic.css";
 interface PublicationBasicProps {
   isOpen: boolean;
   onClose: () => void;
+  onPublish?: () => void;
 }
 
-const PublicationBasic: FC<PublicationBasicProps> = ({ isOpen, onClose }) => {
+const PublicationBasic: FC<PublicationBasicProps> = ({ isOpen, onClose, onPublish }) => {
   if (!isOpen) return null;
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -55,7 +56,9 @@ const PublicationBasic: FC<PublicationBasicProps> = ({ isOpen, onClose }) => {
             <button className="btn-cancel" onClick={onClose}>
               Cancelar
             </button>
-            <button className="btn-publish">Publicar</button>
+            <button className="btn-publish" onClick={onPublish}>
+              Publicar
+            </button>
           </div>
         </div>
       </div>

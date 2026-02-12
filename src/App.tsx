@@ -5,6 +5,7 @@ import Home from "@presentation/pages/home/Home";
 import PropertiesPage from "@presentation/pages/properties/PropertiesPage";
 import RegisterPropertyPage from "@presentation/pages/registerpropeties/RegisterPropertyPage";
 import Promotion from "@presentation/pages/promotion/Promotion";
+import ToolsPage from "@presentation/pages/tools/ToolsPage";
 import Auth from "@presentation/pages/auth/Auth";
 import ModalN from "@presentation/pages/notification/Modal/ModalN"; 
 import Notification from "@presentation/pages/notification/Notification";
@@ -27,6 +28,9 @@ function App() {
 
           {/* Promociones */}
           <Route path="promotion" element={<Promotion />} />
+
+          {/* Herramientas */}
+          <Route path="tools" element={<ToolsPage />} />
 
           {/* Autenticación */}
           <Route path="auth" element={<Auth />} />

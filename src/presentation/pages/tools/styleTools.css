@@ -1,0 +1,387 @@
+.tools-page {
+  padding: 30px 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  min-height: calc(100vh - 260px);
+}
+
+.tools-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.tools-subtitle {
+  font-size: 1rem;
+  color: #666;
+  text-align: center;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.financial-calculator {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* ========== Sección de calculadora ========== */
+.calculator-section {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.calculator-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.calculator-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+.calculator-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.calculator-subtitle {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0 0 25px 0;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #00bfa5;
+  box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.1);
+}
+
+.btn-calculate {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #00bfa5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: auto; /* push the button to the bottom so both cards align */
+}
+
+.btn-calculate:hover {
+  background-color: #00a892;
+}
+
+.btn-calculate:active {
+  transform: scale(0.98);
+}
+
+/* ========== SECCION DE RESULTADOS ========== */
+.results-section {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.results-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.results-icon {
+  font-size: 1.5rem;
+  color: #00bfa5;
+}
+
+.results-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.results-subtitle {
+  color: #999;
+  font-size: 0.88rem;
+  margin: 0 0 8px 0;
+  font-weight: 400;
+}
+
+.result-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00bfa5;
+  margin: 0 0 8px 0;
+}
+
+.result-percentage {
+  color: #999;
+  font-size: 0.9rem;
+  margin: 0 0 25px 0;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 25px 0;
+}
+
+.result-label {
+  color: #555;
+  font-size: 0.9rem;
+  margin: 0 0 8px 0;
+  font-weight: 400;
+}
+
+.result-credit-range {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.result-note {
+  color: #999;
+  font-size: 0.85rem;
+  margin: 0 0 28px 0;
+}
+
+.btn-view-properties {
+  width: 100%;
+  padding: 14px 18px;
+  background-color: #ff9f43;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: auto; /* align with calculator button */
+}
+
+.btn-view-properties:hover {
+  background-color: #ff8c3a;
+}
+
+.btn-view-properties:active {
+  transform: scale(0.98);
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 968px) {
+  .financial-calculator {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .tools-title {
+    font-size: 2rem;
+  }
+
+  .tools-subtitle {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tools-page {
+    padding: 20px 15px;
+  }
+
+  .tools-title {
+    font-size: 1.6rem;
+  }
+
+  .tools-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .calculator-section,
+  .results-section {
+    padding: 20px;
+  }
+
+  .calculator-header h2,
+  .results-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .result-amount {
+    font-size: 1.8rem;
+  }
+
+  .result-credit-range {
+    font-size: 1.2rem;
+  }
+}
+
+/* ========== SECCIÓN DE TARJETAS DE CONSEJO ========== */
+.tips-card {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 14px;
+  padding: 22px;
+  margin-top: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tips-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.tips-icon {
+  font-size: 1.5rem;
+}
+
+.tips-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.tips-subtitle {
+  color: #999;
+  font-size: 0.9rem;
+  margin: 8px 0 25px 0;
+  font-weight: 400;
+}
+
+/* Lista de consejos */
+.tips-list {
+  margin-bottom: 30px;
+}
+
+.tip-item {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tip-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.tip-bar {
+  width: 4px;
+  background-color: #00bfa5;
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tip-content {
+  flex: 1;
+}
+
+.tip-title {
+  margin: 0 0 6px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.tip-description {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Recursos Externos */
+.external-resources {
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.resources-title {
+  margin: 0 0 15px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resource-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #00bfa5;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.resource-link:hover {
+  color: #008080;
+  text-decoration: underline;
+}
+
+.resource-icon {
+  font-size: 0.8rem;
+}
