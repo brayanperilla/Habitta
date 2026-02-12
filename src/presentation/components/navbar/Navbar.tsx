@@ -8,7 +8,7 @@ const notificationIcon = "/notification-9-svgrepo-com.svg";
 import UserModal from "../userModal/UserModal";
 
 // Navbar Component
-function Navbar() {
+function Navbar({ onToggleNotifications }: { onToggleNotifications?: () => void }) {
   const location = useLocation();
 
   // Estado para controlar la visibilidad del modal de usuario

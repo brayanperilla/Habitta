@@ -35,8 +35,6 @@ function App() {
           {/* Autenticación */}
           <Route path="auth" element={<Auth />} />
 
-          <Route path="ModalN" element={<ModalN />} />
-
           <Route path="Notification" element={<Notification />} />
 
           <Route path="myPanel" element={<MyPanel />} />
