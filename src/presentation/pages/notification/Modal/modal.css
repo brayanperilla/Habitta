@@ -1,23 +1,30 @@
 /* Basic modal styles */
 .modal-overlay {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.4);
-	display: flex;
-	align-items: flex-start;
-	justify-content: center;
-  padding-top: 100px;
-  z-index: 1000;
-  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9998;
+  background-color: transparent;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0;
+  pointer-events: auto;
 }
 
 .modal-content {
   background: #fff;
   border-radius: 12px;
-  width: 380px;
-  max-width: calc(100% - 32px);
+  width: 420px;
+  margin: 80px 25px 0 0;
+  max-width: 330px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-height: calc(100vh - 120px); /* menos header y margen */
+  z-index: 10000;
   overflow: hidden;
+  pointer-events: auto;
 }
 
 .modal-header {
@@ -60,11 +67,16 @@
 .notification-card--property {
   background: #d4f1f7;
   border-left-color: #35d2db;
+  margin-left: 5px;
+  margin-right: 10px;
 }
 
 .notification-card--message {
   background: #d9f2e8;
   border-left-color: #35c8be;
+  margin-top: 15px;
+  margin-left: 5px;
+  margin-right: 10px;
 }
 
 .notification-title {

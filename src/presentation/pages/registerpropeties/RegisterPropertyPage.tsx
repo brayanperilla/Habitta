@@ -4,9 +4,11 @@ import "./styleRegisterP.css";
 function RegisterPropertyPage() {
   return (
     <>
+    <div className="register-page-container">
+
       <div className="register-page">
         <h3>Publicar Propiedades</h3>
-        <p>Datos Principales de la Propiedad</p>
+        <p id="subtitle">Datos Principales de la Propiedad</p>
 
         <br />
 
@@ -130,35 +132,6 @@ function RegisterPropertyPage() {
 
           <br />
 
-          <br />
-
-          <div>
-            <label htmlFor="furnished">
-              Amoblado <span aria-hidden="true">*</span>
-            </label>
-            <br />
-            <select id="furnished" name="furnished" defaultValue="">
-              <option value="" disabled>
-                Selecciona
-              </option>
-              <option value="yes">Sí</option>
-              <option value="no">No</option>
-            </select>
-
-            <label htmlFor="parkingLot">
-              Estacionamiento <span aria-hidden="true">*</span>
-            </label>
-            <br />
-            <select id="parkingLot" name="parkingLot" defaultValue="">
-              <option value="" disabled>
-                Selecciona
-              </option>
-              <option value="yes">Sí</option>
-              <option value="no">No</option>
-            </select>
-          </div>
-
-          <br />
 
           <div className="two-col">
             <div>
@@ -225,6 +198,19 @@ function RegisterPropertyPage() {
                 Salón de eventos
               </label>
               <label>
+                <input type="checkbox" name="amenities" value="elevator" />
+                Ascensor
+              </label>
+              <label>
+                <input type="checkbox" name="amenities" value="parking" />
+                Estacionamiento
+              </label>
+              <label>
+                <input type="checkbox" name="amenities" value="amoblado" />
+                Amoblado
+              </label>
+             
+              <label>
                 <input type="checkbox" name="amenities" value="kitchen" />
                 Cocina equipada
               </label>
@@ -277,13 +263,15 @@ function RegisterPropertyPage() {
         <br />
 
         {/* Botones de Acción */}
-        <div className="card actions">
+        <div className="card-actions">
           <button className="btn-cancel">Cancelar</button>
           <button className="btn-primary">Publicar Propiedad</button>
         </div>
       </div>
+    </div>
     </>
   );
+  
 }
 
 export default RegisterPropertyPage;

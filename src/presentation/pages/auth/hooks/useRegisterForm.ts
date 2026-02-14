@@ -3,7 +3,10 @@ import { useState } from "react";
 export function useRegisterForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [confirmationEmail, setConfirmationEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -21,8 +24,14 @@ export function useRegisterForm() {
     setFullName,
     email,
     setEmail,
+    confirmationEmail,
+    setConfirmationEmail,
+    phone,
+    setPhone,
     password,
     setPassword,
+    confirmPassword,
+    setConfirmPassword,
     showPassword,
     togglePasswordVisibility,
     handleSubmit,
