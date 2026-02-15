@@ -9,9 +9,9 @@ const peopleIcon = "/icons/UI/heroIcons/peoples-svgrepo-com.svg";
 const timerIcon = "/icons/UI/heroIcons/timer-svgrepo-com.svg";
 const searchIcon =
   "/icons/UI/navbaricons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg";
-const img1 = "/public/images/example/dream_home_1.png";
-const img2 = "/public/images/example/dream_home_2.png";
-const img3 = "/public/images/example/dream_home_3.png";
+const img1 = "/images/example/dream_home_1.png";
+const img2 = "/images/example/dream_home_2.png";
+const img3 = "/images/example/dream_home_3.png";
 
 // Imágenes de fondo para el carrusel
 const backgroundImages = [img1, img2, img3];

@@ -5,9 +5,10 @@ import { useState, useEffect } from "react";
 
 // Imágenes de Fondo
 const backgroundImages = [
-  "/public/images/example/dream_home_1.png",
-  "/public/images/example/dream_home_2.png",
-  "/public/images/example/dream_home_3.png"];
+  "/images/example/dream_home_1.png",
+  "/images/example/dream_home_2.png",
+  "/images/example/dream_home_3.png",
+];
 
 export function useAuthPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
