@@ -12,13 +12,15 @@ import "./presentation/pages/promotion/promotion.css";
 import "./presentation/pages/properties/styleProperties.css";
 import Favorites from "@presentation/pages/favorites/Favorites";
 import PropertyDetailsPage from "@presentation/pages/propertyDetails/PropertyDetailsPage";
-import mypanel from "@presentation/pages/mypanel/mypanel";
+import Mypanel from "@presentation/pages/myPanel/MyPanel";
+
+
 // Componente Principal de la Aplicación
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Layout />}> 
+        <Route path="/" element={<Layout />}>
           {/* Inicio */}
           <Route index element={<Home />} />
 
@@ -40,10 +42,11 @@ function App() {
           {/* Ruta de Favoritos */}
           <Route path="favorites" element={<Favorites />} />
 
-          <Route path="mypanel" element={<Mypanel/>}
+          {/* Mi Panel */}
+          <Route path="mypanel" element={<Mypanel />} />
 
-            {/* Ruta de Detalles de Propiedad */}
-          <Route path="propertydetails" element={<PropertyDetailsPage />} />
+          {/* Ruta de Detalles de Propiedad */}
+          <Route path="propertydetailspage" element={<PropertyDetailsPage />} />
         </Route>
       </Routes>
     </>

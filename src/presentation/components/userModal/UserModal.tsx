@@ -92,12 +92,6 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 4,
-      label: "Herramientas Financieras",
-      icon: "/icons/UI/navbaricons/calculator-svgrepo-com.svg",
-      link: "/tools",
-    },
-    {
-      id: 5,
       label: "Panel Admin",
       icon: "/icons/UI/navbaricons/admin-svgrepo-com.svg",
       link: "/admin",
