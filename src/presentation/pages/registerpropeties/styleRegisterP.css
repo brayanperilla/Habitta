@@ -22,7 +22,7 @@ body {
 /* Contenedor Principal */
 .register-page-container {
   /*estos backgrounds se usan para centrar y mantener estatica una imagen mientras el resto de contenido se puede desplazar */
-  background-image: url("/images/auth/dream_home_1.png");
+  background-image: url("/images/example/dream_home_1.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
