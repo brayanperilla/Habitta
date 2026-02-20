@@ -6,23 +6,26 @@ import type { Caracteristica } from "@domain/entities/Caracteristica";
 import "./PropertyDetailsPage.css";
 
 const fallbackImage = "/images/auth/dream_home_1.png";
-const thumbnails = [
-  "/images/auth/dream_home_1.png",
-  "/images/auth/dream_home_2.png",
-  "/images/auth/dream_home_3.png",
-];
 
 function PropertyDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const [property, setProperty] = useState<Property | null>(null);
   const [caracteristicas, setCaracteristicas] = useState<Caracteristica[]>([]);
+  const [fotos, setFotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedImg, setSelectedImg] = useState(fallbackImage);
+  const [imgIndex, setImgIndex] = useState(0);
 
   // Tabs
   const [activeTab, setActiveTab] = useState("Descripción");
   const tabNames = ["Descripción", "Características", "Ubicación"];
+
+  // Imagen seleccionada (primera foto o fallback)
+  const selectedImg = fotos.length > 0 ? fotos[imgIndex] : fallbackImage;
+
+  // Navegación de imágenes
+  const prevImg = () => setImgIndex((i) => (i > 0 ? i - 1 : fotos.length - 1));
+  const nextImg = () => setImgIndex((i) => (i < fotos.length - 1 ? i + 1 : 0));
 
   // Cargar datos de la propiedad al montar
   useEffect(() => {
@@ -34,9 +37,10 @@ function PropertyDetailsPage() {
       }
 
       try {
-        const [prop, cars] = await Promise.all([
+        const [prop, cars, imgs] = await Promise.all([
           propertyService.getPropertyById(Number(id)),
           propertyService.getCaracteristicasDePropiedad(Number(id)),
+          propertyService.getFotosPropiedad(Number(id)),
         ]);
 
         if (!prop) {
@@ -44,6 +48,7 @@ function PropertyDetailsPage() {
         } else {
           setProperty(prop);
           setCaracteristicas(cars);
+          setFotos(imgs);
         }
       } catch (err) {
         setError(
@@ -109,7 +114,11 @@ function PropertyDetailsPage() {
             alt={property.titulo || "Propiedad"}
             className="property-details-main-img"
           />
-          <button className="property-details-arrow left" aria-label="Anterior">
+          <button
+            className="property-details-arrow left"
+            aria-label="Anterior"
+            onClick={prevImg}
+          >
             <svg
               width="64"
               height="64"
@@ -130,6 +139,7 @@ function PropertyDetailsPage() {
           <button
             className="property-details-arrow right"
             aria-label="Siguiente"
+            onClick={nextImg}
           >
             <svg
               width="64"
@@ -154,13 +164,13 @@ function PropertyDetailsPage() {
 
         {/* Miniaturas */}
         <div className="property-details-thumbnails">
-          {thumbnails.map((img, idx) => (
+          {fotos.map((img, idx) => (
             <img
               key={idx}
               src={img}
               alt={`Miniatura ${idx + 1}`}
-              className={`property-details-thumbnail${selectedImg === img ? " selected" : ""}`}
-              onClick={() => setSelectedImg(img)}
+              className={`property-details-thumbnail${imgIndex === idx ? " selected" : ""}`}
+              onClick={() => setImgIndex(idx)}
             />
           ))}
         </div>

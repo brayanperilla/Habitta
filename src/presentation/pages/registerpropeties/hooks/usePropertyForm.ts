@@ -4,6 +4,7 @@ import { useAuth } from "@application/context/AuthContext";
 import { propertyService } from "@application/services/propertyService";
 import type { CreatePropertyInput } from "@domain/entities/Property";
 import type { Caracteristica } from "@domain/entities/Caracteristica";
+import { LIMITE_FOTOS } from "@domain/entities/FotoPropiedad";
 
 /** Estado del formulario */
 interface FormState {
@@ -61,6 +62,11 @@ export function usePropertyForm() {
     string | null
   >(null);
 
+  // Estado de imágenes
+  const [imagenes, setImagenes] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const maxFotos = LIMITE_FOTOS.free; // TODO: cambiar a premium cuando se implemente
+
   // Cargar características al montar
   useEffect(() => {
     const cargar = async () => {
@@ -92,6 +98,52 @@ export function usePropertyForm() {
     setCaracteristicasSeleccionadas((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
     );
+  };
+
+  /** Manejar selección de imágenes */
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Validar tipos permitidos
+    const tiposValidos = ["image/jpeg", "image/png", "image/webp"];
+    const invalidos = files.filter((f) => !tiposValidos.includes(f.type));
+    if (invalidos.length > 0) {
+      setError("Solo se permiten imágenes JPG, PNG o WebP.");
+      return;
+    }
+
+    // Validar tamaño (5MB máx por archivo)
+    const grandes = files.filter((f) => f.size > 5 * 1024 * 1024);
+    if (grandes.length > 0) {
+      setError("Cada imagen debe pesar menos de 5MB.");
+      return;
+    }
+
+    // Validar límite total
+    const total = imagenes.length + files.length;
+    if (total > maxFotos) {
+      setError(`Máximo ${maxFotos} fotos. Ya tienes ${imagenes.length}.`);
+      return;
+    }
+
+    setError(null);
+    const nuevas = [...imagenes, ...files];
+    setImagenes(nuevas);
+
+    // Generar previews
+    const urls = files.map((f) => URL.createObjectURL(f));
+    setPreviews((prev) => [...prev, ...urls]);
+
+    // Resetear input para permitir seleccionar las mismas fotos
+    e.target.value = "";
+  };
+
+  /** Eliminar imagen por índice */
+  const removeImage = (index: number) => {
+    URL.revokeObjectURL(previews[index]);
+    setImagenes((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   /** Validar campos obligatorios */
@@ -141,12 +193,12 @@ export function usePropertyForm() {
         estrato: Number(form.estrato),
       };
 
-      // Timeout de 15s para evitar carga infinita
+      // Timeout de 60s (imágenes pueden tardar en subirse)
       const timeout = new Promise<never>((_, reject) =>
         setTimeout(
           () =>
             reject(new Error("El servidor tardó demasiado. Intenta de nuevo.")),
-          15000,
+          60000,
         ),
       );
 
@@ -154,11 +206,15 @@ export function usePropertyForm() {
         propertyService.createPropertyConCaracteristicas(
           input,
           caracteristicasSeleccionadas,
+          imagenes,
         ),
         timeout,
       ])) as Awaited<
         ReturnType<typeof propertyService.createPropertyConCaracteristicas>
       >;
+
+      // Limpiar previews
+      previews.forEach((url) => URL.revokeObjectURL(url));
 
       setSuccess(true);
       setTimeout(
@@ -184,5 +240,10 @@ export function usePropertyForm() {
     success,
     cargandoCaracteristicas,
     errorCaracteristicas,
+    imagenes,
+    previews,
+    handleImageChange,
+    removeImage,
+    maxFotos,
   };
 }

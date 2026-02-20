@@ -19,6 +19,8 @@ export interface Property {
   habitaciones: number;
   banos: number;
   estrato: number;
+  /** URL de la primera foto (viene de fotospropiedad, no de la tabla propiedades) */
+  fotoUrl?: string | null;
 }
 
 /** Crear propiedad — sin campos auto-generados */

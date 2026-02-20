@@ -10,13 +10,6 @@ export const caracteristicasApi = {
       .select("*")
       .order("idcaracteristica", { ascending: true });
 
-    // DEBUG: ver respuesta cruda de Supabase
-    console.log("Supabase caracteristica →", {
-      data,
-      error,
-      count: data?.length,
-    });
-
     if (error) throw new Error(error.message);
     return data ?? [];
   },

@@ -11,11 +11,22 @@ export const propertyApi = {
   getAll: async (): Promise<Property[]> => {
     const { data, error } = await supabase
       .from("propiedades")
-      .select("*")
+      .select(`*, fotospropiedad(url, orden)`)
       .order("fechacreacion", { ascending: false });
 
     if (error) throw new Error(error.message);
-    return data ?? [];
+
+    // Mapear: sacar la primera foto de cada propiedad
+    return (data ?? []).map((p: Record<string, unknown>) => {
+      const fotos =
+        (p.fotospropiedad as { url: string; orden: number }[]) || [];
+      const primeraFoto = fotos.sort(
+        (a, b) => (a.orden ?? 99) - (b.orden ?? 99),
+      )[0];
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { fotospropiedad: _fotos, ...rest } = p;
+      return { ...rest, fotoUrl: primeraFoto?.url ?? null } as Property;
+    });
   },
 
   /** Una propiedad por ID */

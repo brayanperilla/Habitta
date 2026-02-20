@@ -34,7 +34,7 @@ function CardPropetie({ property }: CardPropetieProps) {
     <div className="property-card">
       <div className="property-card__image-container">
         <img
-          src={fallbackImage}
+          src={property.fotoUrl || fallbackImage}
           alt={property.titulo || "Propiedad"}
           className="property-card__img"
         />

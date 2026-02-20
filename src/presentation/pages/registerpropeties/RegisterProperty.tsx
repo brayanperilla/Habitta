@@ -15,6 +15,11 @@ function RegisterPropertyPage() {
     success,
     cargandoCaracteristicas,
     errorCaracteristicas,
+    previews,
+    handleImageChange,
+    removeImage,
+    maxFotos,
+    imagenes,
   } = usePropertyForm();
 
   return (
@@ -293,20 +298,41 @@ function RegisterPropertyPage() {
 
           <br />
 
-          {/* Fotografías (solo visual por ahora — funcionalidad en fase Storage) */}
+          {/* Fotografías */}
           <div className="card">
             <h4>Fotos de la Propiedad</h4>
-            <p>
-              Sube hasta 15 imágenes de la propiedad para mostrarla en detalle
-            </p>
-            <label htmlFor="fileInput">Seleccionar archivos</label>
+            <p>Sube hasta {maxFotos} imágenes (JPG, PNG o WebP, máx 5MB c/u)</p>
+
+            <label htmlFor="fileInput" className="foto-upload-btn">
+              📷 Seleccionar fotos ({imagenes.length}/{maxFotos})
+            </label>
             <input
               id="fileInput"
               type="file"
-              title="Elegir archivos"
               multiple
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleImageChange}
+              style={{ display: "none" }}
             />
+
+            {/* Grid de previews */}
+            {previews.length > 0 && (
+              <div className="fotos-preview-grid">
+                {previews.map((url, i) => (
+                  <div key={i} className="foto-preview-item">
+                    <img src={url} alt={`Foto ${i + 1}`} />
+                    <button
+                      type="button"
+                      className="foto-remove-btn"
+                      onClick={() => removeImage(i)}
+                      title="Eliminar foto"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <br />
