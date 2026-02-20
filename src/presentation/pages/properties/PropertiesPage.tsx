@@ -1,5 +1,7 @@
 import CardPropetie from "../../components/cardPropetie/Card_propietie";
 import { useProperties } from "@application/hooks/useProperties";
+import { useFavorites } from "@application/hooks/useFavorites";
+import { useAuth } from "@application/context/AuthContext";
 import "./styleProperties.css";
 
 /**
@@ -9,6 +11,8 @@ import "./styleProperties.css";
  */
 function PropertiesPage() {
   const { properties, loading, error } = useProperties();
+  const { usuario } = useAuth();
+  const { isFavorito, toggleFavorito } = useFavorites();
 
   return (
     <>
@@ -208,7 +212,12 @@ function PropertiesPage() {
             {/* Tarjetas de propiedades reales desde Supabase */}
             <div className="property-cards-grid">
               {properties.map((property) => (
-                <CardPropetie key={property.idpropiedad} property={property} />
+                <CardPropetie
+                  key={property.idpropiedad}
+                  property={property}
+                  isFav={isFavorito(property.idpropiedad)}
+                  onToggleFav={usuario ? toggleFavorito : undefined}
+                />
               ))}
             </div>
 

@@ -2,6 +2,7 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 
 import Layout from "@presentation/components/layout/Layout";
+import ScrollToTop from "@presentation/components/ScrollToTop";
 import Home from "@presentation/pages/home/Home";
 import PropertiesPage from "@presentation/pages/properties/PropertiesPage";
 import RegisterPropertyPage from "@presentation/pages/registerpropeties/RegisterProperty";
@@ -16,6 +17,7 @@ import Mypanel from "@presentation/pages/myPanel/MyPanel";
 function App() {
   return (
     <>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
           {/* Inicio */}

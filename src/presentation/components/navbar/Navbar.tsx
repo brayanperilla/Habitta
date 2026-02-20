@@ -99,7 +99,7 @@ function Navbar() {
             <li>
               <Link
                 className={`navbar_link ${location.pathname === "/favorites" ? "active" : ""}`}
-                to="/favorites"
+                to={usuario ? "/favorites" : "/auth"}
               >
                 <img
                   className="navbar_icon"
@@ -114,7 +114,7 @@ function Navbar() {
             <li>
               <Link
                 className={`navbar_link ${location.pathname === "/tools" ? "active" : ""}`}
-                to="/tools"
+                to={usuario ? "/tools" : "/auth"}
               >
                 <img
                   className="navbar_icon"

@@ -1,70 +1,127 @@
 /**
  * PropiedadesSection - Sección de Mis Propiedades
  *
- * Muestra las propiedades publicadas por el usuario
+ * Muestra las propiedades publicadas por el usuario logueado
  */
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@application/context/AuthContext";
+import { propertyService } from "@application/services/propertyService";
+import type { Property } from "@domain/entities/Property";
 import "./sections.css";
 
 /**
  * Componente que muestra la lista de propiedades del usuario
  */
 const PropiedadesSection: React.FC = () => {
-  // Datos de ejemplo - Aquí se integraría con el backend
-  const propiedades = [
-    {
-      id: 1,
-      titulo: "Apartamento Moderno Centro",
-      ubicacion: "Centro, Ciudad",
-      tipo: "Apartamento",
-      precio: "$2.600.000.000 COP",
-      visualizaciones: 145,
-      contactos: 8,
-      fecha: "2024-01-15",
-      estado: "Activo",
-    },
-    {
-      id: 2,
-      titulo: "Casa Familiar Suburbios",
-      ubicacion: "Suburbios Norte",
-      tipo: "Casa",
-      precio: "$3.560.000.000 COP",
-      visualizaciones: 67,
-      contactos: 3,
-      fecha: "2024-01-10",
-      estado: "Pendiente",
-    },
-    {
-      id: 3,
-      titulo: "Loft Industrial Moderno",
-      ubicacion: "Zona Industrial",
-      tipo: "Loft",
-      precio: "$1.900.000.000 COP",
-      visualizaciones: 98,
-      contactos: 12,
-      fecha: "2024-02-01",
-      estado: "Activo",
-    },
-  ];
+  const { usuario } = useAuth();
+  const navigate = useNavigate();
+  const [propiedades, setPropiedades] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const cargar = async () => {
+      if (!usuario) {
+        setPropiedades([]);
+        setLoading(false);
+        return;
+      }
+      try {
+        const data = await propertyService.getPropertiesByUsuario(
+          usuario.idusuario,
+        );
+        setPropiedades(data);
+      } catch {
+        /* silencioso */
+      } finally {
+        setLoading(false);
+      }
+    };
+    cargar();
+  }, [usuario]);
+
+  // Formatear precio
+  const formatPrice = (price: number | null) => {
+    if (!price) return "N/A";
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  // Formatear fecha
+  const formatFecha = (fecha: string | null) => {
+    if (!fecha) return "—";
+    return new Date(fecha).toLocaleDateString("es-CO");
+  };
 
   return (
     <div className="section-content">
       <div className="section-header-row">
         <h2 className="section-title">Mis Propiedades</h2>
-        <button className="btn-primary">+ Publicar Propiedad</button>
+        <button
+          className="btn-primary"
+          onClick={() => navigate("/registerpropeties")}
+        >
+          + Publicar Propiedad
+        </button>
       </div>
 
+      {/* Estado de carga */}
+      {loading && (
+        <p style={{ textAlign: "center", padding: "2rem", color: "#aaa" }}>
+          Cargando propiedades...
+        </p>
+      )}
+
+      {/* Sin propiedades */}
+      {!loading && propiedades.length === 0 && (
+        <div className="empty-state">
+          <svg
+            className="empty-state__icon"
+            width="120"
+            height="120"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.5"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
+          </svg>
+          <h3 className="empty-state__title">
+            Aún no has publicado propiedades
+          </h3>
+          <p className="empty-state__description">
+            Publica tu primera propiedad y comienza a recibir interesados
+          </p>
+          <button
+            className="btn-primary"
+            onClick={() => navigate("/registerpropeties")}
+          >
+            Publicar mi primera propiedad
+          </button>
+        </div>
+      )}
+
+      {/* Lista de propiedades */}
       <div className="propiedades-list">
         {propiedades.map((propiedad) => (
-          <div key={propiedad.id} className="propiedad-card">
+          <div key={propiedad.idpropiedad} className="propiedad-card">
             <div className="propiedad-card__info">
               <div className="propiedad-card__header">
-                <h3 className="propiedad-card__title">{propiedad.titulo}</h3>
+                <h3 className="propiedad-card__title">
+                  {propiedad.titulo || "Sin título"}
+                </h3>
                 <span
-                  className={`estado-badge estado-badge--${propiedad.estado.toLowerCase()}`}
+                  className={`estado-badge estado-badge--${(propiedad.estadoPublicacion || "pendiente").toLowerCase()}`}
                 >
-                  {propiedad.estado}
+                  {propiedad.estadoPublicacion || "Pendiente"}
                 </span>
               </div>
 
@@ -79,7 +136,9 @@ const PropiedadesSection: React.FC = () => {
                   >
                     <path d="M8 0C5.243 0 3 2.243 3 5c0 4.5 5 11 5 11s5-6.5 5-11c0-2.757-2.243-5-5-5zm0 7.5c-1.381 0-2.5-1.119-2.5-2.5S6.619 2.5 8 2.5s2.5 1.119 2.5 2.5S9.381 7.5 8 7.5z" />
                   </svg>
-                  {propiedad.ubicacion}
+                  {[propiedad.ciudad, propiedad.departamento]
+                    .filter(Boolean)
+                    .join(", ")}
                 </span>
                 <span className="detail-item">
                   <svg
@@ -91,11 +150,13 @@ const PropiedadesSection: React.FC = () => {
                   >
                     <path d="M2 2h4v4H2V2zm6 0h6v4H8V2zM2 8h4v6H2V8zm6 0h6v6H8V8z" />
                   </svg>
-                  {propiedad.tipo}
+                  {propiedad.tipoPropiedad || "N/A"}
                 </span>
               </div>
 
-              <div className="propiedad-card__price">{propiedad.precio}</div>
+              <div className="propiedad-card__price">
+                {formatPrice(propiedad.precio)}
+              </div>
 
               <div className="propiedad-card__stats">
                 <span className="stat-item">
@@ -106,61 +167,20 @@ const PropiedadesSection: React.FC = () => {
                     viewBox="0 0 16 16"
                     fill="currentColor"
                   >
-                    <path d="M8 3.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM8 10a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                  {propiedad.visualizaciones} visualizaciones
-                </span>
-                <span className="stat-item">
-                  <svg
-                    className="icon"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="currentColor"
-                  >
-                    <path d="M2 2h3v3H2V2zm5 0h7v1H7V2zm0 2h5v1H7V4zM2 7h3v3H2V7zm5 0h7v1H7V7zm0 2h5v1H7V9zm-5 3h3v3H2v-3zm5 0h7v1H7v-1zm0 2h5v1H7v-1z" />
-                  </svg>
-                  {propiedad.contactos} contactos
-                </span>
-                <span className="stat-item">
-                  <svg
-                    className="icon"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="currentColor"
-                  >
                     <path d="M3 2h10v12H3V2zm2 2v8h6V4H5z" />
                   </svg>
-                  {propiedad.fecha}
+                  {formatFecha(propiedad.fechacreacion)}
                 </span>
               </div>
             </div>
 
             <div className="propiedad-card__actions">
-              <button className="action-btn action-btn--edit" title="Editar">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                >
-                  <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9 9a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l9-9z" />
-                </svg>
-              </button>
-              <button className="action-btn action-btn--view" title="Ver">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                >
-                  <path d="M8 3.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM8 10a2 2 0 110-4 2 2 0 010 4z" />
-                </svg>
-              </button>
               <button
-                className="action-btn action-btn--delete"
-                title="Eliminar"
+                className="action-btn action-btn--view"
+                title="Ver"
+                onClick={() =>
+                  navigate(`/propertydetailspage/${propiedad.idpropiedad}`)
+                }
               >
                 <svg
                   width="18"
@@ -168,7 +188,7 @@ const PropiedadesSection: React.FC = () => {
                   viewBox="0 0 16 16"
                   fill="currentColor"
                 >
-                  <path d="M5.5 1a.5.5 0 0 1 .5.5V2h4v-.5a.5.5 0 0 1 1 0V2h1.5a.5.5 0 0 1 0 1H13v10.5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 3 13.5V3H1.5a.5.5 0 0 1 0-1H3v-.5a.5.5 0 0 1 .5-.5h2zM5 3v10.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V3H5z" />
+                  <path d="M8 3.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM8 10a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
               </button>
             </div>

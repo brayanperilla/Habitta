@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import CardPropetie from "../../components/cardPropetie/Card_propietie";
 import { useProperties } from "@application/hooks/useProperties";
+import { useFavorites } from "@application/hooks/useFavorites";
+import { useAuth } from "@application/context/AuthContext";
 import "./home.css";
 import { Link } from "react-router-dom";
 const shieldIcon = "/icons/UI/heroIcons/shield-alt-1-svgrepo-com.svg";
@@ -20,6 +22,8 @@ const backgroundImages = [img1, img2, img3];
 function Home() {
   // Propiedades destacadas desde Supabase
   const { properties, loading } = useProperties();
+  const { usuario } = useAuth();
+  const { isFavorito, toggleFavorito } = useFavorites();
 
   // Estado de rotación de imágenes
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -164,7 +168,12 @@ function Home() {
           {/* Tarjetas de propiedades destacadas desde Supabase */}
           <div className="property-cards-grid">
             {properties.slice(0, 3).map((property) => (
-              <CardPropetie key={property.idpropiedad} property={property} />
+              <CardPropetie
+                key={property.idpropiedad}
+                property={property}
+                isFav={isFavorito(property.idpropiedad)}
+                onToggleFav={usuario ? toggleFavorito : undefined}
+              />
             ))}
             {properties.length === 0 && !loading && (
               <p
