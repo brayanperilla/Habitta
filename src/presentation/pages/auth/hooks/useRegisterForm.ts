@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@application/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { authApi } from "@infrastructure/api/auth.api";
 
 /** Hook del formulario de registro — validaciones frontend + signUp */
 export function useRegisterForm() {
@@ -15,8 +16,34 @@ export function useRegisterForm() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // RF02 — Estados para validación de email en tiempo real
+  const [emailDisponible, setEmailDisponible] = useState<boolean | null>(null);
+  const [checkingEmail, setCheckingEmail] = useState(false);
+
   const { signUp } = useAuth();
   const navigate = useNavigate();
+
+  // RF02 — Lógica de validación con debounce (500ms)
+  useEffect(() => {
+    if (!email.trim() || !email.includes("@")) {
+      setEmailDisponible(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setCheckingEmail(true);
+      try {
+        const disponible = await authApi.checkEmailDisponible(email);
+        setEmailDisponible(disponible);
+      } catch {
+        setEmailDisponible(null);
+      } finally {
+        setCheckingEmail(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +51,10 @@ export function useRegisterForm() {
     setSuccessMessage(null);
 
     // Validaciones frontend
+    if (emailDisponible === false) {
+      setError("Este correo ya está registrado.");
+      return;
+    }
     if (email.trim().toLowerCase() !== confirmationEmail.trim().toLowerCase()) {
       setError("Los correos electrónicos no coinciden.");
       return;
@@ -74,5 +105,7 @@ export function useRegisterForm() {
     error,
     loading,
     successMessage,
+    emailDisponible,
+    checkingEmail,
   };
 }

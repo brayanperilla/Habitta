@@ -22,6 +22,8 @@ function Register() {
     error,
     loading,
     successMessage,
+    emailDisponible,
+    checkingEmail,
   } = useRegisterForm();
 
   return (
@@ -41,8 +43,17 @@ function Register() {
       </div>
 
       {/* Correo Electrónico */}
-      <div className="form-group">
-        <label htmlFor="email">Correo Electrónico</label>
+      <div className="form-group email-group">
+        <label htmlFor="email">
+          Correo Electrónico
+          {checkingEmail && <span className="email-status info"> 🔄</span>}
+          {!checkingEmail && emailDisponible === true && (
+            <span className="email-status success"> ✅</span>
+          )}
+          {!checkingEmail && emailDisponible === false && (
+            <span className="email-status error"> ❌ (Ya registrado)</span>
+          )}
+        </label>
         <input
           type="email"
           id="email"

@@ -28,6 +28,9 @@ interface AuthContextType {
     telefono: string,
   ) => Promise<SignUpResult>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
+  updatePerfil: (datos: Partial<Usuario>) => Promise<Usuario>;
 }
 
 // ─── Contexto ────────────────────────────────────────────────────────
@@ -156,8 +159,38 @@ export function AuthProvider({ children }: Props) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    await authApi.resetPassword(email);
+  };
+
+  const updatePassword = async (newPassword: string) => {
+    await authApi.updatePassword(newPassword);
+  };
+
+  const updatePerfil = async (datos: Partial<Usuario>) => {
+    if (!usuario) throw new Error("No hay usuario autenticado.");
+    const { usuariosApi } = await import("@infrastructure/api/usuarios.api");
+    const actualizado = await usuariosApi.updatePerfil(
+      usuario.idusuario,
+      datos,
+    );
+    setUsuario(actualizado);
+    return actualizado;
+  };
+
   return (
-    <AuthContext.Provider value={{ usuario, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{
+        usuario,
+        loading,
+        signIn,
+        signUp,
+        signOut,
+        resetPassword,
+        updatePassword,
+        updatePerfil,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

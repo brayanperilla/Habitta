@@ -135,6 +135,33 @@ export const authApi = {
     if (error) return null;
     return data;
   },
+
+  /** RF02 — Verificar si un correo ya está registrado (para validación en tiempo real) */
+  checkEmailDisponible: async (correo: string): Promise<boolean> => {
+    const { count, error } = await supabase
+      .from("usuarios")
+      .select("idusuario", { count: "exact", head: true })
+      .eq("correo", correo.toLowerCase().trim());
+
+    if (error) return true; // En caso de error, permitir continuar
+    return (count ?? 0) === 0;
+  },
+
+  /** RF05 — Enviar enlace de recuperación de contraseña al correo */
+  resetPassword: async (email: string): Promise<void> => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth?mode=reset`,
+    });
+    if (error) throw new Error(traducirError(error.message));
+  },
+
+  /** RF08 — Actualizar contraseña del usuario autenticado */
+  updatePassword: async (newPassword: string): Promise<void> => {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) throw new Error(traducirError(error.message));
+  },
 };
 
 /** Crear registro en `usuarios` si no existe */

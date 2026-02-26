@@ -52,6 +52,29 @@ function Login() {
             {showPassword ? "👁️" : "👁️‍🗨️"}
           </button>
         </div>
+        <div style={{ textAlign: "right", marginTop: "4px" }}>
+          <button
+            type="button"
+            className="forgot-password-link"
+            style={{
+              background: "none",
+              border: "none",
+              color: "#3498db",
+              fontSize: "0.85rem",
+              cursor: "pointer",
+              padding: 0,
+            }}
+            onClick={() => {
+              // Emitir evento o llamar a prop para cambiar modo si Auth.tsx lo maneja
+              const event = new CustomEvent("switch-auth-mode", {
+                detail: "forgot",
+              });
+              window.dispatchEvent(event);
+            }}
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
       </div>
 
       {/* Mensaje de error (abajo, cerca del botón) */}
