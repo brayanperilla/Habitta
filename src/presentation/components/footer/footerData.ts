@@ -46,8 +46,8 @@ export const socialMedia = [
 
 // Información de contacto principal
 export const contactInfo = {
-  email: "hola@habitta.com",
-  phone: "+57 55 1234 5678",
+  email: "habittaservice@gmail.com",
+  phone: "+57 317 738 6748",
   location: "Bogotá, Colombia",
   description:
     "La plataforma inmobiliaria más confiable de Latinoamérica. Conectamos personas con su hogar ideal a través de la tecnología y un servicio excepcional.",
