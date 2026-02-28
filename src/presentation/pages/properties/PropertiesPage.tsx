@@ -1,8 +1,11 @@
+import { useState } from "react";
 import CardPropetie from "../../components/cardPropetie/Card_propietie";
 import { useProperties } from "@application/hooks/useProperties";
 import { useFavorites } from "@application/hooks/useFavorites";
 import { useAuth } from "@application/context/AuthContext";
 import "./styleProperties.css";
+
+const ITEMS_PER_PAGE = 20;
 
 /**
  * Página de Propiedades.
@@ -13,6 +16,14 @@ function PropertiesPage() {
   const { properties, loading, error } = useProperties();
   const { usuario } = useAuth();
   const { isFavorito, toggleFavorito } = useFavorites();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(properties.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedProperties = properties.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
 
   return (
     <>
@@ -209,9 +220,9 @@ function PropertiesPage() {
               </p>
             )}
 
-            {/* Tarjetas de propiedades reales desde Supabase */}
+            {/* Tarjetas de propiedades paginadas */}
             <div className="property-cards-grid">
-              {properties.map((property) => (
+              {paginatedProperties.map((property) => (
                 <CardPropetie
                   key={property.idpropiedad}
                   property={property}
@@ -221,16 +232,32 @@ function PropertiesPage() {
               ))}
             </div>
 
-            <br />
-
-            {/* Paginación */}
-            {properties.length > 0 && (
+            {/* Paginación — solo visible cuando hay más de 20 propiedades */}
+            {totalPages > 1 && (
               <div className="button-page">
-                <button className="page-btn">« Anterior</button>
-                <button className="page-btn">1</button>
-                <button className="page-btn">2</button>
-                <button className="page-btn">3</button>
-                <button className="page-btn">Siguiente »</button>
+                <button
+                  className="page-btn"
+                  disabled={currentPage === 1}
+                  onClick={() => {
+                    setCurrentPage((p) => p - 1);
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  ← Anterior
+                </button>
+                <span style={{ padding: "0.5rem 1rem", fontWeight: 600 }}>
+                  {currentPage} de {totalPages}
+                </span>
+                <button
+                  className="page-btn"
+                  disabled={currentPage === totalPages}
+                  onClick={() => {
+                    setCurrentPage((p) => p + 1);
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  Siguiente →
+                </button>
               </div>
             )}
           </main>

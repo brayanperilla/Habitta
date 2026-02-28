@@ -12,8 +12,8 @@ import { authApi } from "@infrastructure/api/auth.api";
 import type { SignUpResult } from "@infrastructure/api/auth.api";
 import { supabase } from "@infrastructure/supabase/client";
 
-/** Tiempo de inactividad para auto-logout: 15 minutos */
-const INACTIVITY_MS = 15 * 60 * 1000;
+/** Tiempo de inactividad para auto-logout: 5 minutos */
+const INACTIVITY_MS = 5 * 60 * 1000;
 
 // ─── Tipos ───────────────────────────────────────────────────────────
 
