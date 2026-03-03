@@ -32,7 +32,7 @@ function ResetPassword() {
       <div className="auth-success-state">
         <div style={{ textAlign: "center", padding: "2rem 0" }}>
           <span style={{ fontSize: "3rem" }}>🔓</span>
-          <h3>Contraseña Actualizada</h3>
+          <h3 style={{ color: "#1a202c" }}>Contraseña Actualizada</h3>
           <p style={{ color: "#666", marginTop: "1rem" }}>
             Tu contraseña ha sido restablecida correctamente. Ya puedes iniciar
             sesión.
@@ -57,7 +57,7 @@ function ResetPassword() {
   return (
     <form className="login-form" onSubmit={handleSubmit}>
       <div style={{ marginBottom: "1.5rem" }}>
-        <h3>Establecer Nueva Contraseña</h3>
+        <h3 style={{ color: "#1a202c" }}>Establecer Nueva Contraseña</h3>
         <p style={{ fontSize: "0.85rem", color: "#666", marginTop: "0.5rem" }}>
           Crea una contraseña segura que no hayas usado antes.
         </p>

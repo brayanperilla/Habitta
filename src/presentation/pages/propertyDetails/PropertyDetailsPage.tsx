@@ -18,6 +18,7 @@ function PropertyDetailsPage() {
 
   // Tabs
   const [activeTab, setActiveTab] = useState("Descripción");
+  const [showLightbox, setShowLightbox] = useState(false);
   const tabNames = ["Descripción", "Características", "Ubicación"];
 
   // Imagen seleccionada (primera foto o fallback)
@@ -158,8 +159,90 @@ function PropertyDetailsPage() {
               />
             </svg>
           </button>
-          <button className="property-details-expand">&#9633;</button>
-          <button className="property-details-share">&#x1f517;</button>
+          <button
+            className="property-details-expand"
+            aria-label="Expandir"
+            onClick={() => setShowLightbox(true)}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 3H5C3.89543 3 3 3.89543 3 5V9M3 15V19C3 20.1046 3.89543 21 5 21H9M15 21H19C20.1046 21 21 20.1046 21 19V15M21 9V5C21 3.89543 20.1046 3 19 3H15"
+                stroke="#1a1a1a"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            className="property-details-share"
+            aria-label="Compartir"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: property.titulo ?? "Propiedad",
+                  text: `Mira esta propiedad: ${property.titulo ?? ""}`,
+                  url: window.location.origin + `/propertydetailspage/${property.idpropiedad}`,
+                });
+              }
+            }}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="18"
+                cy="5"
+                r="3"
+                stroke="#1a1a1a"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx="6"
+                cy="12"
+                r="3"
+                stroke="#1a1a1a"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx="18"
+                cy="19"
+                r="3"
+                stroke="#1a1a1a"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M8.59 13.51L15.42 17.49"
+                stroke="#1a1a1a"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M15.41 6.51L8.59 10.49"
+                stroke="#1a1a1a"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         </div>
 
         {/* Miniaturas */}
@@ -285,14 +368,27 @@ function PropertyDetailsPage() {
               >
                 <circle cx="22" cy="22" r="20" fill="#fff" />
                 <path
-                  d="M22 33s-8.5-6.7-11.5-10.9C7 17.2 8.5 13.5 12 13.5c2.38 0 3.92 1.56 4.6 3.06C17.68 15.06 19.22 13.5 21.6 13.5c3.5 0 5 3.7 2 8.6C30.5 26.3 22 33 22 33z"
-                  fill="#10D6C2"
+                  d="M30.84 14.61a5.5 5.5 0 0 0-7.78 0L22 15.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L22 31.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  fill="none"
+                  stroke="#1a1a1a"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </button>
             <button
               className="property-details-share-btn"
               aria-label="Compartir"
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: property?.titulo ?? "Propiedad",
+                    text: `Mira esta propiedad de Habitta: ${property?.titulo}`,
+                    url: window.location.href,
+                  });
+                }
+              }}
             >
               <svg
                 width="44"
@@ -302,12 +398,49 @@ function PropertyDetailsPage() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <circle cx="22" cy="22" r="20" fill="#fff" />
-                <path
-                  d="M29.5 27.5a3.5 3.5 0 0 0-2.77 1.38l-8.46-4.23a3.5 3.5 0 0 0 0-2.3l8.46-4.23A3.5 3.5 0 1 0 27 14.5a3.5 3.5 0 0 0 0 2.3l-8.46 4.23A3.5 3.5 0 1 0 14.5 29.5a3.5 3.5 0 0 0 2.77-1.38l8.46 4.23A3.5 3.5 0 1 0 29.5 27.5z"
-                  stroke="#A78BFA"
-                  strokeWidth="2.5"
-                  fill="none"
-                />
+                <g transform="translate(10, 10) scale(1)">
+                  <circle
+                    cx="18"
+                    cy="5"
+                    r="3"
+                    stroke="#1a1a1a"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle
+                    cx="6"
+                    cy="12"
+                    r="3"
+                    stroke="#1a1a1a"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle
+                    cx="18"
+                    cy="19"
+                    r="3"
+                    stroke="#1a1a1a"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M8.59 13.51L15.42 17.49"
+                    stroke="#1a1a1a"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M15.41 6.51L8.59 10.49"
+                    stroke="#1a1a1a"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </g>
               </svg>
             </button>
           </div>
@@ -320,27 +453,38 @@ function PropertyDetailsPage() {
             </span>
           )}
           <div className="property-details-info-features">
-            <div>
-              <span className="property-details-info-icon">&#128719;</span>
-              <span className="property-details-info-value">
-                {property.habitaciones}
-              </span>
-              <span className="property-details-info-label">Habitaciones</span>
+            <div className="detail-feature-item">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="feature-svg">
+                <path d="M2 13V18M2 15H22M22 13V18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 13V9C4 7.89543 4.89543 7 6 7H18C19.1046 7 20 7.89543 20 9V13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M7 11H11M13 11H17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div className="feature-text-group">
+                <span className="property-details-info-value">{property.habitaciones}</span>
+                <span className="property-details-info-label">Habitaciones</span>
+              </div>
             </div>
-            <div>
-              <span className="property-details-info-icon">&#128705;</span>
-              <span className="property-details-info-value">
-                {property.banos}
-              </span>
-              <span className="property-details-info-label">Baños</span>
+            <div className="detail-feature-item">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="feature-svg">
+                <path d="M4 11H20C21.1046 11 22 11.8954 22 13V15C22 16.1046 21.1046 17 20 17H4C2.89543 17 2 16.1046 2 15V13C2 11.8954 2.89543 11 4 11Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M6 17V19M18 17V19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M7 11V7C7 5.89543 7.89543 5 9 5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M8.5 4.5L10 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div className="feature-text-group">
+                <span className="property-details-info-value">{property.banos}</span>
+                <span className="property-details-info-label">Baños</span>
+              </div>
             </div>
             {property.area && (
-              <div>
-                <span className="property-details-info-icon">&#9632;</span>
-                <span className="property-details-info-value">
-                  {property.area}
-                </span>
-                <span className="property-details-info-label">m²</span>
+              <div className="detail-feature-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="feature-svg">
+                  <rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <div className="feature-text-group">
+                  <span className="property-details-info-value">{property.area}</span>
+                  <span className="property-details-info-label">m²</span>
+                </div>
               </div>
             )}
           </div>
@@ -368,6 +512,25 @@ function PropertyDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Lightbox / Imagen Completa */}
+      {showLightbox && (
+        <div className="property-lightbox" onClick={() => setShowLightbox(false)}>
+          <div className="property-lightbox__content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="property-lightbox__close"
+              onClick={() => setShowLightbox(false)}
+            >
+              &times;
+            </button>
+            <img
+              src={selectedImg}
+              alt={property?.titulo || "Propiedad"}
+              className="property-lightbox__img"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
