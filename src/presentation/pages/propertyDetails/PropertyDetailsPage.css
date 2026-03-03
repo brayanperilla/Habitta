@@ -51,26 +51,38 @@
 
 .property-details-info-features {
   display: flex;
-  justify-content: space-between;
+  gap: 32px;
   margin-bottom: 18px;
   margin-top: 18px;
 }
 
-.property-details-info-icon {
-  font-size: 1.5rem;
-  color: #2dd4bf;
-  margin-right: 6px;
+.detail-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feature-text-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
 }
 
 .property-details-info-value {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  margin-right: 4px;
+  color: #4b4444;
 }
 
 .property-details-info-label {
-  color: #666;
-  font-size: 1rem;
+  color: #665c5c;
+  font-size: 0.95rem;
+}
+
+.feature-svg {
+  width: 28px;
+  height: 28px;
+  color: #665c5c;
 }
 
 .property-details-info-call-btn {
@@ -320,6 +332,10 @@
   cursor: pointer;
   width: 32px;
   height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 2;
 }
 
@@ -336,6 +352,10 @@
   cursor: pointer;
   width: 32px;
   height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 2;
 }
 

@@ -32,6 +32,36 @@ function Promotion() {
       <div className="promotion-cards">
         {/* Plan Básico */}
         <div className="promotion-card basic">
+          <div className="plan-icon-container">
+            <svg
+              className="plan-icon"
+              viewBox="0 0 100 100"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M50 20 C52 40 60 48 80 50 C60 52 52 60 50 80 C48 60 40 52 20 50 C40 48 48 40 50 20 Z"
+                fill="none"
+                stroke="#00C4B4"
+                strokeWidth="6"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M70 25 L82 25 M76 19 L76 31"
+                fill="none"
+                stroke="#00C4B4"
+                strokeWidth="6"
+                strokeLinecap="round"
+              />
+              <circle
+                cx="28"
+                cy="72"
+                r="4.5"
+                fill="none"
+                stroke="#00C4B4"
+                strokeWidth="5"
+              />
+            </svg>
+          </div>
           <h2>Publicación Básica</h2>
           <p className="card-subtitle">Publicación estándar de tu propiedad</p>
           <p className="price">$0</p>
@@ -54,6 +84,23 @@ function Promotion() {
 
         {/* Plan Destacado */}
         <div className="promotion-card featured">
+          <div className="plan-icon-container" style={{ backgroundColor: "#EDFDFA" }}>
+            <svg
+              className="plan-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ width: "50px", height: "50px" }}
+            >
+              <path
+                d="M13 2L6 12H11L10 22L18 11H13L14 2.5"
+                stroke="#20D4BF"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
           <h2>Publicación Destacada</h2>
           <p className="card-subtitle">
             Tu propiedad destacada en los resultados

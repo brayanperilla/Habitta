@@ -24,6 +24,23 @@ const PublicationOutstanding: FC<PublicationOutstandingProps> = ({
     <div className="outstanding-modal-overlay" onClick={handleOverlayClick}>
       <div className="outstanding-modal-content">
         <div className="outstanding-modal-header">
+          <div className="plan-icon-container" style={{ margin: "0 auto 1rem auto", width: "70px", height: "70px", backgroundColor: "#EDFDFA", padding: "10px" }}>
+            <svg
+              className="plan-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ width: "40px", height: "40px" }}
+            >
+              <path
+                d="M13 2L6 12H11L10 22L18 11H13L14 2.5"
+                stroke="#20D4BF"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
           <h2 className="outstanding-modal-title">Completar promoción</h2>
           <p className="outstanding-modal-subtitle">
             Selecciona la propiedad y método de pago

@@ -18,7 +18,7 @@ function ForgotPassword() {
       <div className="auth-success-state">
         <div style={{ textAlign: "center", padding: "2rem 0" }}>
           <span style={{ fontSize: "3rem" }}>📧</span>
-          <h3>¡Correo enviado!</h3>
+          <h3 style={{ color: "#1a202c" }}>¡Correo enviado!</h3>
           <p style={{ color: "#666", marginTop: "1rem" }}>
             Revisa tu bandeja de entrada para seguir las instrucciones y
             restablecer tu contraseña.
@@ -43,7 +43,7 @@ function ForgotPassword() {
   return (
     <form className="login-form" onSubmit={handleSubmit}>
       <div style={{ marginBottom: "1.5rem" }}>
-        <h3>Recuperar Contraseña</h3>
+        <h3 style={{ color: "#1a202c" }}>Recuperar Contraseña</h3>
         <p style={{ fontSize: "0.85rem", color: "#666", marginTop: "0.5rem" }}>
           Ingresa tu correo y te enviaremos un enlace para que vuelvas a entrar.
         </p>

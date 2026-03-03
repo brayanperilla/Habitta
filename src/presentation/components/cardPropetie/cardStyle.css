@@ -98,6 +98,7 @@
   border-radius: 50%;
   width: 36px;
   height: 36px;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -149,30 +150,37 @@
 .property-card__price {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #1a1a1a;
+  color: #2dd4bf;
   margin-bottom: 12px;
 }
 
 /* Features */
 .property-card__features {
   display: flex;
-  gap: 16px;
+  gap: 24px;
   align-items: center;
-  color: #6b7280;
-  font-size: 0.9rem;
+  color: #665c5c;
+  font-size: 1.1rem;
   margin-bottom: 20px;
+  padding-top: 8px;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
-.feature-icon {
-  width: 16px;
-  height: 16px;
-  opacity: 0.6;
+.feature-svg {
+  width: 24px;
+  height: 24px;
+  color: #665c5c;
+  opacity: 0.9;
+}
+
+.feature-value {
+  font-weight: 700;
+  color: #4b4444;
 }
 
 /* Details Button */
@@ -194,21 +202,69 @@
   background: #14b8a6;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .property-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* Lightbox / Fullscreen Image */
+.property-lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.property-lightbox__content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.property-lightbox__img {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.property-lightbox__close {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 3rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  padding: 10px;
+}
+
+.property-lightbox__close:hover {
+  transform: scale(1.2);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 
-@media (max-width: 640px) {
-  .property-cards-grid {
-    grid-template-columns: 1fr;
-    padding: 10px 0;
-    gap: 20px;
-  }
-
-  .property-card__image-container {
-    height: 240px;
+@media (max-width: 768px) {
+  .property-lightbox__close {
+    top: -50px;
+    right: 0;
   }
 }
