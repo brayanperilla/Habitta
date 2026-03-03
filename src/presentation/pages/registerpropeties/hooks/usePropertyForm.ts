@@ -231,6 +231,28 @@ export function usePropertyForm(editId?: number) {
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  /** RF19 — Reordenar previews (y archivos) tras drag-and-drop */
+  const reorderPreviews = (newOrder: string[]) => {
+    // Reordenar los archivos nuevos para que coincidan con el nuevo orden
+    const blobIndexes = previews
+      .map((url, i) => (url.startsWith("blob:") ? i : -1))
+      .filter((i) => i >= 0);
+
+    const newBlobOrder = newOrder
+      .map((url, _i) => previews.indexOf(url))
+      .filter((origIdx) => previews[origIdx]?.startsWith("blob:"));
+
+    // Solo reordenar archivos locales si hay correspondencia
+    if (newBlobOrder.length === blobIndexes.length && imagenes.length > 0) {
+      const reorderedFiles = newBlobOrder.map(
+        (origIdx) => imagenes[blobIndexes.indexOf(origIdx)],
+      );
+      setImagenes(reorderedFiles);
+    }
+
+    setPreviews(newOrder);
+  };
+
   /** Validar campos obligatorios */
   const validar = (): string | null => {
     if (!form.titulo.trim()) return "El título es obligatorio.";
@@ -351,6 +373,7 @@ export function usePropertyForm(editId?: number) {
     previews,
     handleImageChange,
     removeImage,
+    reorderPreviews,
     maxFotos,
     isEditMode,
     loadingEdit,

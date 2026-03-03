@@ -96,6 +96,57 @@
 
 /* ===== SECCIÓN PROPIEDADES ===== */
 
+/* Filtro por estado (RF26) */
+.estado-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.estado-filter__btn {
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: #fff;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.estado-filter__btn:hover {
+  border-color: #35d2db;
+  color: #35d2db;
+}
+
+.estado-filter__btn--active {
+  background: #35d2db;
+  color: #fff;
+  border-color: #35d2db;
+}
+
+.estado-filter__count {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.estado-filter__btn--active .estado-filter__count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Badge archivada */
+.estado-badge--archivada {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 /* Lista de propiedades */
 .propiedades-list {
   display: flex;
@@ -308,6 +359,26 @@
 
 .action-btn--reactivar:hover {
   background: #059669;
+  color: #ffffff;
+}
+
+.action-btn--duplicate {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.action-btn--duplicate:hover {
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+.action-btn--archivar {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.action-btn--archivar:hover {
+  background: #6b7280;
   color: #ffffff;
 }
 

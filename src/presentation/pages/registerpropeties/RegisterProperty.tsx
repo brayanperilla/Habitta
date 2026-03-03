@@ -4,6 +4,7 @@ import "./styleRegisterP.css";
 import { usePropertyForm } from "./hooks/usePropertyForm";
 import { useWarnIfUnsavedChanges } from "@application/hooks/useWarnIfUnsavedChanges";
 import { useToast } from "@application/context/ToastContext";
+import SortableImageGrid from "@presentation/components/SortableImageGrid/SortableImageGrid";
 
 // Página de Registro / Edición de Propiedades
 function RegisterPropertyPage() {
@@ -27,6 +28,7 @@ function RegisterPropertyPage() {
     previews,
     handleImageChange,
     removeImage,
+    reorderPreviews,
     maxFotos,
     imagenes,
     isEditMode,
@@ -372,24 +374,12 @@ function RegisterPropertyPage() {
               style={{ display: "none" }}
             />
 
-            {/* Grid de previews */}
-            {previews.length > 0 && (
-              <div className="fotos-preview-grid">
-                {previews.map((url, i) => (
-                  <div key={i} className="foto-preview-item">
-                    <img src={url} alt={`Foto ${i + 1}`} />
-                    <button
-                      type="button"
-                      className="foto-remove-btn"
-                      onClick={() => removeImage(i)}
-                      title="Eliminar foto"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Grid de previews con drag-and-drop (RF19) */}
+            <SortableImageGrid
+              previews={previews}
+              onReorder={reorderPreviews}
+              onRemove={removeImage}
+            />
           </div>
 
           <br />

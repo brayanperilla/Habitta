@@ -63,11 +63,11 @@ export const propertyApi = {
     });
   },
 
-  /** Crear propiedad (estadoPublicacion y fechacreacion son auto-generados) */
+  /** Crear propiedad — se publica como «activa» automáticamente (RF22) */
   create: async (property: CreatePropertyInput): Promise<Property> => {
     const { data, error } = await supabase
       .from("propiedades")
-      .insert(property)
+      .insert({ ...property, estadoPublicacion: "activa" })
       .select()
       .single();
 

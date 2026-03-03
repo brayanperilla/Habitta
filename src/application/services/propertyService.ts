@@ -9,6 +9,7 @@ import { propertyApi } from "@infrastructure/api/properties.api";
 import { caracteristicasApi } from "@infrastructure/api/caracteristicas.api";
 import { storageApi } from "@infrastructure/api/storage.api";
 import { supabase } from "@infrastructure/supabase/client";
+import { compressImage } from "@application/utils/imageUtils";
 
 /** Servicio de propiedades — lógica de negocio y validaciones */
 export const propertyService = {
@@ -94,11 +95,12 @@ export const propertyService = {
     const archivos = files.slice(0, limite);
 
     for (let i = 0; i < archivos.length; i++) {
-      const file = archivos[i];
-      const ext = file.name.split(".").pop() || "jpg";
+      // RF17 — Comprimir imagen antes de subir
+      const compressed = await compressImage(archivos[i]);
+      const ext = compressed.name.split(".").pop() || "webp";
       const path = `${idpropiedad}/${Date.now()}_${i}.${ext}`;
 
-      const url = await storageApi.upload(path, file);
+      const url = await storageApi.upload(path, compressed);
 
       const { error } = await supabase.from("fotospropiedad").insert({
         idpropiedad,
@@ -150,5 +152,48 @@ export const propertyService = {
     idpropiedad: number,
   ): Promise<Caracteristica[]> => {
     return await caracteristicasApi.getByPropiedad(idpropiedad);
+  },
+
+  /**
+   * RF27 — Duplicar una propiedad existente.
+   * Copia todos los datos + características, sin imágenes.
+   * El título lleva "(Copia)" al final.
+   */
+  duplicateProperty: async (id: number): Promise<Property> => {
+    const original = await propertyApi.getById(id);
+    if (!original) throw new Error("No se encontró la propiedad original.");
+
+    // Clonar datos sin campos auto-generados
+    const clon: CreatePropertyInput = {
+      idusuario: original.idusuario,
+      titulo: (original.titulo || "Sin título") + " (Copia)",
+      descripcion: original.descripcion,
+      tipoPropiedad: original.tipoPropiedad,
+      precio: original.precio,
+      area: original.area,
+      antiguedad: original.antiguedad,
+      tipoOperacion: original.tipoOperacion,
+      direccion: original.direccion,
+      ciudad: original.ciudad,
+      departamento: original.departamento,
+      barrio: original.barrio,
+      codigopostal: original.codigopostal,
+      habitaciones: original.habitaciones,
+      banos: original.banos,
+      estrato: original.estrato,
+    };
+
+    const nueva = await propertyApi.create(clon);
+
+    // Copiar características
+    const chars = await caracteristicasApi.getByPropiedad(id);
+    if (chars.length > 0) {
+      await caracteristicasApi.guardarCaracteristicasPropiedad(
+        nueva.idpropiedad,
+        chars.map((c) => c.idcaracteristica),
+      );
+    }
+
+    return nueva;
   },
 };
