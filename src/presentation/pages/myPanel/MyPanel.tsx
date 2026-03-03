@@ -3,12 +3,15 @@
  * sus propiedades, favoritos, reportes y configurar su perfil
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TabNavigator from "./componentsMyPanel/TabNavigator";
 import PropiedadesSection from "./componentsMyPanel/PropiedadesSection";
 import FavoritosSection from "./componentsMyPanel/FavoritosSection";
 import ReportesSection from "./componentsMyPanel/ReportesSection";
 import PerfilSection from "./componentsMyPanel/PerfilSection";
+import { useAuth } from "@application/context/AuthContext";
+import { propertyService } from "@application/services/propertyService";
+import { useFavorites } from "@application/hooks/useFavorites";
 import "./myPanel.css";
 
 /**
@@ -17,6 +20,30 @@ import "./myPanel.css";
 const MyPanel: React.FC = () => {
   // Estado para controlar la pestaña activa
   const [activeTab, setActiveTab] = useState<string>("propiedades");
+  const { usuario } = useAuth();
+  const { favIds } = useFavorites();
+
+  // Stats dinámicas
+  const [totalPropiedades, setTotalPropiedades] = useState(0);
+  const [propiedadesActivas, setPropiedadesActivas] = useState(0);
+
+  useEffect(() => {
+    const cargarStats = async () => {
+      if (!usuario) return;
+      try {
+        const props = await propertyService.getPropertiesByUsuario(
+          usuario.idusuario,
+        );
+        setTotalPropiedades(props.length);
+        setPropiedadesActivas(
+          props.filter((p) => p.estadoPublicacion === "activa").length,
+        );
+      } catch {
+        /* silencioso */
+      }
+    };
+    cargarStats();
+  }, [usuario]);
 
   /**
    * Maneja el cambio de pestaña
@@ -45,11 +72,11 @@ const MyPanel: React.FC = () => {
     }
   };
 
-  // Datos de estadísticas - Se integrarían con el backend
+  // Stats reales — solo datos verificables
   const estadisticas = [
     {
       id: 1,
-      numero: "8",
+      numero: String(totalPropiedades),
       label: "Propiedades",
       icono: (
         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
@@ -60,7 +87,7 @@ const MyPanel: React.FC = () => {
     },
     {
       id: 2,
-      numero: "6",
+      numero: String(propiedadesActivas),
       label: "Activas",
       icono: (
         <svg
@@ -82,7 +109,7 @@ const MyPanel: React.FC = () => {
     },
     {
       id: 3,
-      numero: "12",
+      numero: String(favIds.size),
       label: "Favoritos",
       icono: (
         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
@@ -90,28 +117,6 @@ const MyPanel: React.FC = () => {
         </svg>
       ),
       color: "#ec4899",
-    },
-    {
-      id: 4,
-      numero: "1247",
-      label: "Visualizaciones",
-      icono: (
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-        </svg>
-      ),
-      color: "#3b82f6",
-    },
-    {
-      id: 5,
-      numero: "23",
-      label: "Contactos",
-      icono: (
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z" />
-        </svg>
-      ),
-      color: "#8b5cf6",
     },
   ];
 

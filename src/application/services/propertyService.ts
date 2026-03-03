@@ -47,7 +47,7 @@ export const propertyService = {
     property: CreatePropertyInput,
     idsCaracteristicas: number[],
     imagenes: File[] = [],
-    plan: 'gratuito' | 'premium' = 'gratuito',
+    plan: "gratuito" | "premium" = "gratuito",
   ): Promise<Property> => {
     if (!property.titulo?.trim()) throw new Error("El título es obligatorio.");
     if (!property.direccion?.trim())
@@ -69,7 +69,11 @@ export const propertyService = {
 
     // Subir imágenes si las hay
     if (imagenes.length > 0) {
-      await propertyService.uploadPropertyImages(nueva.idpropiedad, imagenes, plan);
+      await propertyService.uploadPropertyImages(
+        nueva.idpropiedad,
+        imagenes,
+        plan,
+      );
     }
 
     return nueva;
@@ -83,9 +87,10 @@ export const propertyService = {
   uploadPropertyImages: async (
     idpropiedad: number,
     files: File[],
-    plan: 'gratuito' | 'premium' = 'gratuito',
+    plan: "gratuito" | "premium" = "gratuito",
   ): Promise<void> => {
-    const limite = plan === 'premium' ? LIMITE_FOTOS.premium : LIMITE_FOTOS.free;
+    const limite =
+      plan === "premium" ? LIMITE_FOTOS.premium : LIMITE_FOTOS.free;
     const archivos = files.slice(0, limite);
 
     for (let i = 0; i < archivos.length; i++) {
@@ -122,8 +127,16 @@ export const propertyService = {
     return await propertyApi.update(id, updates);
   },
 
-  /** Eliminar propiedad */
+  /** Eliminar propiedad (con dependencias: fotos y características) */
   deleteProperty: async (id: number): Promise<void> => {
+    // 1. Eliminar fotos de la propiedad
+    await supabase.from("fotospropiedad").delete().eq("idpropiedad", id);
+    // 2. Eliminar características asociadas
+    await supabase
+      .from("propiedades_caracteristicas")
+      .delete()
+      .eq("idpropiedad", id);
+    // 3. Eliminar la propiedad en sí
     return await propertyApi.delete(id);
   },
 

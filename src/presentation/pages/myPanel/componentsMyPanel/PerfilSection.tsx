@@ -4,12 +4,13 @@ import { useAuth } from "@application/context/AuthContext";
 import { useToast } from "@application/context/ToastContext";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { useWarnIfUnsavedChanges } from "@application/hooks/useWarnIfUnsavedChanges";
+import { supabase } from "@infrastructure/supabase/client";
 
 /**
  * Componente que muestra el perfil del usuario y opciones de configuración
  */
 const PerfilSection: React.FC = () => {
-  const { usuario, updatePerfil } = useAuth();
+  const { usuario, updatePerfil, signOut } = useAuth();
 
   // Estados para edición de perfil (RF09)
   const [isEditing, setIsEditing] = useState(false);
@@ -29,7 +30,34 @@ const PerfilSection: React.FC = () => {
   // Estado para modal de cambio de contraseña (RF08)
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-  // Escuchar evento para abrir el modal
+  // Estado para cambio de correo (RF10)
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [emailStep, setEmailStep] = useState<1 | 2>(1);
+  const [emailVerify, setEmailVerify] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [emailLoading, setEmailLoading] = useState(false);
+
+  // Estado para notificaciones (RF11)
+  const [isNotifsOpen, setIsNotifsOpen] = useState(false);
+  const [notifPrefs, setNotifPrefs] = useState(() => {
+    try {
+      const saved = localStorage.getItem("habitta_notif_prefs");
+      return saved
+        ? JSON.parse(saved)
+        : { nuevas: true, favoritos: true, promos: false, seguridad: true };
+    } catch {
+      return { nuevas: true, favoritos: true, promos: false, seguridad: true };
+    }
+  });
+
+  // Estado para eliminación de cuenta (RF12)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteStep, setDeleteStep] = useState<1 | 2>(1);
+  const [deleteEmailVerify, setDeleteEmailVerify] = useState("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Escuchar evento para abrir el modal de contraseña
   useEffect(() => {
     const handleOpenModal = () => setIsPasswordModalOpen(true);
     window.addEventListener("open-password-modal", handleOpenModal);
@@ -55,6 +83,94 @@ const PerfilSection: React.FC = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  // RF10 — Cambio de correo
+  const handleEmailVerifyStep = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (emailVerify.trim().toLowerCase() !== usuario?.correo?.toLowerCase()) {
+      showToast("El correo electrónico no coincide con tu cuenta.", "error");
+      return;
+    }
+    setEmailStep(2);
+  };
+
+  const handleEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmail.trim() || !newEmail.includes("@")) {
+      showToast("Ingresa un correo electrónico válido.", "error");
+      return;
+    }
+    setEmailLoading(true);
+    try {
+      const { error: err } = await supabase.auth.updateUser({
+        email: newEmail.trim(),
+      });
+      if (err) throw new Error(err.message);
+      showToast(
+        "Se envió un correo de confirmación al nuevo email. Revisa tu bandeja.",
+        "success",
+      );
+      setIsEmailModalOpen(false);
+      setEmailStep(1);
+      setEmailVerify("");
+      setNewEmail("");
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Error al cambiar correo.",
+        "error",
+      );
+    } finally {
+      setEmailLoading(false);
+    }
+  };
+
+  // RF11 — Notificaciones
+  const toggleNotif = (key: string) => {
+    setNotifPrefs((prev: Record<string, boolean>) => {
+      const updated = { ...prev, [key]: !prev[key] };
+      localStorage.setItem("habitta_notif_prefs", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  // RF12 — Eliminar cuenta
+  const handleDeleteEmailStep = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      deleteEmailVerify.trim().toLowerCase() !== usuario?.correo?.toLowerCase()
+    ) {
+      showToast("El correo electrónico no coincide con tu cuenta.", "error");
+      return;
+    }
+    setDeleteStep(2);
+  };
+
+  const handleDeleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (deleteConfirmText !== "ELIMINAR") {
+      showToast('Escribe "ELIMINAR" para confirmar.', "error");
+      return;
+    }
+    setDeleteLoading(true);
+    try {
+      // Marcar cuenta como eliminada
+      await supabase
+        .from("usuarios")
+        .update({ estadocuenta: "eliminada" })
+        .eq("idusuario", usuario!.idusuario);
+      showToast("Cuenta eliminada. Redirigiendo...", "success");
+      // Cerrar sesión e ir al login inmediatamente
+      await signOut();
+      window.location.href = "/auth";
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Error al eliminar cuenta.",
+        "error",
+      );
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -198,7 +314,7 @@ const PerfilSection: React.FC = () => {
 
         {/* Opciones de configuración */}
         <div className="configuracion-grid">
-          {/* RF08 - Solo implementamos el botón funcional para contraseña aquí */}
+          {/* RF08 - Cambiar Contraseña */}
           <div
             className="configuracion-card clickable"
             onClick={() => setIsPasswordModalOpen(true)}
@@ -242,8 +358,57 @@ const PerfilSection: React.FC = () => {
             </svg>
           </div>
 
-          {/* Resto de opciones estáticas por ahora */}
-          <div className="configuracion-card">
+          {/* RF10 - Cambiar Correo */}
+          <div
+            className="configuracion-card clickable"
+            onClick={() => setIsEmailModalOpen(true)}
+          >
+            <div className="configuracion-card__icon">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <div className="configuracion-card__content">
+              <h4 className="configuracion-card__title">
+                Cambiar Correo Electrónico
+              </h4>
+              <p className="configuracion-card__description">
+                Actualiza tu email de inicio de sesión
+              </p>
+            </div>
+            <svg
+              className="configuracion-card__arrow"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+
+          {/* RF11 - Notificaciones */}
+          <div
+            className="configuracion-card clickable"
+            onClick={() => setIsNotifsOpen(!isNotifsOpen)}
+          >
             <div className="configuracion-card__icon">
               <svg
                 width="24"
@@ -268,6 +433,99 @@ const PerfilSection: React.FC = () => {
                 Gestiona cómo recibes las notificaciones
               </p>
             </div>
+            <svg
+              className="configuracion-card__arrow"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              style={{
+                transform: isNotifsOpen ? "rotate(90deg)" : "none",
+                transition: "transform 0.2s",
+              }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+
+          {/* Panel de notificaciones expandible */}
+          {isNotifsOpen && (
+            <div className="notif-panel">
+              {[
+                { key: "nuevas", label: "Nuevas propiedades en mi zona" },
+                { key: "favoritos", label: "Cambios en mis favoritos" },
+                { key: "promos", label: "Promociones y ofertas" },
+                { key: "seguridad", label: "Alertas de seguridad" },
+              ].map((item) => (
+                <label key={item.key} className="notif-toggle">
+                  <span>{item.label}</span>
+                  <input
+                    type="checkbox"
+                    checked={notifPrefs[item.key]}
+                    onChange={() => toggleNotif(item.key)}
+                  />
+                  <span className="toggle-slider" />
+                </label>
+              ))}
+            </div>
+          )}
+
+          {/* RF12 - Eliminar cuenta */}
+          <div
+            className="configuracion-card configuracion-card--danger clickable"
+            onClick={() => setIsDeleteModalOpen(true)}
+          >
+            <div
+              className="configuracion-card__icon"
+              style={{ background: "#fef2f2", color: "#ef4444" }}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </div>
+            <div className="configuracion-card__content">
+              <h4
+                className="configuracion-card__title"
+                style={{ color: "#ef4444" }}
+              >
+                Eliminar Cuenta
+              </h4>
+              <p className="configuracion-card__description">
+                Elimina permanentemente tu cuenta y datos
+              </p>
+            </div>
+            <svg
+              className="configuracion-card__arrow"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ef4444"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
           </div>
         </div>
       </div>
@@ -277,6 +535,222 @@ const PerfilSection: React.FC = () => {
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
       />
+
+      {/* Modal de cambio de correo (RF10) */}
+      {isEmailModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h3>Cambiar Correo Electrónico</h3>
+              <button
+                className="close-button"
+                onClick={() => {
+                  setIsEmailModalOpen(false);
+                  setEmailStep(1);
+                  setEmailVerify("");
+                  setNewEmail("");
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {emailStep === 1 ? (
+              <form onSubmit={handleEmailVerifyStep} className="modal-form">
+                <p
+                  style={{
+                    color: "#6b7280",
+                    fontSize: "0.9rem",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  Por seguridad, confirma tu correo actual antes de cambiarlo.
+                </p>
+                <div className="form-group">
+                  <label>Correo Electrónico Actual</label>
+                  <input
+                    type="email"
+                    value={emailVerify}
+                    onChange={(e) => setEmailVerify(e.target.value)}
+                    placeholder="Ingresa tu correo actual"
+                    required
+                  />
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn-text"
+                    onClick={() => {
+                      setIsEmailModalOpen(false);
+                      setEmailStep(1);
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn-primary">
+                    Verificar
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleEmailChange} className="modal-form">
+                <p
+                  style={{
+                    color: "#6b7280",
+                    fontSize: "0.9rem",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  ✅ Identidad verificada. Ingresa tu nuevo correo electrónico.
+                </p>
+                <div className="form-group">
+                  <label>Nuevo Correo Electrónico</label>
+                  <input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="nuevo@correo.com"
+                    required
+                    disabled={emailLoading}
+                  />
+                </div>
+                <p style={{ color: "#9ca3af", fontSize: "0.8rem" }}>
+                  Se enviará un correo de confirmación al nuevo email. Tu
+                  contraseña no cambiará.
+                </p>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn-text"
+                    onClick={() => setEmailStep(1)}
+                    disabled={emailLoading}
+                  >
+                    ← Volver
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    disabled={emailLoading}
+                  >
+                    {emailLoading ? "Enviando..." : "Cambiar Correo"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de eliminación de cuenta (RF12) */}
+      {isDeleteModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h3 style={{ color: "#ef4444" }}>Eliminar Cuenta</h3>
+              <button
+                className="close-button"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setDeleteStep(1);
+                  setDeleteEmailVerify("");
+                  setDeleteConfirmText("");
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {deleteStep === 1 ? (
+              <form onSubmit={handleDeleteEmailStep} className="modal-form">
+                <p
+                  style={{
+                    color: "#6b7280",
+                    fontSize: "0.9rem",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  ⚠️ Esta acción es irreversible. Por seguridad, confirma tu
+                  correo electrónico.
+                </p>
+                <div className="form-group">
+                  <label>Correo Electrónico</label>
+                  <input
+                    type="email"
+                    value={deleteEmailVerify}
+                    onChange={(e) => setDeleteEmailVerify(e.target.value)}
+                    placeholder="Ingresa tu correo electrónico"
+                    required
+                  />
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn-text"
+                    onClick={() => {
+                      setIsDeleteModalOpen(false);
+                      setDeleteStep(1);
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    style={{ background: "#ef4444" }}
+                  >
+                    Continuar
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleDeleteAccount} className="modal-form">
+                <p
+                  style={{
+                    color: "#ef4444",
+                    fontSize: "0.9rem",
+                    marginBottom: "1rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  Se eliminarán todos los datos de tu cuenta. Esta acción NO se
+                  puede deshacer.
+                </p>
+                <div className="form-group">
+                  <label>
+                    Escribe <strong>ELIMINAR</strong> para confirmar
+                  </label>
+                  <input
+                    type="text"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="ELIMINAR"
+                    required
+                    disabled={deleteLoading}
+                  />
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn-text"
+                    onClick={() => setDeleteStep(1)}
+                    disabled={deleteLoading}
+                  >
+                    ← Volver
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    style={{ background: "#ef4444" }}
+                    disabled={deleteLoading || deleteConfirmText !== "ELIMINAR"}
+                  >
+                    {deleteLoading ? "Eliminando..." : "Eliminar mi cuenta"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -43,8 +43,11 @@ const INITIAL_FORM: FormState = {
   estrato: "",
 };
 
-/** Hook del formulario de registro de propiedades */
-export function usePropertyForm() {
+/**
+ * Hook del formulario de registro/edición de propiedades.
+ * @param editId — si se provee, carga la propiedad existente para edición
+ */
+export function usePropertyForm(editId?: number) {
   const navigate = useNavigate();
   const { usuario } = useAuth();
 
@@ -65,7 +68,12 @@ export function usePropertyForm() {
   // Estado de imágenes
   const [imagenes, setImagenes] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const maxFotos = usuario?.plan === 'premium' ? LIMITE_FOTOS.premium : LIMITE_FOTOS.free;
+  const maxFotos =
+    usuario?.plan === "premium" ? LIMITE_FOTOS.premium : LIMITE_FOTOS.free;
+
+  // Modo edición
+  const isEditMode = Boolean(editId);
+  const [loadingEdit, setLoadingEdit] = useState(isEditMode);
 
   // Cargar características al montar
   useEffect(() => {
@@ -83,6 +91,73 @@ export function usePropertyForm() {
     };
     cargar();
   }, []);
+
+  // Cargar datos de propiedad existente para edición
+  useEffect(() => {
+    if (!editId) return;
+    const cargarPropiedad = async () => {
+      try {
+        const propiedad = await propertyService.getPropertyById(editId);
+        if (!propiedad) {
+          setError("La propiedad no existe o fue eliminada.");
+          setLoadingEdit(false);
+          return;
+        }
+
+        // Verificar que el usuario sea el dueño
+        if (usuario && propiedad.idusuario !== usuario.idusuario) {
+          setError("No tienes permisos para editar esta propiedad.");
+          setLoadingEdit(false);
+          return;
+        }
+
+        // Rellenar formulario con datos existentes
+        setForm({
+          titulo: propiedad.titulo || "",
+          descripcion: propiedad.descripcion || "",
+          tipoPropiedad: propiedad.tipoPropiedad || "",
+          tipoOperacion: propiedad.tipoOperacion || "",
+          precio: propiedad.precio ? String(propiedad.precio) : "",
+          area: propiedad.area ? String(propiedad.area) : "",
+          antiguedad: propiedad.antiguedad || "",
+          direccion: propiedad.direccion || "",
+          ciudad: propiedad.ciudad || "",
+          departamento: propiedad.departamento || "",
+          barrio: propiedad.barrio || "",
+          codigopostal: propiedad.codigopostal || "",
+          habitaciones: propiedad.habitaciones
+            ? String(propiedad.habitaciones)
+            : "",
+          banos: propiedad.banos ? String(propiedad.banos) : "",
+          estrato: propiedad.estrato ? String(propiedad.estrato) : "",
+        });
+
+        // Cargar características seleccionadas
+        try {
+          const chars =
+            await propertyService.getCaracteristicasDePropiedad(editId);
+          setCaracteristicasSeleccionadas(chars.map((c) => c.idcaracteristica));
+        } catch {
+          /* silencioso — no bloquea la edición */
+        }
+
+        // Cargar fotos existentes como previews (solo URLs, no Files)
+        try {
+          const fotos = await propertyService.getFotosPropiedad(editId);
+          setPreviews(fotos);
+        } catch {
+          /* silencioso */
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Error al cargar la propiedad.",
+        );
+      } finally {
+        setLoadingEdit(false);
+      }
+    };
+    cargarPropiedad();
+  }, [editId, usuario]);
 
   /** Actualizar campo del formulario */
   const handleChange = (
@@ -121,9 +196,11 @@ export function usePropertyForm() {
     }
 
     // Validar límite total
-    const total = imagenes.length + files.length;
+    const total = imagenes.length + previews.length + files.length;
     if (total > maxFotos) {
-      setError(`Máximo ${maxFotos} fotos. Ya tienes ${imagenes.length}.`);
+      setError(
+        `Máximo ${maxFotos} fotos. Ya tienes ${imagenes.length + previews.length}.`,
+      );
       return;
     }
 
@@ -141,8 +218,16 @@ export function usePropertyForm() {
 
   /** Eliminar imagen por índice */
   const removeImage = (index: number) => {
-    URL.revokeObjectURL(previews[index]);
-    setImagenes((prev) => prev.filter((_, i) => i !== index));
+    // Solo revocar blob URLs (no URLs de Supabase)
+    if (previews[index]?.startsWith("blob:")) {
+      URL.revokeObjectURL(previews[index]);
+      // Encontrar el índice correspondiente en imagenes (archivos nuevos)
+      const blobPreviews = previews.filter((p) => p.startsWith("blob:"));
+      const blobIndex = blobPreviews.indexOf(previews[index]);
+      if (blobIndex >= 0) {
+        setImagenes((prev) => prev.filter((_, i) => i !== blobIndex));
+      }
+    }
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -160,7 +245,7 @@ export function usePropertyForm() {
     return null;
   };
 
-  /** Enviar formulario — crear propiedad en Supabase */
+  /** Enviar formulario — crear o actualizar propiedad */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -202,26 +287,47 @@ export function usePropertyForm() {
         ),
       );
 
-      const nueva = (await Promise.race([
-        propertyService.createPropertyConCaracteristicas(
-          input,
-          caracteristicasSeleccionadas,
-          imagenes,
-          usuario?.plan ?? 'gratuito',
-        ),
-        timeout,
-      ])) as Awaited<
-        ReturnType<typeof propertyService.createPropertyConCaracteristicas>
-      >;
+      let propertyId: number;
 
-      // Limpiar previews
-      previews.forEach((url) => URL.revokeObjectURL(url));
+      if (isEditMode && editId) {
+        // --- MODO EDICIÓN ---
+        const updated = await Promise.race([
+          propertyService.updateProperty(editId, input),
+          timeout,
+        ]);
+        propertyId = (updated as { idpropiedad: number }).idpropiedad;
+
+        // Subir nuevas imágenes si las hay
+        if (imagenes.length > 0) {
+          await propertyService.uploadPropertyImages(
+            propertyId,
+            imagenes,
+            usuario?.plan ?? "gratuito",
+          );
+        }
+      } else {
+        // --- MODO CREACIÓN ---
+        const nueva = (await Promise.race([
+          propertyService.createPropertyConCaracteristicas(
+            input,
+            caracteristicasSeleccionadas,
+            imagenes,
+            usuario?.plan ?? "gratuito",
+          ),
+          timeout,
+        ])) as Awaited<
+          ReturnType<typeof propertyService.createPropertyConCaracteristicas>
+        >;
+        propertyId = nueva.idpropiedad;
+      }
+
+      // Limpiar previews blob
+      previews.forEach((url) => {
+        if (url.startsWith("blob:")) URL.revokeObjectURL(url);
+      });
 
       setSuccess(true);
-      setTimeout(
-        () => navigate(`/propertydetailspage/${nueva.idpropiedad}`),
-        1500,
-      );
+      setTimeout(() => navigate(`/propertydetailspage/${propertyId}`), 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al publicar.");
     } finally {
@@ -246,5 +352,7 @@ export function usePropertyForm() {
     handleImageChange,
     removeImage,
     maxFotos,
+    isEditMode,
+    loadingEdit,
   };
 }

@@ -1,11 +1,17 @@
 import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import "./styleRegisterP.css";
 import { usePropertyForm } from "./hooks/usePropertyForm";
 import { useWarnIfUnsavedChanges } from "@application/hooks/useWarnIfUnsavedChanges";
 import { useToast } from "@application/context/ToastContext";
 
-// Página de Registro de Propiedades
+// Página de Registro / Edición de Propiedades
 function RegisterPropertyPage() {
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("edit")
+    ? Number(searchParams.get("edit"))
+    : undefined;
+
   const {
     form,
     handleChange,
@@ -23,7 +29,9 @@ function RegisterPropertyPage() {
     removeImage,
     maxFotos,
     imagenes,
-  } = usePropertyForm();
+    isEditMode,
+    loadingEdit,
+  } = usePropertyForm(editId);
 
   const { showToast } = useToast();
 
@@ -34,7 +42,9 @@ function RegisterPropertyPage() {
   useEffect(() => {
     if (success)
       showToast(
-        "¡Propiedad publicada exitosamente! Redirigiendo...",
+        isEditMode
+          ? "¡Propiedad actualizada exitosamente! Redirigiendo..."
+          : "¡Propiedad publicada exitosamente! Redirigiendo...",
         "success",
       );
   }, [success]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -49,12 +59,31 @@ function RegisterPropertyPage() {
   );
   useWarnIfUnsavedChanges(hasUnsavedChanges && !success);
 
+  if (loadingEdit) {
+    return (
+      <div className="register-page-container">
+        <div
+          className="register-page"
+          style={{ textAlign: "center", padding: "4rem" }}
+        >
+          <p style={{ color: "#aaa", fontSize: "1.1rem" }}>
+            Cargando propiedad...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="register-page-container">
         <form className="register-page" onSubmit={handleSubmit}>
-          <h3>Publicar Propiedades</h3>
-          <p id="subtitle">Datos Principales de la Propiedad</p>
+          <h3>{isEditMode ? "Editar Propiedad" : "Publicar Propiedades"}</h3>
+          <p id="subtitle">
+            {isEditMode
+              ? "Modifica los datos de tu propiedad"
+              : "Datos Principales de la Propiedad"}
+          </p>
 
           <br />
 
@@ -331,7 +360,8 @@ function RegisterPropertyPage() {
             <p>Sube hasta {maxFotos} imágenes (JPG, PNG o WebP, máx 5MB c/u)</p>
 
             <label htmlFor="fileInput" className="foto-upload-btn">
-              📷 Seleccionar fotos ({imagenes.length}/{maxFotos})
+              📷 Seleccionar fotos ({imagenes.length + previews.length}/
+              {maxFotos})
             </label>
             <input
               id="fileInput"
@@ -376,7 +406,13 @@ function RegisterPropertyPage() {
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={submitting}>
-              {submitting ? "Publicando..." : "Publicar Propiedad"}
+              {submitting
+                ? isEditMode
+                  ? "Actualizando..."
+                  : "Publicando..."
+                : isEditMode
+                  ? "Actualizar Propiedad"
+                  : "Publicar Propiedad"}
             </button>
           </div>
         </form>

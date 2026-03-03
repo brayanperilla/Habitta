@@ -101,6 +101,7 @@ export function AuthProvider({ children }: Props) {
      */
     const crearUsuarioDesdeSession = (su: {
       email?: string;
+      created_at?: string;
       user_metadata?: Record<string, unknown>;
     }): Usuario => ({
       idusuario: 0,
@@ -113,6 +114,7 @@ export function AuthProvider({ children }: Props) {
       estadocuenta: null,
       ultimaactividad: null,
       fechalogin: null,
+      fecharegistro: su.created_at ?? null,
       plan: "gratuito",
     });
 
@@ -126,6 +128,13 @@ export function AuthProvider({ children }: Props) {
       try {
         const perfil = await authApi.getUsuarioByCorreo(email);
         if (perfil && mounted) {
+          // Bloquear cuentas eliminadas incluso en restore de sesión
+          if (perfil.estadocuenta === "eliminada") {
+            console.warn("[AuthContext] Cuenta eliminada — cerrando sesión");
+            await supabase.auth.signOut();
+            setUsuario(null);
+            return;
+          }
           setUsuario(perfil);
           console.log("[AuthContext] Perfil DB cargado:", perfil.correo);
         }

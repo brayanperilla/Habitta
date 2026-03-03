@@ -108,12 +108,13 @@
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 24px;
+  padding: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: stretch;
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  min-height: 160px;
 }
 
 .propiedad-card:hover {
@@ -121,9 +122,34 @@
   transform: translateY(-2px);
 }
 
+/* Thumbnail de la propiedad */
+.propiedad-card__thumbnail {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.propiedad-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+
+.propiedad-card__no-img {
+  width: 100%;
+  height: 100%;
+  background: #f0fdfa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #35d2db;
+}
+
 /* Información de la propiedad */
 .propiedad-card__info {
   flex: 1;
+  padding: 20px 20px 20px 24px;
 }
 
 .propiedad-card__header {
@@ -253,6 +279,46 @@
 .action-btn--delete:hover {
   background: #dc2626;
   color: #ffffff;
+}
+
+.action-btn--delete-prop {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.action-btn--delete-prop:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.action-btn--pausar {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.action-btn--pausar:hover {
+  background: #d97706;
+  color: #ffffff;
+}
+
+.action-btn--reactivar {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.action-btn--reactivar:hover {
+  background: #059669;
+  color: #ffffff;
+}
+
+.estado-badge--activa {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.estado-badge--pausada {
+  background: #fef3c7;
+  color: #92400e;
 }
 
 /* ===== SECCIÓN FAVORITOS ===== */
@@ -514,7 +580,11 @@
 
   .propiedad-card {
     flex-direction: column;
-    gap: 20px;
+  }
+
+  .propiedad-card__thumbnail {
+    width: 100%;
+    height: 180px;
   }
 
   .propiedad-card__actions {
@@ -563,4 +633,65 @@
   .perfil-nombre {
     font-size: 24px;
   }
+}
+
+/* ===== NOTIFICACIONES PANEL ===== */
+.notif-panel {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notif-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #374151;
+  user-select: none;
+}
+
+.notif-toggle input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 44px;
+  height: 24px;
+  background: #d1d5db;
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+
+.toggle-slider::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.notif-toggle input:checked + .toggle-slider {
+  background: #35d2db;
+}
+
+.notif-toggle input:checked + .toggle-slider::after {
+  transform: translateX(20px);
+}
+
+/* Danger card */
+.configuracion-card--danger:hover {
+  border-color: #fca5a5;
+  background: #fef2f2;
 }

@@ -167,7 +167,7 @@ function Home() {
 
           {/* Tarjetas de propiedades destacadas desde Supabase */}
           <div className="property-cards-grid">
-            {properties.slice(0, 3).map((property) => (
+            {properties.slice(0, 20).map((property) => (
               <CardPropetie
                 key={property.idpropiedad}
                 property={property}

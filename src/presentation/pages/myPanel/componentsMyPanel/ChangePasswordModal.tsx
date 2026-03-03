@@ -9,13 +9,16 @@ interface Props {
 }
 
 const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
+  // Paso 1: verificación de email, Paso 2: nueva contraseña
+  const [step, setStep] = useState<1 | 2>(1);
+  const [emailInput, setEmailInput] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const { updatePassword } = useAuth();
+  const { usuario, updatePassword } = useAuth();
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -28,6 +31,8 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (!isOpen) {
+      setStep(1);
+      setEmailInput("");
       setNewPassword("");
       setConfirmPassword("");
       setError(null);
@@ -35,6 +40,20 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
+  // Paso 1: Verificar que el email coincida con el de la cuenta
+  const handleVerifyEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (emailInput.trim().toLowerCase() !== usuario?.correo?.toLowerCase()) {
+      setError("El correo electrónico no coincide con tu cuenta.");
+      return;
+    }
+
+    setStep(2);
+  };
+
+  // Paso 2: Cambiar la contraseña
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -51,9 +70,6 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      // Supabase no requiere la contraseña actual para updatePassword si ya hay sesión
-      // pero por seguridad el RF08 dice "validar contraseña anterior".
-      // Nota: supabase.auth.updateUser solo toma la nueva.
       await updatePassword(newPassword);
       setSuccess(true);
       setTimeout(onClose, 2000);
@@ -82,8 +98,51 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <div className="modal-success">
             <p>Cerrando...</p>
           </div>
+        ) : step === 1 ? (
+          /* Paso 1: Verificación de identidad por email */
+          <form onSubmit={handleVerifyEmail} className="modal-form">
+            <p
+              style={{
+                color: "#6b7280",
+                fontSize: "0.9rem",
+                marginBottom: "1rem",
+              }}
+            >
+              Por seguridad, confirma tu correo electrónico antes de cambiar la
+              contraseña.
+            </p>
+            <div className="form-group">
+              <label>Correo Electrónico</label>
+              <input
+                type="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="Ingresa tu correo electrónico"
+                required
+              />
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn-text" onClick={onClose}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn-primary">
+                Verificar
+              </button>
+            </div>
+          </form>
         ) : (
+          /* Paso 2: Ingresar nueva contraseña */
           <form onSubmit={handleSubmit} className="modal-form">
+            <p
+              style={{
+                color: "#6b7280",
+                fontSize: "0.9rem",
+                marginBottom: "1rem",
+              }}
+            >
+              ✅ Identidad verificada. Ingresa tu nueva contraseña.
+            </p>
             <div className="form-group">
               <label>Nueva Contraseña</label>
               <input
@@ -111,10 +170,10 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
               <button
                 type="button"
                 className="btn-text"
-                onClick={onClose}
+                onClick={() => setStep(1)}
                 disabled={loading}
               >
-                Cancelar
+                ← Volver
               </button>
               <button type="submit" className="btn-primary" disabled={loading}>
                 {loading ? "Actualizando..." : "Actualizar Contraseña"}

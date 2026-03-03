@@ -31,5 +31,5 @@ export type CreatePropertyInput = Omit<
 
 /** Actualizar propiedad — todos los campos opcionales */
 export type UpdatePropertyInput = Partial<
-  Omit<Property, "idpropiedad" | "estadoPublicacion" | "fechacreacion">
+  Omit<Property, "idpropiedad" | "fechacreacion">
 >;

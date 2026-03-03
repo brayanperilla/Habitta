@@ -11,6 +11,10 @@ interface CardPropetieProps {
   isFav?: boolean;
   /** Callback al hacer click en el corazón */
   onToggleFav?: (idpropiedad: number) => void;
+  /** ¿El usuario actual es el dueño de esta propiedad? */
+  isOwner?: boolean;
+  /** Callback al hacer click en eliminar */
+  onDelete?: (idpropiedad: number) => void;
 }
 
 // Componente de tarjeta de propiedad individual
@@ -18,6 +22,8 @@ function CardPropetie({
   property,
   isFav = false,
   onToggleFav,
+  isOwner = false,
+  onDelete,
 }: CardPropetieProps) {
   const navigate = useNavigate();
 

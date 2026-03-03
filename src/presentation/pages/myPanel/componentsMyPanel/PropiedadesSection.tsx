@@ -2,13 +2,16 @@
  * PropiedadesSection - Sección de Mis Propiedades
  *
  * Muestra las propiedades publicadas por el usuario logueado
+ * con opciones de editar, eliminar y pausar/reactivar.
  */
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@application/context/AuthContext";
+import { useToast } from "@application/context/ToastContext";
 import { propertyService } from "@application/services/propertyService";
 import type { Property } from "@domain/entities/Property";
+import ConfirmModal from "@presentation/components/confirmModal/ConfirmModal";
 import "./sections.css";
 
 /**
@@ -17,8 +20,14 @@ import "./sections.css";
 const PropiedadesSection: React.FC = () => {
   const { usuario } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [propiedades, setPropiedades] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Estado para modal de confirmación de eliminación
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const cargar = async () => {
@@ -55,6 +64,62 @@ const PropiedadesSection: React.FC = () => {
   const formatFecha = (fecha: string | null) => {
     if (!fecha) return "—";
     return new Date(fecha).toLocaleDateString("es-CO");
+  };
+
+  // Eliminar propiedad
+  const handleDeleteClick = (id: number) => {
+    setPropertyToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!propertyToDelete) return;
+    setDeleting(true);
+    try {
+      await propertyService.deleteProperty(propertyToDelete);
+      setPropiedades((prev) =>
+        prev.filter((p) => p.idpropiedad !== propertyToDelete),
+      );
+      showToast("Propiedad eliminada correctamente.", "success");
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Error al eliminar la propiedad.",
+        "error",
+      );
+    } finally {
+      setDeleting(false);
+      setDeleteModalOpen(false);
+      setPropertyToDelete(null);
+    }
+  };
+
+  // Pausar / Reactivar publicación
+  const handleToggleEstado = async (propiedad: Property) => {
+    const nuevoEstado =
+      propiedad.estadoPublicacion === "pausada" ? "activa" : "pausada";
+    try {
+      await propertyService.updateProperty(propiedad.idpropiedad, {
+        estadoPublicacion: nuevoEstado,
+      });
+      setPropiedades((prev) =>
+        prev.map((p) =>
+          p.idpropiedad === propiedad.idpropiedad
+            ? { ...p, estadoPublicacion: nuevoEstado }
+            : p,
+        ),
+      );
+      showToast(
+        nuevoEstado === "pausada"
+          ? "Publicación pausada."
+          : "Publicación reactivada.",
+        "success",
+      );
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Error al cambiar estado.",
+        "error",
+      );
+    }
   };
 
   return (
@@ -113,6 +178,28 @@ const PropiedadesSection: React.FC = () => {
       <div className="propiedades-list">
         {propiedades.map((propiedad) => (
           <div key={propiedad.idpropiedad} className="propiedad-card">
+            {/* Thumbnail de la propiedad */}
+            <div className="propiedad-card__thumbnail">
+              {propiedad.fotoUrl ? (
+                <img
+                  src={propiedad.fotoUrl}
+                  alt={propiedad.titulo || "Propiedad"}
+                  className="propiedad-card__img"
+                />
+              ) : (
+                <div className="propiedad-card__no-img">
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                  </svg>
+                </div>
+              )}
+            </div>
+
             <div className="propiedad-card__info">
               <div className="propiedad-card__header">
                 <h3 className="propiedad-card__title">
@@ -175,6 +262,7 @@ const PropiedadesSection: React.FC = () => {
             </div>
 
             <div className="propiedad-card__actions">
+              {/* Ver */}
               <button
                 className="action-btn action-btn--view"
                 title="Ver"
@@ -191,10 +279,97 @@ const PropiedadesSection: React.FC = () => {
                   <path d="M8 3.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM8 10a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
               </button>
+
+              {/* Editar */}
+              <button
+                className="action-btn action-btn--edit"
+                title="Editar"
+                onClick={() =>
+                  navigate(`/registerpropeties?edit=${propiedad.idpropiedad}`)
+                }
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9 9a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l9-9z" />
+                </svg>
+              </button>
+
+              {/* Pausar / Reactivar */}
+              <button
+                className={`action-btn ${propiedad.estadoPublicacion === "pausada" ? "action-btn--reactivar" : "action-btn--pausar"}`}
+                title={
+                  propiedad.estadoPublicacion === "pausada"
+                    ? "Reactivar"
+                    : "Pausar"
+                }
+                onClick={() => handleToggleEstado(propiedad)}
+              >
+                {propiedad.estadoPublicacion === "pausada" ? (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Eliminar */}
+              <button
+                className="action-btn action-btn--delete-prop"
+                title="Eliminar"
+                onClick={() => handleDeleteClick(propiedad.idpropiedad)}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                  <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                </svg>
+              </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Modal de confirmación de eliminación */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        title="Eliminar propiedad"
+        message="¿Estás seguro de que deseas eliminar esta propiedad? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        loading={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setPropertyToDelete(null);
+        }}
+      />
     </div>
   );
 };

@@ -38,7 +38,7 @@ function traducirError(msg: string): string {
     "invalid refresh token": "Tu sesión ha expirado. Inicia sesión de nuevo.",
     "refresh token not found": "Tu sesión ha expirado. Inicia sesión de nuevo.",
   };
-  return t[msg.toLowerCase().trim()] ?? msg;
+  return t[msg.toLowerCase().trim().replace(/\.$/, "")] ?? msg;
 }
 
 /** Resultado de registro */
@@ -121,6 +121,13 @@ export const authApi = {
 
       if (insertErr || !nuevo) throw new Error("No se pudo crear tu perfil.");
       return nuevo;
+    }
+    // Bloquear cuentas eliminadas
+    if (usuario.estadocuenta === "eliminada") {
+      await supabase.auth.signOut();
+      throw new Error(
+        "Esta cuenta ha sido eliminada. No es posible iniciar sesión.",
+      );
     }
 
     return usuario;
