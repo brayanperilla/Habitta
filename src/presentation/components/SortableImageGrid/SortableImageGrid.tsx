@@ -61,6 +61,8 @@ function SortableImage({
     zIndex: isDragging ? 10 : 1,
   };
 
+  const isVideo = url.toLowerCase().includes(".mp4") || url.toLowerCase().includes("/video/");
+
   return (
     <div
       ref={setNodeRef}
@@ -83,11 +85,18 @@ function SortableImage({
           <circle cx="15" cy="19" r="1.5" />
         </svg>
       </div>
-      <img
-        src={url}
-        alt={`Foto ${index + 1}`}
-        className="sortable-img-item__img"
-      />
+      {isVideo ? (
+        <div className="sortable-img-item__video-thumb">
+          <video src={url} className="sortable-img-item__img" muted preload="metadata" />
+          <span className="sortable-img-item__play-icon">▶️</span>
+        </div>
+      ) : (
+        <img
+          src={url}
+          alt={`Foto ${index + 1}`}
+          className="sortable-img-item__img"
+        />
+      )}
       {index === 0 && (
         <span className="sortable-img-item__badge">Principal</span>
       )}
@@ -172,12 +181,23 @@ const SortableImageGrid: React.FC<SortableImageGridProps> = ({
       {/* Lightbox */}
       {lightbox && createPortal(
         <div className="sortable-lightbox" onClick={() => setLightbox(null)}>
-          <img
-            src={lightbox}
-            alt="Vista ampliada"
-            className="sortable-lightbox__img"
-            onClick={(e) => e.stopPropagation()}
-          />
+          {(lightbox.toLowerCase().includes(".mp4") || lightbox.toLowerCase().includes("/video/")) ? (
+            <video
+              src={lightbox}
+              controls
+              autoPlay
+              className="sortable-lightbox__img"
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxHeight: "85vh", maxWidth: "90vw", borderRadius: "12px" }}
+            />
+          ) : (
+            <img
+              src={lightbox}
+              alt="Vista ampliada"
+              className="sortable-lightbox__img"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
           <button
             className="sortable-lightbox__close"
             onClick={() => setLightbox(null)}

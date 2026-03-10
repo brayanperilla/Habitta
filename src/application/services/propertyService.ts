@@ -125,6 +125,31 @@ export const propertyService = {
     }
   },
 
+  /** Subir videos de una propiedad a Storage + BD (tabla fotospropiedad) */
+  uploadPropertyVideos: async (
+    idpropiedad: number,
+    files: File[],
+    startOrder: number = 100,
+  ): Promise<void> => {
+    for (let i = 0; i < files.length; i++) {
+      const ext = files[i].name.split(".").pop() || "mp4";
+      const path = `${idpropiedad}/video/${Date.now()}_${i}.${ext}`;
+
+      const url = await storageApi.upload(path, files[i]);
+
+      const { error } = await supabase.from("fotospropiedad").insert({
+        idpropiedad,
+        url,
+        orden: startOrder + i,
+      });
+
+      if (error) {
+        console.error("Error guardando video en BD:", error);
+        throw new Error(`Error guardando video en BD: ${error.message}`);
+      }
+    }
+  },
+
   /** Crear propiedad sin características */
   createProperty: async (property: CreatePropertyInput): Promise<Property> => {
     if (!property.titulo?.trim()) throw new Error("El título es obligatorio.");

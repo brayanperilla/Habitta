@@ -45,11 +45,19 @@ function CardPropetie({
   return (
     <div className="property-card">
       <div className="property-card__image-container">
-        <img
-          src={property.fotoUrl || fallbackImage}
-          alt={property.titulo || "Propiedad"}
-          className="property-card__img"
-        />
+        {/* Si la foto principal es un video MP4, mostrar fallback image para no distorsionar la card */}
+        {(() => {
+          const src = property.fotoUrl || fallbackImage;
+          const isVideo = src.toLowerCase().includes(".mp4") || src.toLowerCase().includes("/video/");
+          return (
+            <img
+              src={isVideo ? fallbackImage : src}
+              alt={property.titulo || "Propiedad"}
+              className="property-card__img"
+            />
+          );
+        })()}
+
         {/* Badges */}
         {badges.length > 0 && (
           <div className="property-card__badges">

@@ -35,6 +35,11 @@ function RegisterPropertyPage() {
     isEditMode,
     loadingEdit,
     setCoordenadas,
+    // Video
+    videoPreviews,
+    maxVideos,
+    handleVideoChange,
+    removeVideo,
   } = usePropertyForm(editId);
 
   const { showToast } = useToast();
@@ -113,7 +118,12 @@ function RegisterPropertyPage() {
               onChange={handleChange}
               placeholder="Describe las características principales de la propiedad"
               rows={4}
+              maxLength={800}
+              style={{ resize: "vertical", maxHeight: "220px" }}
             />
+            <span style={{ fontSize: "0.78rem", color: "#aaa", display: "block", textAlign: "right", marginTop: "-6px" }}>
+              {(form.descripcion || "").length}/800 caracteres
+            </span>
 
             <div>
               {/* Tipo de Propiedad */}
@@ -379,10 +389,10 @@ function RegisterPropertyPage() {
 
           <br />
 
-          {/* Fotografías */}
+          {/* Fotografías y Videos */}
           <div className="card">
             <h4>Fotos de la Propiedad</h4>
-            <p>Sube hasta {maxFotos} imágenes (JPG, PNG o WebP, máx 5MB c/u)</p>
+            <p>Sube hasta {maxFotos} imágenes (JPG, PNG o WebP, máx 5MB c/u). <strong>La primera imagen es la portada; los videos no pueden ser portada.</strong></p>
 
             <label htmlFor="fileInput" className="foto-upload-btn">
               📷 Seleccionar fotos ({previews.length}/{maxFotos})
@@ -396,12 +406,45 @@ function RegisterPropertyPage() {
               style={{ display: "none" }}
             />
 
-            {/* Grid de previews con drag-and-drop (RF19) */}
+            {/* Grid de previews con drag-and-drop (RF19) — el primero es la portada */}
             <SortableImageGrid
               previews={previews}
               onReorder={reorderPreviews}
               onRemove={removeImage}
             />
+
+            {/* Sección de Videos (RF20) */}
+            <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #eee" }} />
+            <h4>Videos de la Propiedad</h4>
+            <p>Sube hasta <strong>{maxVideos}</strong> video(s) MP4 (máx 50MB c/u). Los videos nunca serán la portada.</p>
+
+            <label htmlFor="videoInput" className="foto-upload-btn" style={{ background: "#10b981" }}>
+              🎬 Seleccionar videos ({videoPreviews.length}/{maxVideos})
+            </label>
+            <input
+              id="videoInput"
+              type="file"
+              multiple
+              accept="video/mp4"
+              onChange={handleVideoChange}
+              style={{ display: "none" }}
+            />
+
+            {videoPreviews.length > 0 && (
+              <div className="video-previews-grid">
+                {videoPreviews.map((url, idx) => (
+                  <div key={url} className="video-preview-item">
+                    <video src={url} controls style={{ width: "100%", borderRadius: "8px", maxHeight: "160px", objectFit: "contain", background: "#000" }} />
+                    <button
+                      type="button"
+                      className="remove-image-btn"
+                      onClick={() => removeVideo(idx)}
+                      aria-label="Eliminar video"
+                    >✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <br />
