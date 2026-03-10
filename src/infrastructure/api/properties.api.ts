@@ -27,6 +27,7 @@ export const propertyApi = {
     const { data, error } = await supabase
       .from("propiedades")
       .select(`*, fotospropiedad(url, orden)`)
+      .ilike("estadoPublicacion", "activa")
       .order("fechacreacion", { ascending: false });
 
     if (error) throw new Error(error.message);
@@ -50,8 +51,8 @@ export const propertyApi = {
       .from("propiedades")
       .select(`*, fotospropiedad(url, orden)`);
 
-    // Only show active properties in search
-    query = query.eq("estadoPublicacion", "Activa");
+    // Solo mostrar propiedades activas (ignorando mayúsculas/minúsculas)
+    query = query.ilike("estadoPublicacion", "activa");
 
     if (filters.searchTerm) {
       // Supabase text search
