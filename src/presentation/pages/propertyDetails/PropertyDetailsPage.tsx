@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { propertyService } from "@application/services/propertyService";
+import { usuariosApi } from "@infrastructure/api/usuarios.api";
 import type { Property } from "@domain/entities/Property";
 import type { Caracteristica } from "@domain/entities/Caracteristica";
+import type { Usuario } from "@domain/entities/Usuario";
 import { MapSelector } from "@presentation/components/MapSelector/MapSelector";
 import "./PropertyDetailsPage.css";
 
@@ -12,6 +14,7 @@ function PropertyDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [property, setProperty] = useState<Property | null>(null);
+  const [vendedor, setVendedor] = useState<Usuario | null>(null);
   const [caracteristicas, setCaracteristicas] = useState<Caracteristica[]>([]);
   const [fotos, setFotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +39,7 @@ function PropertyDetailsPage() {
   const prevImg = () => setImgIndex((i) => (i > 0 ? i - 1 : fotos.length - 1));
   const nextImg = () => setImgIndex((i) => (i < fotos.length - 1 ? i + 1 : 0));
 
-  // Cargar datos de la propiedad al montar
+  // Cargar datos de la propiedad y del vendedor al montar
   useEffect(() => {
     const cargar = async () => {
       if (!id) {
@@ -58,6 +61,10 @@ function PropertyDetailsPage() {
           setProperty(prop);
           setCaracteristicas(cars);
           setFotos(imgs);
+          // Cargar el perfil del vendedor (para leer su teléfono)
+          if (prop.idusuario) {
+            usuariosApi.getById(prop.idusuario).then(setVendedor).catch(() => {});
+          }
         }
       } catch (err) {
         setError(

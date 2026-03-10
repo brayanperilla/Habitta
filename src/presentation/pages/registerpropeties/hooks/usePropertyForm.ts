@@ -257,6 +257,46 @@ export function usePropertyForm(editId?: number) {
 
 
 
+  /** Manejar selección de videos MP4 (RF20) */
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const invalidos = files.filter((f) => !TIPOS_VIDEO.includes(f.type as typeof TIPOS_VIDEO[number]));
+    if (invalidos.length > 0) {
+      setError("Solo se permiten videos en formato MP4.");
+      return;
+    }
+
+    // Máx 50MB por video
+    const grandes = files.filter((f) => f.size > 50 * 1024 * 1024);
+    if (grandes.length > 0) {
+      setError("Cada video debe pesar menos de 50MB.");
+      return;
+    }
+
+    const total = videoFiles.length + files.length;
+    if (total > maxVideos) {
+      setError(`Máximo ${maxVideos} video(s). Ya tienes ${videoFiles.length}.`);
+      return;
+    }
+
+    setError(null);
+    setVideoFiles((prev) => [...prev, ...files]);
+    const urls = files.map((f) => URL.createObjectURL(f));
+    setVideoPreviews((prev) => [...prev, ...urls]);
+    e.target.value = "";
+  };
+
+  /** Eliminar video por índice */
+  const removeVideo = (index: number) => {
+    if (videoPreviews[index]?.startsWith("blob:")) {
+      URL.revokeObjectURL(videoPreviews[index]);
+    }
+    setVideoFiles((prev) => prev.filter((_, i) => i !== index));
+    setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
   /** Eliminar imagen por índice */
   const removeImage = (index: number) => {
     // Solo revocar blob URLs (no URLs de Supabase)
@@ -386,8 +426,20 @@ export function usePropertyForm(editId?: number) {
         propertyId = nueva.idpropiedad;
       }
 
+      // Subir videos si los hay (RF20)
+      if (videoFiles.length > 0) {
+        await propertyService.uploadPropertyVideos(
+          propertyId,
+          videoFiles,
+          imagenes.length + 1,
+        );
+      }
+
       // Limpiar previews blob
       previews.forEach((url) => {
+        if (url.startsWith("blob:")) URL.revokeObjectURL(url);
+      });
+      videoPreviews.forEach((url) => {
         if (url.startsWith("blob:")) URL.revokeObjectURL(url);
       });
 

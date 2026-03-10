@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardPropetie from "../../components/cardPropetie/Card_propietie";
 import { useProperties } from "@application/hooks/useProperties";
 import { useFavorites } from "@application/hooks/useFavorites";
@@ -6,6 +6,8 @@ import { useAuth } from "@application/context/AuthContext";
 import { useSearchParams } from "react-router-dom";
 import { LocationAutocomplete } from "../../components/LocationAutocomplete/LocationAutocomplete";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
+import { propertyService } from "@application/services/propertyService";
+import type { Caracteristica } from "@domain/entities/Caracteristica";
 import "./styleProperties.css";
 
 const ITEMS_PER_PAGE = 20;
@@ -21,6 +23,15 @@ function PropertiesPage() {
   
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Características disponibles y seleccionadas para el filtro
+  const [caracteristicas, setCaracteristicas] = useState<Caracteristica[]>([]);
+  const [selectedCaracteristicas, setSelectedCaracteristicas] = useState<number[]>([]);
+  const [caracteristicasOpen, setCaracteristicasOpen] = useState(false);
+
+  useEffect(() => {
+    propertyService.getCaracteristicas().then(setCaracteristicas).catch(() => {});
+  }, []);
 
   // Estado local para los inputs del formulario antes de aplicarlos, inicializado con URL
   const precioMaxFromUrl = searchParams.get("precioMax") ? Number(searchParams.get("precioMax")) : 7560000000;
@@ -55,6 +66,7 @@ function PropertiesPage() {
       habitaciones: localFilters.habitaciones,
       banos: localFilters.banos,
       estrato: localFilters.estrato,
+      caracteristicas: selectedCaracteristicas.length > 0 ? selectedCaracteristicas : undefined,
       sortBy: localFilters.sortBy
     });
     setCurrentPage(1);
@@ -252,11 +264,57 @@ function PropertiesPage() {
               </select>
             </div>
 
+            {/* Características — dropdown estilo AnimeFlv */}
+            {caracteristicas.length > 0 && (
+              <div className="filter-group-inline caracteristicas-dropdown-wrapper">
+                <button
+                  type="button"
+                  className="caracteristicas-dropdown-btn"
+                  onClick={() => setCaracteristicasOpen(prev => !prev)}
+                >
+                  Características
+                  {selectedCaracteristicas.length > 0 && (
+                    <span className="car-badge">{selectedCaracteristicas.length}</span>
+                  )}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: "auto", transform: caracteristicasOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+
+                {caracteristicasOpen && (
+                  <div className="caracteristicas-panel">
+                    <div className="caracteristicas-grid">
+                      {caracteristicas.map(c => (
+                        <label key={c.idcaracteristica} className="car-check-label">
+                          <input
+                            type="checkbox"
+                            className="car-checkbox"
+                            checked={selectedCaracteristicas.includes(c.idcaracteristica)}
+                            onChange={() => {
+                              setSelectedCaracteristicas(prev =>
+                                prev.includes(c.idcaracteristica)
+                                  ? prev.filter(id => id !== c.idcaracteristica)
+                                  : [...prev, c.idcaracteristica]
+                              );
+                            }}
+                          />
+                          <span className={selectedCaracteristicas.includes(c.idcaracteristica) ? "car-label-active" : ""}>
+                            {c.nombre}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <button className="btn-apply-filters-inline" onClick={handleApplyFilters}>
               Aplicar filtros
             </button>
           </div>
         </section>
+
 
         <div className="content-wrapper full-width-wrapper">
 

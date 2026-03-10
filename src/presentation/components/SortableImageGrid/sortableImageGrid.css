@@ -198,3 +198,27 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Miniatura de video con ícono de play */
+.sortable-img-item__video-thumb {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.sortable-img-item__video-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.sortable-img-item__play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7));
+  pointer-events: none;
+}

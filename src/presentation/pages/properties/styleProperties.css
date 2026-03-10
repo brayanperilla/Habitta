@@ -1,7 +1,10 @@
 /* Contenedor Principal */
 .properties-page {
-  padding: 18px 10px;
+  padding: 18px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
+
 
 /* Título */
 .properties-title {
@@ -398,4 +401,83 @@
   .properties-grid {
     display: block;
   }
+}
+
+/* === Dropdown de Características estilo AnimeFlv === */
+.caracteristicas-dropdown-wrapper {
+  position: relative;
+  align-items: flex-start !important;
+}
+
+.caracteristicas-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  min-width: 160px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.caracteristicas-dropdown-btn:hover {
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.15);
+}
+
+.car-badge {
+  background: #2dd4bf;
+  color: #fff;
+  border-radius: 99px;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.caracteristicas-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 100;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.13);
+  min-width: 560px;
+  max-width: 95vw;
+}
+
+.caracteristicas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 24px;
+}
+
+.car-check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: #374151;
+  padding: 3px 0;
+  user-select: none;
+}
+
+.car-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #2dd4bf;
+  cursor: pointer;
+}
+
+.car-label-active {
+  color: #0d9488;
+  font-weight: 700;
 }

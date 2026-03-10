@@ -17,6 +17,8 @@ export interface PropertyFilters {
   banos?: number;
   banosExacta?: boolean;
   estrato?: number;
+  /** IDs de características que debe tener la propiedad (AND lógico) */
+  caracteristicas?: number[];
   sortBy?: "Relevancia" | "Mayor a menor precio" | "Menor a mayor precio";
 }
 
@@ -106,7 +108,27 @@ export const propertyApi = {
       return { ...rest, fotoUrl: primeraFoto?.url ?? null } as Property;
     });
 
-    // Ordenamiento Post-Fetch para asegurar cast Numérico real de JSONs
+    // Filtro post-fetch por características (AND lógico)
+    if (filters.caracteristicas && filters.caracteristicas.length > 0) {
+      const { data: charData } = await supabase
+        .from("propiedad_caracteristicas")
+        .select("idpropiedad, idcaracteristica")
+        .in("idcaracteristica", filters.caracteristicas);
+
+      // Agrupar por propiedad: solo conservar las que tienen TODAS las caracteristicas seleccionadas
+      const charMap: Record<number, Set<number>> = {};
+      for (const row of charData ?? []) {
+        if (!charMap[row.idpropiedad]) charMap[row.idpropiedad] = new Set();
+        charMap[row.idpropiedad].add(row.idcaracteristica);
+      }
+      formattedData = formattedData.filter(p => {
+        if (!p.idpropiedad) return false;
+        const set = charMap[p.idpropiedad as number];
+        return filters.caracteristicas!.every(id => set?.has(id));
+      });
+    }
+
+    // Ordenamiento post-fetch para asegurar cast Numérico real
     if (filters.sortBy === "Mayor a menor precio") {
       formattedData = formattedData.sort((a, b) => Number(b.precio || 0) - Number(a.precio || 0));
     } else if (filters.sortBy === "Menor a mayor precio") {
@@ -115,6 +137,7 @@ export const propertyApi = {
 
     return formattedData;
   },
+
 
   /** Una propiedad por ID */
   getById: async (id: number): Promise<Property | null> => {
