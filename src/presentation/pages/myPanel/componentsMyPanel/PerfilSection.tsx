@@ -203,7 +203,7 @@ const PerfilSection: React.FC = () => {
       // 1. Obtener la imagen recortada del Canvas
       const canvasScaled = editorRef.current.getImageScaledToCanvas();
       const blob = await new Promise<Blob>((resolve, reject) => {
-        canvasScaled.toBlob((blob) => {
+        canvasScaled.toBlob((blob: Blob | null) => {
           if (blob) resolve(blob);
           else reject(new Error("Error al procesar la imagen."));
         }, "image/jpeg", 0.9);
@@ -367,8 +367,8 @@ const PerfilSection: React.FC = () => {
               </svg>
               <span>
                 Miembro desde{" "}
-                {usuario.fechalogin
-                  ? new Date(usuario.fechalogin).toLocaleDateString()
+                {usuario.created_at || usuario.fechalogin
+                  ? new Date((usuario.created_at || usuario.fechalogin)!).toLocaleDateString()
                   : "N/A"}
               </span>
             </div>
@@ -377,12 +377,29 @@ const PerfilSection: React.FC = () => {
           <div className="perfil-biografia">
             <h4>Biografía</h4>
             {isEditing ? (
-              <textarea
-                className="edit-textarea-bio"
-                value={biografia}
-                onChange={(e) => setBiografia(e.target.value)}
-                placeholder="Cuéntanos un poco sobre ti..."
-              />
+              <div style={{ position: "relative" }}>
+                <textarea
+                  className="edit-textarea-bio"
+                  value={biografia}
+                  onChange={(e) => {
+                    let text = e.target.value;
+                    if (text.length > 0) text = text.charAt(0).toUpperCase() + text.slice(1);
+                    setBiografia(text);
+                  }}
+                  placeholder="Cuéntanos un poco sobre ti..."
+                  maxLength={800}
+                  rows={4}
+                  style={{ 
+                    resize: "vertical", 
+                    maxHeight: "220px",
+                    minHeight: "120px",
+                    marginBottom: "8px" 
+                  }}
+                />
+                <span style={{ fontSize: "0.78rem", color: "#aaa", display: "block", textAlign: "right", marginTop: "-6px" }}>
+                  {(biografia || "").length}/800 caracteres
+                </span>
+              </div>
             ) : (
               <p>{usuario.descripcion || "Sin descripción"}</p>
             )}

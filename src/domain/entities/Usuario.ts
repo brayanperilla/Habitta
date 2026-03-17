@@ -12,6 +12,7 @@ export interface Usuario {
   fechalogin: string | null;
   plan: "gratuito" | "premium";
   rol?: string | null;
+  created_at?: string;
 }
 
 /** Crear usuario — sin campos auto-generados */

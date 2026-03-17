@@ -171,13 +171,36 @@ export function usePropertyForm(editId?: number) {
     cargarPropiedad();
   }, [editId, usuario]);
 
+  /** Helper para aplicar capitalización (primera letra mayúscula) a un texto */
+  const capitalizeFirst = (str: string) => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   /** Actualizar campo del formulario */
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
   ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    let { name, value } = e.target;
+    
+    // Aplicar norma gramatical (primera letra en mayúscula) de forma automática 
+    // a los campos de texto libre
+    const textFieldsToCapitalize = [
+      "titulo", 
+      "descripcion", 
+      "direccion", 
+      "ciudad", 
+      "departamento", 
+      "barrio"
+    ];
+    
+    if (textFieldsToCapitalize.includes(name) && value.length > 0) {
+      value = capitalizeFirst(value);
+    }
+
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   /** Alternar característica */
@@ -325,6 +348,7 @@ export function usePropertyForm(editId?: number) {
     if (!form.banos.trim()) return "Los baños son obligatorios.";
     if (!form.estrato.trim()) return "El estrato es obligatorio.";
     if (!usuario) return "Debes iniciar sesión para publicar.";
+    if (previews.length < 3) return "Debes subir un mínimo de 3 fotos de la propiedad para poder publicarla.";
     return null;
   };
 

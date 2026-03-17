@@ -387,7 +387,7 @@ function RegisterPropertyPage() {
                           toggleCaracteristica(car.idcaracteristica)
                         }
                       />
-                      {car.nombre}
+                      {car.nombre.charAt(0).toUpperCase() + car.nombre.slice(1).toLowerCase()}
                     </label>
                   ))
                 ) : (
@@ -403,19 +403,19 @@ function RegisterPropertyPage() {
 
           <br />
 
-          {/* Fotografías y Videos */}
+          {/* Fotografías */}
           <div className="card">
-            <h4>Fotos y Videos de la Propiedad</h4>
-            <p>Hasta {maxFotos} fotos (JPG, PNG, WebP · máx 5MB) y {maxVideos} video{maxVideos > 1 ? "s" : ""} MP4 (máx 50MB)</p>
+            <h4>Fotos de la Propiedad</h4>
+            <p>Sube al menos 3 fotos (máx {maxFotos}). Formatos: JPG, PNG, WebP · máx 5MB.</p>
 
             <label htmlFor="fileInput" className="foto-upload-btn">
-              🎞️ Seleccionar fotos/videos ({previews.length}/{maxFotos + maxVideos})
+              📷 Seleccionar fotos ({previews.length}/{maxFotos})
             </label>
             <input
               id="fileInput"
               type="file"
               multiple
-              accept="image/jpeg,image/png,image/webp,video/mp4"
+              accept="image/jpeg,image/png,image/webp"
               onChange={handleImageChange}
               style={{ display: "none" }}
             />

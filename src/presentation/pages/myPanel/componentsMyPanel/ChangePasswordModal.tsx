@@ -18,6 +18,35 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Validación de contraseña en tiempo real
+  const passwordValidation = {
+    hasLength: newPassword.length >= 8,
+    hasUpper: /[A-Z]/.test(newPassword),
+    hasLower: /[a-z]/.test(newPassword),
+    hasNumberAndSafe: (() => {
+      if (!/[0-9]/.test(newPassword)) return false;
+      if (/(\d)\1{2,}/.test(newPassword)) return false; // Repetidos como 222
+
+      // Secuenciales como 123 o 321
+      for (let i = 0; i < newPassword.length - 2; i++) {
+        const c1 = newPassword.charCodeAt(i);
+        const c2 = newPassword.charCodeAt(i + 1);
+        const c3 = newPassword.charCodeAt(i + 2);
+
+        if (c1 >= 48 && c1 <= 57 && c2 >= 48 && c2 <= 57 && c3 >= 48 && c3 <= 57) {
+          if ((c2 === c1 + 1 && c3 === c2 + 1) || (c2 === c1 - 1 && c3 === c2 - 1)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    })(),
+    hasSpecial: /[^A-Za-z0-9]/.test(newPassword),
+  };
+
+  const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+  const passwordsMatch = newPassword.length > 0 && confirmPassword.length > 0 && newPassword === confirmPassword;
+
   const { usuario, updatePassword } = useAuth();
   const { showToast } = useToast();
 
@@ -58,13 +87,13 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
     e.preventDefault();
     setError(null);
 
-    if (newPassword !== confirmPassword) {
+    if (!passwordsMatch) {
       setError("Las contraseñas no coinciden.");
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError("La nueva contraseña debe tener al menos 8 caracteres.");
+    if (!isPasswordValid) {
+      setError("La nueva contraseña no cumple con los requisitos de seguridad.");
       return;
     }
 
@@ -154,6 +183,25 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 disabled={loading}
               />
             </div>
+            {newPassword.length > 0 && (
+              <ul className="password-requirements" style={{ marginBottom: "16px" }}>
+                <li className={passwordValidation.hasLength ? "valid" : "invalid"}>
+                  {passwordValidation.hasLength ? "✓" : "✕"} Mínimo 8 caracteres
+                </li>
+                <li className={passwordValidation.hasUpper ? "valid" : "invalid"}>
+                  {passwordValidation.hasUpper ? "✓" : "✕"} Al menos 1 mayúscula
+                </li>
+                <li className={passwordValidation.hasLower ? "valid" : "invalid"}>
+                  {passwordValidation.hasLower ? "✓" : "✕"} Al menos 1 minúscula
+                </li>
+                <li className={passwordValidation.hasNumberAndSafe ? "valid" : "invalid"}>
+                  {passwordValidation.hasNumberAndSafe ? "✓" : "✕"} Números (sin secuencias 123 ni repeticiones 222)
+                </li>
+                <li className={passwordValidation.hasSpecial ? "valid" : "invalid"}>
+                  {passwordValidation.hasSpecial ? "✓" : "✕"} Al menos 1 carácter especial
+                </li>
+              </ul>
+            )}
             <div className="form-group">
               <label>Confirmar Nueva Contraseña</label>
               <input
@@ -165,6 +213,11 @@ const ChangePasswordModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 disabled={loading}
               />
             </div>
+            {confirmPassword.length > 0 && (
+              <small className={`password-match-hint ${passwordsMatch ? "valid" : "invalid"}`} style={{ display: "block", marginBottom: "16px" }}>
+                {passwordsMatch ? "✓ Las contraseñas coinciden" : "✕ Las contraseñas no coinciden"}
+              </small>
+            )}
 
             <div className="modal-footer">
               <button

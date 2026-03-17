@@ -17,6 +17,7 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -190,7 +191,7 @@ const SortableImageGrid: React.FC<SortableImageGridProps> = ({
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
-        onDragStart={(e) => setActiveId(e.active.id as string)}
+        onDragStart={(e: DragStartEvent) => setActiveId(e.active.id as string)}
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={previews} strategy={rectSortingStrategy}>

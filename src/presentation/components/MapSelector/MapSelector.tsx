@@ -32,7 +32,7 @@ function MapUpdater({ center }: { center: [number, number] }) {
 // Componente para manejar clics en el mapa
 function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
   useMapEvents({
-    click(e) {
+    click(e: L.LeafletMouseEvent) {
       onLocationSelect(e.latlng.lat, e.latlng.lng);
     },
   });

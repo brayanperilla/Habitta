@@ -4,6 +4,9 @@ import { propertyService } from "@application/services/propertyService";
 import type { Property } from "@domain/entities/Property";
 import type { Caracteristica } from "@domain/entities/Caracteristica";
 import { MapSelector } from "@presentation/components/MapSelector/MapSelector";
+import { useFavorites } from "@application/hooks/useFavorites";
+import { useAuth } from "@application/context/AuthContext";
+import { supabase } from "@infrastructure/supabase/client";
 import "./PropertyDetailsPage.css";
 
 const fallbackImage = "/images/auth/dream_home_1.png";
@@ -23,6 +26,27 @@ function PropertyDetailsPage() {
   const [activeTab, setActiveTab] = useState("Descripción");
   const [showLightbox, setShowLightbox] = useState(false);
   const tabNames = ["Descripción", "Características", "Ubicación"];
+
+  // Favoritos & Usuario Auth
+  const { usuario } = useAuth();
+  const { toggleFavorito, isFavorito } = useFavorites();
+  const isFav = property ? isFavorito(property.idpropiedad) : false;
+
+  // Teléfono del vendedor
+  const [sellerPhone, setSellerPhone] = useState<string | null>(null);
+
+  // Funciones de capitalización (Norma gramatical)
+  const capitalize = (str?: string | null) => {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+  const capitalizeWords = (str?: string | null) => {
+    if (!str) return "";
+    return str
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
 
   // Imagen/video seleccionado (primera foto o fallback)
   const selectedImg = fotos.length > 0 ? fotos[imgIndex] : fallbackImage;
@@ -58,6 +82,18 @@ function PropertyDetailsPage() {
           setProperty(prop);
           setCaracteristicas(cars);
           setFotos(imgs);
+
+          // Obtener el teléfono del vendedor
+          if (prop.idusuario) {
+            const { data: seller } = await supabase
+              .from("usuarios")
+              .select("telefono")
+              .eq("idusuario", prop.idusuario)
+              .maybeSingle();
+            if (seller?.telefono) {
+              setSellerPhone(seller.telefono);
+            }
+          }
         }
       } catch (err) {
         setError(
@@ -157,7 +193,7 @@ function PropertyDetailsPage() {
               <circle cx="32" cy="32" r="32" fill="#fff" />
               <path
                 d="M40 32H24M24 32l8-8M24 32l8 8"
-                stroke="#10D6C2"
+                stroke="#1a1a1a"
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -179,7 +215,7 @@ function PropertyDetailsPage() {
               <circle cx="32" cy="32" r="32" fill="#fff" />
               <path
                 d="M24 32h16M40 32l-8-8M40 32l-8 8"
-                stroke="#10D6C2"
+                stroke="#1a1a1a"
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -279,7 +315,7 @@ function PropertyDetailsPage() {
 
         {/* Info rápida */}
         <div className="property-details-info">
-          <span className="property-details-badge">
+          <span className="property-details-badge" style={{ textTransform: "capitalize" }}>
             {property.tipoOperacion || "N/A"}
           </span>
           <h2 className="property-details-price">
@@ -305,13 +341,13 @@ function PropertyDetailsPage() {
           {/* Tab: Descripción */}
           {activeTab === "Descripción" && (
             <div className="property-details-description-box">
-              <h3>{property.titulo || "Sin título"}</h3>
+              <h3 style={{ textTransform: "capitalize" }}>{property.titulo || "Sin título"}</h3>
               <p style={{ color: "#666", marginBottom: "1rem" }}>
-                {property.tipoPropiedad || "Tipo no especificado"} ·{" "}
-                {property.tipoOperacion}
+                {capitalize(property.tipoPropiedad) || "Tipo no especificado"} ·{" "}
+                {capitalize(property.tipoOperacion)}
               </p>
               <p>
-                {property.descripcion ||
+                {capitalize(property.descripcion) ||
                   "No hay descripción disponible para esta propiedad."}
               </p>
               {property.antiguedad && (
@@ -329,11 +365,11 @@ function PropertyDetailsPage() {
                 <ul>
                   {caracteristicas.map((car) => (
                     <li key={car.idcaracteristica}>
-                      {car.nombre}
+                      {capitalize(car.nombre)}
                       {car.descripcion && (
                         <span style={{ color: "#888" }}>
                           {" "}
-                          — {car.descripcion}
+                          — {capitalize(car.descripcion)}
                         </span>
                       )}
                     </li>
@@ -352,14 +388,14 @@ function PropertyDetailsPage() {
                 <strong>Dirección:</strong> {property.direccion}
               </p>
               <p>
-                <strong>Ciudad:</strong> {property.ciudad}
+                <strong>Ciudad:</strong> {capitalizeWords(property.ciudad)}
               </p>
               <p>
-                <strong>Departamento:</strong> {property.departamento}
+                <strong>Departamento:</strong> {capitalizeWords(property.departamento)}
               </p>
               {property.barrio && (
                 <p>
-                  <strong>Barrio:</strong> {property.barrio}
+                  <strong>Barrio:</strong> {capitalizeWords(property.barrio)}
                 </p>
               )}
               {property.codigopostal && (
@@ -384,10 +420,20 @@ function PropertyDetailsPage() {
         {/* Sección de información de propiedad */}
         <div className="property-details-info-box">
           <div className="property-details-info-header">
-            <span className="property-details-badge">
+            <span className="property-details-badge" style={{ textTransform: "capitalize" }}>
               {property.tipoOperacion}
             </span>
-            <button className="property-details-fav-btn" aria-label="Favorito">
+            <button 
+              className="property-details-fav-btn" 
+              aria-label="Favorito"
+              onClick={() => {
+                if(!usuario) {
+                  navigate("/auth");
+                  return;
+                }
+                toggleFavorito(property.idpropiedad);
+              }}
+            >
               <svg
                 width="44"
                 height="44"
@@ -398,11 +444,12 @@ function PropertyDetailsPage() {
                 <circle cx="22" cy="22" r="20" fill="#fff" />
                 <path
                   d="M30.84 14.61a5.5 5.5 0 0 0-7.78 0L22 15.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L22 31.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                  fill="none"
-                  stroke="#1a1a1a"
+                  fill={isFav ? "#ff3040" : "none"}
+                  stroke={isFav ? "#ff3040" : "#1a1a1a"}
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  style={{ transition: "all 0.2s" }}
                 />
               </svg>
             </button>
@@ -558,7 +605,7 @@ function PropertyDetailsPage() {
             </button>
           </div>
 
-          {/* Modal de contacto (cuando no hay teléfono registrado) */}
+          {/* Modal de contacto (cuando no hay teléfono registrado o sí hay) */}
           {showContactModal && (
             <div className="contact-modal-overlay" onClick={() => setShowContactModal(false)}>
               <div className="contact-modal" onClick={(e) => e.stopPropagation()}>
@@ -568,9 +615,20 @@ function PropertyDetailsPage() {
                     <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5 19.79 19.79 0 01.03 2.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11l-1.27 1.27a16 16 0 006.29 6.29l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
                   </svg>
                 </div>
-                <h3>Contactar al vendedor</h3>
-                <p>El vendedor no ha registrado un número de teléfono aún.</p>
-                <p style={{color: '#aaa', fontSize: '0.9rem'}}>Contáctalo por WhatsApp para coordinar la llamada.</p>
+                <h3>{sellerPhone ? "Contactar al vendedor" : "Vendedor sin número"}</h3>
+                
+                {sellerPhone ? (
+                  <>
+                    <p>El propietario ha registrado el siguiente número:</p>
+                    <h2 style={{margin: '1rem 0', color: '#10D6C2', fontSize: '2rem'}}>{sellerPhone}</h2>
+                    <p style={{color: '#aaa', fontSize: '0.9rem'}}>Llama directamente para coordinar con el vendedor.</p>
+                  </>
+                ) : (
+                  <>
+                    <p>El vendedor no ha registrado un número de teléfono aún.</p>
+                    <p style={{color: '#aaa', fontSize: '0.9rem'}}>Contáctalo por WhatsApp para coordinar la llamada.</p>
+                  </>
+                )}
                 <button
                   className="contact-modal__msg-btn"
                   onClick={() => setShowContactModal(false)}

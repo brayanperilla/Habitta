@@ -115,6 +115,7 @@ export function AuthProvider({ children }: Props) {
       ultimaactividad: null,
       fechalogin: su.created_at ?? null,
       plan: "gratuito",
+      created_at: su.created_at,
     });
 
     /**

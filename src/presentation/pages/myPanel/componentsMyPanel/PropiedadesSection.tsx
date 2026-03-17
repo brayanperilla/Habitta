@@ -96,78 +96,6 @@ const PropiedadesSection: React.FC = () => {
     }
   };
 
-  // Pausar / Reactivar publicación
-  const handleToggleEstado = async (propiedad: Property) => {
-    const nuevoEstado =
-      propiedad.estadoPublicacion === "pausada" ? "activa" : "pausada";
-    try {
-      await propertyService.updateProperty(propiedad.idpropiedad, {
-        estadoPublicacion: nuevoEstado,
-      });
-      setPropiedades((prev) =>
-        prev.map((p) =>
-          p.idpropiedad === propiedad.idpropiedad
-            ? { ...p, estadoPublicacion: nuevoEstado }
-            : p,
-        ),
-      );
-      showToast(
-        nuevoEstado === "pausada"
-          ? "Publicación pausada."
-          : "Publicación reactivada.",
-        "success",
-      );
-    } catch (err) {
-      showToast(
-        err instanceof Error ? err.message : "Error al cambiar estado.",
-        "error",
-      );
-    }
-  };
-
-  // RF26 — Archivar propiedad
-  const handleArchivar = async (propiedad: Property) => {
-    const nuevoEstado =
-      propiedad.estadoPublicacion === "archivada" ? "activa" : "archivada";
-    try {
-      await propertyService.updateProperty(propiedad.idpropiedad, {
-        estadoPublicacion: nuevoEstado,
-      });
-      setPropiedades((prev) =>
-        prev.map((p) =>
-          p.idpropiedad === propiedad.idpropiedad
-            ? { ...p, estadoPublicacion: nuevoEstado }
-            : p,
-        ),
-      );
-      showToast(
-        nuevoEstado === "archivada"
-          ? "Propiedad archivada."
-          : "Propiedad restaurada.",
-        "success",
-      );
-    } catch (err) {
-      showToast(
-        err instanceof Error ? err.message : "Error al archivar.",
-        "error",
-      );
-    }
-  };
-
-  // RF27 — Duplicar propiedad
-  const handleDuplicar = async (id: number) => {
-    try {
-      const nueva = await propertyService.duplicateProperty(id);
-      setPropiedades((prev) => [nueva, ...prev]);
-      showToast("Propiedad duplicada correctamente.", "success");
-    } catch (err) {
-      showToast(
-        err instanceof Error ? err.message : "Error al duplicar.",
-        "error",
-      );
-    }
-  };
-
   // Propiedades filtradas
   const propiedadesFiltradas =
     filtroEstado === "todas"
@@ -348,24 +276,6 @@ const PropiedadesSection: React.FC = () => {
             </div>
 
             <div className="propiedad-card__actions">
-              {/* Ver */}
-              <button
-                className="action-btn action-btn--view"
-                title="Ver"
-                onClick={() =>
-                  navigate(`/propertydetailspage/${propiedad.idpropiedad}`)
-                }
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                >
-                  <path d="M8 3.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM8 10a2 2 0 110-4 2 2 0 010 4z" />
-                </svg>
-              </button>
-
               {/* Editar */}
               <button
                 className="action-btn action-btn--edit"
@@ -383,84 +293,22 @@ const PropiedadesSection: React.FC = () => {
                   <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9 9a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l9-9z" />
                 </svg>
               </button>
-
-              {/* RF27 — Duplicar */}
+              
+              {/* Ver */}
               <button
-                className="action-btn action-btn--duplicate"
-                title="Duplicar"
-                onClick={() => handleDuplicar(propiedad.idpropiedad)}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                </svg>
-              </button>
-
-              {/* Pausar / Reactivar (solo si no está archivada ni en revisión) */}
-              {propiedad.estadoPublicacion !== "archivada" && propiedad.estadoPublicacion !== "pending_manual" && (
-                <button
-                  className={`action-btn ${propiedad.estadoPublicacion === "pausada" ? "action-btn--reactivar" : "action-btn--pausar"}`}
-                  title={
-                    propiedad.estadoPublicacion === "pausada"
-                      ? "Reactivar"
-                      : "Pausar"
-                  }
-                  onClick={() => handleToggleEstado(propiedad)}
-                >
-                  {propiedad.estadoPublicacion === "pausada" ? (
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  ) : (
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                    </svg>
-                  )}
-                </button>
-              )}
-
-              {/* RF26 — Archivar / Restaurar */}
-              <button
-                className={`action-btn ${propiedad.estadoPublicacion === "archivada" ? "action-btn--reactivar" : "action-btn--archivar"}`}
-                title={
-                  propiedad.estadoPublicacion === "archivada"
-                    ? "Restaurar"
-                    : "Archivar"
+                className="action-btn action-btn--view"
+                title="Ver"
+                onClick={() =>
+                  navigate(`/propertydetailspage/${propiedad.idpropiedad}`)
                 }
-                onClick={() => handleArchivar(propiedad)}
               >
                 <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
                 >
-                  <polyline points="21 8 21 21 3 21 3 8" />
-                  <rect x="1" y="3" width="22" height="5" />
-                  <line x1="10" y1="12" x2="14" y2="12" />
+                  <path d="M8 3.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM8 10a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
               </button>
 
