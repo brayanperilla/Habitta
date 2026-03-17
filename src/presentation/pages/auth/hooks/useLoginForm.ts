@@ -65,12 +65,18 @@ export function useLoginForm() {
         ),
       );
 
-      await Promise.race([signIn(email, password), timeout]);
+      const profile = await Promise.race([signIn(email, password), timeout]);
 
       // Login exitoso — limpiar intentos
       localStorage.removeItem(ATTEMPTS_KEY);
       localStorage.removeItem(LOCK_KEY);
-      navigate("/");
+
+      // Redirigir según el rol
+      if (profile.rol === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       // Incrementar intentos fallidos
       const attempts = Number(localStorage.getItem(ATTEMPTS_KEY) || 0) + 1;

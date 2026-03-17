@@ -236,6 +236,11 @@
   color: #92400e;
 }
 
+.estado-badge--pending_manual {
+  background: #fef3c7;
+  color: #d97706;
+}
+
 /* Detalles de la propiedad */
 .propiedad-card__details {
   display: flex;

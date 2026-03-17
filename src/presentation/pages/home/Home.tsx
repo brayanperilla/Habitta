@@ -6,8 +6,9 @@ import { useAuth } from "@application/context/AuthContext";
 import { useBusquedas } from "@application/hooks/useBusquedas";
 import { LocationAutocomplete } from "../../components/LocationAutocomplete/LocationAutocomplete";
 import "./home.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
+
 const shieldIcon = "/icons/UI/heroIcons/shield-alt-1-svgrepo-com.svg";
 const medallIcon = "/icons/UI/heroIcons/medal-ribbon-svgrepo-com.svg";
 const peopleIcon = "/icons/UI/heroIcons/peoples-svgrepo-com.svg";
@@ -24,8 +25,8 @@ const backgroundImages = [img1, img2, img3];
 // Componente de Página Principal
 function Home() {
   // Propiedades destacadas desde Supabase
-  const { properties, loading } = useProperties();
-  const { usuario } = useAuth();
+  const { properties, loading: loadingProperties } = useProperties();
+  const { usuario, loading: loadingAuth } = useAuth();
   const { isFavorito, toggleFavorito } = useFavorites();
   const { busquedas } = useBusquedas(usuario?.idusuario?.toString());
   const navigate = useNavigate();
@@ -59,6 +60,19 @@ function Home() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Redirigir al admin si intenta acceder al Home. Evitar flicker si la autenticación está cargando
+  if (loadingAuth) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+        {/* Loader ligero para evitar destellos (flicker) de UI antes del redirect */}
+      </div>
+    );
+  }
+
+  if (usuario?.rol === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
 
   return (
     <>
@@ -209,7 +223,7 @@ function Home() {
                 onToggleFav={usuario ? toggleFavorito : undefined}
               />
             ))}
-            {properties.length === 0 && !loading && (
+            {properties.length === 0 && !loadingProperties && (
               <p
                 style={{ textAlign: "center", color: "#aaa", padding: "1rem" }}
               >

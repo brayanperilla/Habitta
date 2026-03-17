@@ -13,17 +13,18 @@ export const usuariosApi = {
     return data as import("@domain/entities/Usuario").Usuario | null;
   },
 
-  /** Cambiar el plan del usuario (gratuito ↔ premium) */
   cambiarPlan: async (
     idusuario: number,
     nuevoPlan: "gratuito" | "premium",
   ): Promise<void> => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("usuarios")
       .update({ plan: nuevoPlan })
-      .eq("idusuario", idusuario);
+      .eq("idusuario", idusuario)
+      .select();
 
     if (error) throw new Error(`Error cambiando plan: ${error.message}`);
+    if (!data || data.length === 0) throw new Error("Acceso denegado. Configura las políticas RLS en Supabase para permitir a los administradores actualizar la tabla 'usuarios'.");
   },
 
   /** Obtener el plan actual del usuario */
@@ -52,5 +53,30 @@ export const usuariosApi = {
 
     if (error) throw new Error(`Error actualizando perfil: ${error.message}`);
     return data as import("@domain/entities/Usuario").Usuario;
+  },
+
+  /** (Admin) Obtener todos los usuarios de la plataforma */
+  getAllUsuarios: async (): Promise<import("@domain/entities/Usuario").Usuario[]> => {
+    const { data, error } = await supabase
+      .from("usuarios")
+      .select("idusuario,nombre,correo,telefono,plan,estadocuenta,fechalogin,rol,ultimaactividad")
+      .order("fechalogin", { ascending: false });
+
+    if (error) throw new Error(`Error obteniendo lista de usuarios: ${error.message}`);
+    return data as import("@domain/entities/Usuario").Usuario[];
+  },
+
+  updateUserState: async (
+    idusuario: number,
+    nuevoEstado: "Activa" | "Suspendida" | "Eliminada",
+  ): Promise<void> => {
+    const { data, error } = await supabase
+      .from("usuarios")
+      .update({ estadocuenta: nuevoEstado })
+      .eq("idusuario", idusuario)
+      .select();
+
+    if (error) throw new Error(`Error cambiando estado de cuenta: ${error.message}`);
+    if (!data || data.length === 0) throw new Error("Acceso denegado por base de datos. Debes habilitar permisos (UPDATE) a los administradores en las políticas RLS de Supabase.");
   },
 };

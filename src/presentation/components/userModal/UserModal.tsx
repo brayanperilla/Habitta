@@ -77,33 +77,48 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose }) => {
       label: "Panel de Usuario",
       icon: "/icons/UI/navbaricons/user-alt-1-svgrepo-com.svg",
       link: "/myPanel",
+      showForAdmin: true,
+      showForUser: true,
     },
     {
       id: 2,
       label: "Promociones",
       icon: "/icons/UI/navbaricons/star-alt-4-svgrepo-com.svg",
       link: "/promotion",
+      showForAdmin: false,
+      showForUser: true,
     },
     {
       id: 3,
       label: "PQRS",
       icon: "/icons/UI/navbaricons/message-circle-chat-svgrepo-com.svg",
       link: "/pqrs",
+      showForAdmin: false,
+      showForUser: true,
     },
     {
       id: 4,
       label: "Panel Admin",
       icon: "/icons/UI/navbaricons/admin-svgrepo-com.svg",
       link: "/admin",
+      showForAdmin: true,
+      showForUser: false, // Solo visible manualmente, aunque globalmente esté protegido
     },
   ];
+
+  // Identificar rol y obtener opciones
+  const { usuario } = useAuth();
+  const isAdmin = usuario?.rol === "admin";
+  const visibleOptions = menuOptions.filter((opt) => 
+    isAdmin ? opt.showForAdmin : opt.showForUser
+  );
 
   return (
     <div className="user-modal" ref={modalRef}>
       <div className="user-modal__container">
         {/* Lista de opciones del menú */}
         <ul className="user-modal__menu">
-          {menuOptions.map((option) => (
+          {visibleOptions.map((option) => (
             <li key={option.id} className="user-modal__item">
               <Link
                 to={option.link}

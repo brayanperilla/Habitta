@@ -113,8 +113,7 @@ export function AuthProvider({ children }: Props) {
       descripcion: null,
       estadocuenta: null,
       ultimaactividad: null,
-      fechalogin: null,
-      fecharegistro: su.created_at ?? null,
+      fechalogin: su.created_at ?? null,
       plan: "gratuito",
     });
 
@@ -128,15 +127,18 @@ export function AuthProvider({ children }: Props) {
       try {
         const perfil = await authApi.getUsuarioByCorreo(email);
         if (perfil && mounted) {
-          // Bloquear cuentas eliminadas incluso en restore de sesión
-          if (perfil.estadocuenta === "eliminada") {
-            console.warn("[AuthContext] Cuenta eliminada — cerrando sesión");
+          // Bloquear cuentas eliminadas o suspendidas
+          const estado = (perfil.estadocuenta || "").trim().toLowerCase();
+          if (estado === "eliminada" || estado === "suspendida") {
+            console.warn(`[AuthContext] Cuenta ${perfil.estadocuenta} — cerrando sesión`);
             await supabase.auth.signOut();
             setUsuario(null);
             return;
           }
           setUsuario(perfil);
           console.log("[AuthContext] Perfil DB cargado:", perfil.correo);
+          // Tracking de actividad pasivo
+          authApi.actualizarUltimaActividad(perfil.idusuario).catch(() => {});
         }
       } catch (err) {
         console.warn(
@@ -159,8 +161,9 @@ export function AuthProvider({ children }: Props) {
 
         if (session?.user?.email) {
           setUsuario(crearUsuarioDesdeSession(session.user));
-          setLoading(false);
-          enriquecerConPerfilDB(session.user.email);
+          enriquecerConPerfilDB(session.user.email).finally(() => {
+            if (mounted) setLoading(false);
+          });
         } else {
           setUsuario(null);
           setLoading(false);
@@ -182,13 +185,19 @@ export function AuthProvider({ children }: Props) {
         setUsuario(null);
         dbProfileLoaded = false;
         setLoading(false);
-      } else if (event === "SIGNED_IN") {
-        // Login fresco — cargar todo
+      } else if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+        // Login fresco o actualización — cargar todo
         if (session?.user?.email) {
-          setUsuario(crearUsuarioDesdeSession(session.user));
-          setLoading(false);
+          // Solo actualizamos de manera básica si NO tenemos usuario, para no borrar el ROL y perder el UI
+          setUsuario((prev) => {
+            if (prev?.correo === session.user.email) return prev;
+            return crearUsuarioDesdeSession(session.user);
+          });
+          
           dbProfileLoaded = false;
-          enriquecerConPerfilDB(session.user.email);
+          enriquecerConPerfilDB(session.user.email).finally(() => {
+            if (mounted) setLoading(false);
+          });
         }
       }
       // TOKEN_REFRESHED e INITIAL_SESSION: NO hacer nada.
@@ -206,6 +215,14 @@ export function AuthProvider({ children }: Props) {
 
   const signIn = async (email: string, password: string): Promise<Usuario> => {
     const perfil = await authApi.signIn(email, password);
+    
+    // Bloqueo duro al intentar entrar
+    const estado = (perfil.estadocuenta || "").trim().toLowerCase();
+    if (estado === "eliminada" || estado === "suspendida") {
+      await authApi.signOut();
+      throw new Error(`Tu cuenta ha sido ${estado}. Por favor, contacta a soporte para más detalles.`);
+    }
+    
     setUsuario(perfil);
     return perfil;
   };

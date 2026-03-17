@@ -13,6 +13,8 @@ interface TabNavigatorProps {
   activeTab: string;
   /** Función para cambiar de pestaña */
   onTabChange: (tab: string) => void;
+  /** Indica si la vista actual pertenece al administrador */
+  isAdmin?: boolean;
 }
 
 /**
@@ -21,14 +23,17 @@ interface TabNavigatorProps {
 const TabNavigator: React.FC<TabNavigatorProps> = ({
   activeTab,
   onTabChange,
+  isAdmin,
 }) => {
   // Definición de las pestañas disponibles
-  const tabs = [
-    { id: "propiedades", label: "Mis Propiedades" },
-    { id: "favoritos", label: "Favoritos" },
-    { id: "reportes", label: "Reportes" },
-    { id: "perfil", label: "Perfil" },
-  ];
+  const tabs = isAdmin
+    ? [{ id: "perfil", label: "Perfil" }]
+    : [
+        { id: "propiedades", label: "Mis Propiedades" },
+        { id: "favoritos", label: "Favoritos" },
+        { id: "reportes", label: "Reportes" },
+        { id: "perfil", label: "Perfil" },
+      ];
 
   return (
     <nav className="tab-navigator">

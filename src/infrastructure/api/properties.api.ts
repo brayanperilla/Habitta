@@ -37,8 +37,9 @@ export const propertyApi = {
   getAll: async (): Promise<Property[]> => {
     const { data, error } = await supabase
       .from("propiedades")
-      .select(`*, fotospropiedad(url, orden)`)
+      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta)`)
       .ilike("estadoPublicacion", "activa")
+      .eq("usuarios.estadocuenta", "Activa")
       .order("fechacreacion", { ascending: false });
 
     if (error) throw new Error(error.message);
@@ -49,10 +50,10 @@ export const propertyApi = {
   getFiltered: async (filters: PropertyFilters): Promise<Property[]> => {
     let query = supabase
       .from("propiedades")
-      .select(`*, fotospropiedad(url, orden)`);
+      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta)`);
 
-    // Solo mostrar propiedades activas (ignorando mayúsculas/minúsculas)
-    query = query.ilike("estadoPublicacion", "activa");
+    // Solo mostrar propiedades activas publicadas por usuarios con cuenta Activa
+    query = query.ilike("estadoPublicacion", "activa").eq("usuarios.estadocuenta", "Activa");
 
     if (filters.searchTerm) {
       // Supabase text search
@@ -155,11 +156,23 @@ export const propertyApi = {
     return (data ?? []).map(mapPropertyWithPhoto);
   },
 
-  /** Crear propiedad — se publica como «activa» automáticamente (RF22) */
+  /** Obtener propiedades en revisión (pending_manual) para administradores */
+  getPendingProperties: async (): Promise<Property[]> => {
+    const { data, error } = await supabase
+      .from("propiedades")
+      .select(`*, fotospropiedad(url, orden)`)
+      .eq("estadoPublicacion", "pending_manual")
+      .order("fechacreacion", { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(mapPropertyWithPhoto);
+  },
+
+  /** Crear propiedad — pasa a revisión (RF22 modificado) */
   create: async (property: CreatePropertyInput): Promise<Property> => {
     const { data, error } = await supabase
       .from("propiedades")
-      .insert({ ...property, estadoPublicacion: "activa" })
+      .insert({ ...property, estadoPublicacion: "pending_manual" })
       .select()
       .single();
 

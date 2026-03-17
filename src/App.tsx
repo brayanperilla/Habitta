@@ -10,6 +10,8 @@ import {
 import Layout from "@presentation/components/layout/Layout";
 import ScrollToTop from "@presentation/components/ScrollToTop";
 import PrivateRoute from "@presentation/components/PrivateRoute";
+import AdminRoute from "@presentation/components/AdminRoute";
+import { useAuth } from "@application/context/AuthContext";
 
 // Lazy-loaded pages — cada una se descarga solo cuando el usuario la visita
 const Home = lazy(() => import("@presentation/pages/home/Home"));
@@ -31,6 +33,7 @@ const NotificationPage = lazy(
   () =>
     import("@presentation/pages/notification/NotificationPage/Notification"),
 );
+const AdminPage = lazy(() => import("@presentation/pages/admin/AdminPage"));
 const ErrorPage = lazy(
   () => import("@presentation/components/error/ErrorPage"),
 );
@@ -169,6 +172,18 @@ const router = createBrowserRouter(
         />
       </Route>
 
+      {/* ── Rutas protegidas (Solo Admin) ── */}
+      <Route element={<AdminRoute />}>
+        <Route
+          path="admin"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <AdminPage />
+            </Suspense>
+          }
+        />
+      </Route>
+
       {/* 404 — Ruta no encontrada */}
       <Route
         path="*"
@@ -184,6 +199,16 @@ const router = createBrowserRouter(
 
 // Componente Principal de la Aplicación
 function App() {
+  const { loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+        {/* Loader global en raíz para evitar parpadeos completos (flicker) */}
+      </div>
+    );
+  }
+
   return <RouterProvider router={router} />;
 }
 

@@ -1,5 +1,7 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@application/context/AuthContext";
+import { useToast } from "@application/context/ToastContext";
 
 /**
  * Envuelve rutas que requieren autenticación.
@@ -8,7 +10,21 @@ import { useAuth } from "@application/context/AuthContext";
  * no vuelva a la página protegida.
  */
 const PrivateRoute = () => {
-  const { usuario, loading } = useAuth();
+  const { usuario, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (usuario) {
+      const estado = (usuario.estadocuenta || "").trim().toLowerCase();
+      if (estado === "eliminada" || estado === "suspendida") {
+        signOut().then(() => {
+          showToast(`Tu cuenta ha sido ${estado}. Has sido desconectado.`, "error");
+          navigate("/auth", { replace: true });
+        });
+      }
+    }
+  }, [usuario, signOut, navigate, showToast]);
 
   if (loading) {
     return (

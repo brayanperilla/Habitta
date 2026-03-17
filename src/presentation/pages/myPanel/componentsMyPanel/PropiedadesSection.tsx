@@ -194,6 +194,7 @@ const PropiedadesSection: React.FC = () => {
           {[
             { key: "todas", label: "Todas" },
             { key: "activa", label: "Activas" },
+            { key: "pending_manual", label: "En Revisión" },
             { key: "pausada", label: "Pausadas" },
             { key: "archivada", label: "Archivadas" },
           ].map((f) => (
@@ -291,9 +292,9 @@ const PropiedadesSection: React.FC = () => {
                   {propiedad.titulo || "Sin título"}
                 </h3>
                 <span
-                  className={`estado-badge estado-badge--${(propiedad.estadoPublicacion || "pendiente").toLowerCase()}`}
+                  className={`estado-badge estado-badge--${(propiedad.estadoPublicacion || "pendiente").toLowerCase() === "pending_manual" ? "pending_manual" : (propiedad.estadoPublicacion || "pendiente").toLowerCase()}`}
                 >
-                  {propiedad.estadoPublicacion || "Pendiente"}
+                  {(propiedad.estadoPublicacion || "pendiente") === "pending_manual" ? "En revisión" : (propiedad.estadoPublicacion || "Pendiente")}
                 </span>
               </div>
 
@@ -404,8 +405,8 @@ const PropiedadesSection: React.FC = () => {
                 </svg>
               </button>
 
-              {/* Pausar / Reactivar (solo si no está archivada) */}
-              {propiedad.estadoPublicacion !== "archivada" && (
+              {/* Pausar / Reactivar (solo si no está archivada ni en revisión) */}
+              {propiedad.estadoPublicacion !== "archivada" && propiedad.estadoPublicacion !== "pending_manual" && (
                 <button
                   className={`action-btn ${propiedad.estadoPublicacion === "pausada" ? "action-btn--reactivar" : "action-btn--pausar"}`}
                   title={

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./sections.css";
 import { useAuth } from "@application/context/AuthContext";
 import { useToast } from "@application/context/ToastContext";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { useWarnIfUnsavedChanges } from "@application/hooks/useWarnIfUnsavedChanges";
 import { supabase } from "@infrastructure/supabase/client";
+import AvatarEditor from "react-avatar-editor";
 
 /**
  * Componente que muestra el perfil del usuario y opciones de configuración
@@ -56,6 +57,14 @@ const PerfilSection: React.FC = () => {
   const [deleteEmailVerify, setDeleteEmailVerify] = useState("");
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Estados para Modal de Foto de Perfil
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | string | null>(null);
+  const [avatarScale, setAvatarScale] = useState(1);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const editorRef = useRef<AvatarEditor | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Escuchar evento para abrir el modal de contraseña
   useEffect(() => {
@@ -174,6 +183,63 @@ const PerfilSection: React.FC = () => {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setAvatarFile(e.target.files[0]);
+      setIsAvatarModalOpen(true);
+      setAvatarScale(1);
+    }
+    // Limpiar input para permitir seleccionar la misma foto
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSaveAvatar = async () => {
+    if (!editorRef.current || !usuario?.idusuario) return;
+
+    setAvatarLoading(true);
+    try {
+      // 1. Obtener la imagen recortada del Canvas
+      const canvasScaled = editorRef.current.getImageScaledToCanvas();
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvasScaled.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error("Error al procesar la imagen."));
+        }, "image/jpeg", 0.9);
+      });
+
+      // 2. Subir al Bucket de Supabase
+      const fileName = `${usuario.idusuario}_avatar_${Date.now()}.jpg`;
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, blob, {
+          contentType: "image/jpeg",
+          upsert: true,
+        });
+
+      if (uploadError) throw new Error(uploadError.message);
+
+      // 3. Obtener URL pública
+      const { data: publicData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(fileName);
+
+      // 4. Actualizar tabla usuarios a través del AuthContext
+      await updatePerfil({
+        fotoperfil: publicData.publicUrl,
+      });
+
+      showToast("Foto de perfil actualizada correctamente.", "success");
+      setIsAvatarModalOpen(false);
+      setAvatarFile(null);
+    } catch (err: any) {
+      showToast(err.message || "Error al subir foto.", "error");
+    } finally {
+      setAvatarLoading(false);
+    }
+  };
+
   if (!usuario) {
     return (
       <div className="section-content">
@@ -216,19 +282,30 @@ const PerfilSection: React.FC = () => {
       <div className="perfil-container">
         {/* Información del usuario */}
         <div className="perfil-info-card">
-          <div className="perfil-avatar">
-            {usuario.fotoperfil ? (
-              <img src={usuario.fotoperfil} alt={usuario.nombre} />
-            ) : (
-              <svg
-                width="60"
-                height="60"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-              </svg>
-            )}
+          <div className="perfil-avatar-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div className="perfil-avatar">
+              {usuario.fotoperfil ? (
+                <img src={usuario.fotoperfil} alt={usuario.nombre} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+              ) : (
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                </svg>
+              )}
+            </div>
+            <button 
+              className="btn-secondary" 
+              onClick={() => fileInputRef.current?.click()}
+              style={{ padding: "6px 14px", fontSize: "0.85rem", marginTop: "16px", width: "100%" }}
+            >
+              Cambiar foto de perfil
+            </button>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              style={{ display: "none" }} 
+              accept="image/png, image/jpeg, image/jpg"
+              onChange={handleFileChange}
+            />
           </div>
 
           <div className="perfil-datos">
@@ -290,8 +367,8 @@ const PerfilSection: React.FC = () => {
               </svg>
               <span>
                 Miembro desde{" "}
-                {usuario.fecharegistro
-                  ? new Date(usuario.fecharegistro).toLocaleDateString()
+                {usuario.fechalogin
+                  ? new Date(usuario.fechalogin).toLocaleDateString()
                   : "N/A"}
               </span>
             </div>
@@ -748,6 +825,81 @@ const PerfilSection: React.FC = () => {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Cambio y Recorte de Foto de Perfil */}
+      {isAvatarModalOpen && avatarFile && (
+        <div className="modal-overlay">
+          <div className="modal-container" style={{ maxWidth: "450px", textAlign: "center" }}>
+            <div className="modal-header">
+              <h3>Cambiar foto de perfil</h3>
+              <button
+                className="close-button"
+                onClick={() => {
+                  setIsAvatarModalOpen(false);
+                  setAvatarFile(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <p style={{ color: "#6b7280", fontSize: "0.9rem", marginBottom: "20px" }}>
+              Ajusta tu foto o aplica zoom para encuadrarla.
+            </p>
+
+            <div style={{ display: "flex", justifyContent: "center", background: "#f9fafb", padding: "20px", borderRadius: "8px" }}>
+              <AvatarEditor
+                ref={editorRef}
+                image={avatarFile}
+                width={200}
+                height={200}
+                border={20}
+                borderRadius={100} // Círculo perfecto
+                color={[0, 0, 0, 0.4]} // Sombra de encuadre
+                scale={avatarScale}
+                rotate={0}
+              />
+            </div>
+
+            <div style={{ marginTop: "20px", padding: "0 10px" }}>
+              <label style={{ display: "block", fontSize: "0.85rem", color: "#4b5563", marginBottom: "8px" }}>
+                Nivel de Zoom: {Math.round(avatarScale * 100)}%
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="0.05"
+                value={avatarScale}
+                onChange={(e) => setAvatarScale(Number(e.target.value))}
+                style={{ width: "80%", cursor: "pointer", accentColor: "#0ea5e9" }}
+              />
+            </div>
+
+            <div className="modal-footer" style={{ marginTop: "30px", justifyContent: "center", display: "flex", gap: "10px" }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => {
+                  setIsAvatarModalOpen(false);
+                  setAvatarFile(null);
+                }}
+                disabled={avatarLoading}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={handleSaveAvatar}
+                disabled={avatarLoading}
+              >
+                {avatarLoading ? "Subiendo..." : "Guardar Foto"}
+              </button>
+            </div>
           </div>
         </div>
       )}

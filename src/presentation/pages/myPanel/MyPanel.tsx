@@ -18,10 +18,12 @@ import "./myPanel.css";
  * Componente principal de la página Mi Panel
  */
 const MyPanel: React.FC = () => {
-  // Estado para controlar la pestaña activa
-  const [activeTab, setActiveTab] = useState<string>("propiedades");
   const { usuario } = useAuth();
   const { favIds } = useFavorites();
+  const isAdmin = usuario?.rol === "admin";
+
+  // Estado para controlar la pestaña activa (si es admin, empieza en perfil)
+  const [activeTab, setActiveTab] = useState<string>(isAdmin ? "perfil" : "propiedades");
 
   // Stats dinámicas
   const [totalPropiedades, setTotalPropiedades] = useState(0);
@@ -127,30 +129,36 @@ const MyPanel: React.FC = () => {
         <div className="my-panel__header-content">
           <h1 className="my-panel__title">Mi Panel</h1>
           <p className="my-panel__subtitle">
-            Gestiona tus propiedades y configuración de cuenta
+            {isAdmin 
+              ? "Configuración de tu cuenta de administrador" 
+              : "Gestiona tus propiedades y configuración de cuenta"}
           </p>
         </div>
       </div>
 
-      {/* Tarjetas de estadísticas */}
-      <div className="my-panel__stats">
-        <div className="stats-container">
-          {estadisticas.map((stat) => (
-            <div key={stat.id} className="stat-card">
-              <div className="stat-card__icon" style={{ color: stat.color }}>
-                {stat.icono}
+      {/* Tarjetas de estadísticas (Ocultas para el administrador) */}
+      {!isAdmin && (
+        <div className="my-panel__stats">
+          <div className="stats-container">
+            {estadisticas.map((stat) => (
+              <div key={stat.id} className="stat-card">
+                <div className="stat-card__icon" style={{ color: stat.color }}>
+                  {stat.icono}
+                </div>
+                <div className="stat-card__info">
+                  <span className="stat-card__number">{stat.numero}</span>
+                  <span className="stat-card__label">{stat.label}</span>
+                </div>
               </div>
-              <div className="stat-card__info">
-                <span className="stat-card__number">{stat.numero}</span>
-                <span className="stat-card__label">{stat.label}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Navegación por pestañas */}
-      <TabNavigator activeTab={activeTab} onTabChange={handleTabChange} />
+      {/* Navegación por pestañas (Solo para usuarios regulares) */}
+      {!isAdmin && (
+        <TabNavigator activeTab={activeTab} onTabChange={handleTabChange} isAdmin={isAdmin} />
+      )}
 
       {/* Contenido de la sección activa */}
       <div className="my-panel__content">{renderActiveSection()}</div>

@@ -87,10 +87,13 @@ export const authApi = {
     });
     if (error) throw new Error(traducirError(error.message));
 
-    // Actualizar fecha de login (no crítico)
+    // Actualizar fecha de login y última actividad
     await supabase
       .from("usuarios")
-      .update({ fechalogin: new Date().toISOString() })
+      .update({ 
+        fechalogin: new Date().toISOString(),
+        ultimaactividad: new Date().toISOString()
+      })
       .eq("correo", email);
 
     // Buscar perfil en tabla `usuarios`
@@ -122,11 +125,12 @@ export const authApi = {
       if (insertErr || !nuevo) throw new Error("No se pudo crear tu perfil.");
       return nuevo;
     }
-    // Bloquear cuentas eliminadas
-    if (usuario.estadocuenta === "eliminada") {
+    // Bloquear cuentas eliminadas o suspendidas
+    const estado = (usuario.estadocuenta || "").trim().toLowerCase();
+    if (estado === "eliminada" || estado === "suspendida") {
       await supabase.auth.signOut();
       throw new Error(
-        "Esta cuenta ha sido eliminada. No es posible iniciar sesión.",
+        `Esta cuenta ha sido ${estado}. No es posible iniciar sesión.`,
       );
     }
 
@@ -159,6 +163,14 @@ export const authApi = {
       return null;
     }
     return data;
+  },
+
+  /** Actualizar última actividad del usuario (silencioso) */
+  actualizarUltimaActividad: async (idusuario: number): Promise<void> => {
+    await supabase
+      .from("usuarios")
+      .update({ ultimaactividad: new Date().toISOString() })
+      .eq("idusuario", idusuario);
   },
 
   /** RF02 — Verificar si un correo ya está registrado (para validación en tiempo real) */

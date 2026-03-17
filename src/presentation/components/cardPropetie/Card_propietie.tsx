@@ -58,6 +58,24 @@ function CardPropetie({
           );
         })()}
 
+        {/* Badges especiales por estado */}
+        {property.estadoPublicacion === "pending_manual" && (
+          <div className="property-card__status-badge" style={{
+            position: "absolute",
+            top: "8px",
+            right: "8px",
+            background: "#f59e0b",
+            color: "#fff",
+            padding: "4px 8px",
+            borderRadius: "4px",
+            fontSize: "0.75rem",
+            fontWeight: "bold",
+            zIndex: 10
+          }}>
+            En revisión (normalmente &lt; 12h)
+          </div>
+        )}
+
         {/* Badges */}
         {badges.length > 0 && (
           <div className="property-card__badges">

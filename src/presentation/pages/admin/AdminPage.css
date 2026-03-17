@@ -1,0 +1,160 @@
+.admin-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background-color: #f9fafb;
+  min-height: calc(100vh - 80px); /* Ajuste basado en navbar */
+  font-family: inherit;
+}
+
+.admin-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+  color: #6b7280;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Tabs */
+.admin-tabs {
+  display: flex;
+  gap: 1rem;
+  background-color: #f3f4f6;
+  padding: 0.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.admin-tab {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-tab:hover {
+  background-color: #e5e7eb;
+}
+
+.admin-tab.active {
+  background-color: #fff;
+  color: #1f2937;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Content Area */
+.admin-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.admin-tab-content h2 {
+  font-size: 1.5rem;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.admin-tab-content p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.admin-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #9ca3af;
+  border: 2px dashed #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+/* Table */
+.admin-table-container {
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.admin-table th {
+  background-color: #f9fafb;
+  color: #6b7280;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+  padding: 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: #1f2937;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Acciones en Tabla */
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-btn-approve,
+.admin-btn-reject {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.admin-btn-approve {
+  background-color: #10b981;
+  color: #fff;
+}
+
+.admin-btn-reject {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.admin-btn-approve:hover,
+.admin-btn-reject:hover {
+  opacity: 0.9;
+}
+
+.admin-td-title a:hover {
+  text-decoration: underline;
+}
