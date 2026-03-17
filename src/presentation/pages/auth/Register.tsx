@@ -27,6 +27,8 @@ function Register() {
     successMessage,
     emailDisponible,
     checkingEmail,
+    passwordValidation,
+    passwordsMatch,
   } = useRegisterForm();
 
   const { showToast } = useToast();
@@ -138,7 +140,25 @@ function Register() {
             {showPassword ? "👁️" : "👁️‍🗨️"}
           </button>
         </div>
-        <small className="password-hint">Mínimo 8 caracteres</small>
+        {password.length > 0 && (
+          <ul className="password-requirements">
+            <li className={passwordValidation.hasLength ? "valid" : "invalid"}>
+              {passwordValidation.hasLength ? "✓" : "✕"} Mínimo 8 caracteres
+            </li>
+            <li className={passwordValidation.hasUpper ? "valid" : "invalid"}>
+              {passwordValidation.hasUpper ? "✓" : "✕"} Al menos 1 mayúscula
+            </li>
+            <li className={passwordValidation.hasLower ? "valid" : "invalid"}>
+              {passwordValidation.hasLower ? "✓" : "✕"} Al menos 1 minúscula
+            </li>
+            <li className={passwordValidation.hasNumberAndSafe ? "valid" : "invalid"}>
+              {passwordValidation.hasNumberAndSafe ? "✓" : "✕"} Números (sin secuencias 123 ni repeticiones 222)
+            </li>
+            <li className={passwordValidation.hasSpecial ? "valid" : "invalid"}>
+              {passwordValidation.hasSpecial ? "✓" : "✕"} Al menos 1 carácter especial
+            </li>
+          </ul>
+        )}
       </div>
 
       {/* Confirmar Contraseña */}
@@ -163,7 +183,11 @@ function Register() {
             {showPassword ? "👁️" : "👁️‍🗨️"}
           </button>
         </div>
-        <small className="password-hint">Mínimo 8 caracteres</small>
+        {confirmPassword.length > 0 && (
+          <small className={`password-match-hint ${passwordsMatch ? "valid" : "invalid"}`}>
+            {passwordsMatch ? "✓ Las contraseñas coinciden" : "✕ Las contraseñas no coinciden"}
+          </small>
+        )}
       </div>
 
       {/* Botón de Envío */}

@@ -68,11 +68,42 @@
   opacity: 1;
 }
 
-/* Pista de Contraseña */
+/* Pista y Requisitos de Contraseña */
 .password-hint {
   font-size: 12px;
   color: #718096;
   margin-top: -4px;
+}
+
+.password-requirements {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.password-requirements li,
+.password-match-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+}
+
+.password-match-hint {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.valid {
+  color: #38a169; /* Verde */
+}
+
+.invalid {
+  color: #e53e3e; /* Rojo */
 }
 
 /* Botón de Registro */
