@@ -35,6 +35,10 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose }) => {
    */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Ignorar si el click fue en el botón que abre el modal (lo maneja su propio onClick)
+      const triggerBtn = document.getElementById("userModalTrigger");
+      if (triggerBtn && triggerBtn.contains(event.target as Node)) return;
+
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target as Node)

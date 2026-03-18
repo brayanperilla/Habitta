@@ -8,18 +8,14 @@ const TIPO_ICONS: Record<string, string> = {
   propiedad_publicada: "🏠",
   estado_propiedad: "📋",
   nueva_coincidencia: "🔍",
-};
-
-const TIPO_LABELS: Record<string, string> = {
-  propiedad_publicada: "Propiedad publicada",
-  estado_propiedad: "Estado de propiedad",
-  nueva_coincidencia: "Nueva coincidencia",
+  favorito: "❤️",
+  cuenta: "🔒",
+  mensaje: "💬",
 };
 
 function formatFecha(iso: string | null): string {
   if (!iso) return "";
-  const d = new Date(iso);
-  return d.toLocaleDateString("es-CO", {
+  return new Date(iso).toLocaleDateString("es-CO", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -40,12 +36,6 @@ const Notification = () => {
     try {
       const data = await notificacionesApi.getByUsuario(usuario.idusuario);
       setNotificaciones(data);
-      // Auto-marcar como leídas al abrir la página
-      const noLeidas = data.filter((n) => !n.leido);
-      if (noLeidas.length > 0) {
-        await notificacionesApi.marcarTodasLeidas(usuario.idusuario);
-        setNotificaciones((prev) => prev.map((n) => ({ ...n, leido: true })));
-      }
     } catch (e) {
       console.error("Error cargando notificaciones:", e);
     } finally {
@@ -59,7 +49,6 @@ const Notification = () => {
 
   const handleToggleLeida = async (notif: Notificacion) => {
     const nuevo = !notif.leido;
-    // Actualizar estado local inmediatamente
     setNotificaciones((prev) =>
       prev.map((n) =>
         n.idnotificacion === notif.idnotificacion ? { ...n, leido: nuevo } : n
@@ -68,7 +57,6 @@ const Notification = () => {
     try {
       await notificacionesApi.toggleLeida(notif.idnotificacion, nuevo);
     } catch {
-      // Revertir si falla
       setNotificaciones((prev) =>
         prev.map((n) =>
           n.idnotificacion === notif.idnotificacion ? { ...n, leido: !nuevo } : n
@@ -81,9 +69,8 @@ const Notification = () => {
     setNotificaciones((prev) => prev.filter((n) => n.idnotificacion !== id));
     try {
       await notificacionesApi.eliminar(id);
-    } catch (e) {
-      console.error("Error eliminando notificación:", e);
-      cargar(); // Recargar si falla
+    } catch {
+      cargar();
     }
   };
 
@@ -93,6 +80,20 @@ const Notification = () => {
       : notificaciones;
 
   const noLeidasCount = notificaciones.filter((n) => !n.leido).length;
+
+  const getActionLink = (n: Notificacion) => {
+    switch (n.tipo) {
+      case "estado_propiedad":
+        return { label: "Ver mis propiedades", path: "/mypanel" };
+      case "propiedad_publicada":
+      case "nueva_coincidencia":
+        return { label: "Ver propiedades", path: "/properties" };
+      case "favorito":
+        return { label: "Ver mis propiedades", path: "/mypanel" };
+      default:
+        return null;
+    }
+  };
 
   if (!usuario) {
     return (
@@ -109,6 +110,7 @@ const Notification = () => {
     <div className="notification-page">
       <h1 className="notification-title">Notificaciones</h1>
 
+      {/* Tabs tipo segmento */}
       <nav className="notification-tabs" aria-label="Filtrar notificaciones">
         <button
           className={`tab${tab === "todas" ? " tab--active" : ""}`}
@@ -133,88 +135,72 @@ const Notification = () => {
 
         {!loading && mostradas.length === 0 && (
           <p style={{ textAlign: "center", color: "#aaa", padding: "2rem" }}>
-            {tab === "sinleer" ? "No tienes notificaciones sin leer." : "No tienes notificaciones."}
+            {tab === "sinleer"
+              ? "No tienes notificaciones sin leer."
+              : "No tienes notificaciones."}
           </p>
         )}
 
-        {mostradas.map((n) => (
-          <article
-            key={n.idnotificacion}
-            className={`notification-card${n.leido ? "" : " notification-card--unread"}`}
-            role="article"
-            aria-label={n.titulo}
-          >
-            <div className="notification-card__actions" role="group" aria-label="acciones de notificación">
-              <button
-                className={`icon-btn mark-read${n.leido ? " is-read" : ""}`}
-                aria-label={n.leido ? "Marcar como no leído" : "Marcar como leído"}
-                title={n.leido ? "Marcar como no leído" : "Marcar como leído"}
-                onClick={() => handleToggleLeida(n)}
-              >
-                {n.leido ? "↩" : "✓"}
-              </button>
-              <button
-                className="icon-btn delete"
-                aria-label="Eliminar notificación"
-                onClick={() => handleEliminar(n.idnotificacion)}
-              >
-                🗑
-              </button>
-            </div>
-
-            <div className="notification-card__content">
+        {mostradas.map((n) => {
+          const actionLink = getActionLink(n);
+          return (
+            <article
+              key={n.idnotificacion}
+              className={`notification-card${n.leido ? "" : " notification-card--unread"}`}
+              role="article"
+              aria-label={n.titulo}
+            >
+              {/* Header: título + fecha | botones de acción */}
               <div className="notification-card__header">
-                <h3 className="notification-card__title">
-                  <span className="notif-tipo-icon">
-                    {TIPO_ICONS[n.tipo] ?? "🔔"}
-                  </span>
-                  {n.titulo}
-                  {!n.leido && <span className="notification-dot" aria-hidden="true" />}
-                </h3>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
-                  <time className="notification-card__date">{formatFecha(n.fechaEnvio)}</time>
-                  {n.tipo && (
-                    <span className="notif-tipo-badge">
-                      {TIPO_LABELS[n.tipo] ?? n.tipo}
+                <div className="notification-card__meta">
+                  <h3 className="notification-card__title">
+                    <span className="notif-tipo-icon">
+                      {TIPO_ICONS[n.tipo] ?? "🔔"}
                     </span>
-                  )}
+                    {n.titulo}
+                    {!n.leido && <span className="notification-dot" aria-hidden="true" />}
+                  </h3>
+                  <time className="notification-card__date">{formatFecha(n.fechaEnvio)}</time>
+                </div>
+
+                {/* Botones naranjas cuadrados (Figma) */}
+                <div className="notification-card__actions" role="group" aria-label="Acciones">
+                  <button
+                    className={`icon-btn mark-read${n.leido ? " is-read" : ""}`}
+                    aria-label={n.leido ? "Marcar como no leído" : "Marcar como leído"}
+                    title={n.leido ? "Marcar como no leído" : "Marcar como leído"}
+                    onClick={() => handleToggleLeida(n)}
+                  >
+                    {n.leido ? "↩" : "✓"}
+                  </button>
+                  <button
+                    className="icon-btn delete"
+                    aria-label="Eliminar notificación"
+                    title="Eliminar"
+                    onClick={() => handleEliminar(n.idnotificacion)}
+                  >
+                    🗑
+                  </button>
                 </div>
               </div>
 
+              {/* Cuerpo */}
               {n.descripcion && (
                 <p className="notification-card__text">{n.descripcion}</p>
               )}
 
-              {n.tipo === "estado_propiedad" && (
+              {/* Botón de acción */}
+              {actionLink && (
                 <button
                   className="btn btn--orange"
-                  onClick={() => navigate("/my-panel")}
-                  aria-label="Ver mis propiedades"
+                  onClick={() => navigate(actionLink.path)}
                 >
-                  Ver mis propiedades
+                  {actionLink.label}
                 </button>
               )}
-              {n.tipo === "propiedad_publicada" && (
-                <button
-                  className="btn btn--orange"
-                  onClick={() => navigate("/properties")}
-                  aria-label="Ver propiedades"
-                >
-                  Ver propiedades
-                </button>
-              )}
-              {n.tipo === "nueva_coincidencia" && (
-                <button
-                  className="btn btn--orange"
-                  onClick={() => navigate("/properties")}
-                  aria-label="Ver coincidencias"
-                >
-                  Ver coincidencias
-                </button>
-              )}
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </section>
     </div>
   );

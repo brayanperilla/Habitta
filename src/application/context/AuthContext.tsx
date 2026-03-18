@@ -90,33 +90,6 @@ export function AuthProvider({ children }: Props) {
     };
   }, [usuario, reiniciarTimer]);
 
-  // Polling periódico: verifica el estado de la cuenta cada 20 segundos desde la BD
-  useEffect(() => {
-    if (!usuario?.correo) return;
-
-    const poll = setInterval(async () => {
-      try {
-        const perfil = await authApi.getUsuarioByCorreo(usuario.correo);
-        if (!perfil) return;
-        const estado = (perfil.estadocuenta || "").trim().toLowerCase();
-        if (estado === "eliminada" || estado === "suspendida") {
-          console.warn(`[AuthContext] Polling: cuenta ${estado} — expulsando`);
-          await supabase.auth.signOut();
-          setUsuario(null);
-        } else {
-          // Sincronizar estadocuenta si cambió (ej. reactivación)
-          setUsuario((prev) =>
-            prev ? { ...prev, estadocuenta: perfil.estadocuenta } : null
-          );
-        }
-      } catch {
-        // Silencioso — no crashear si hay error de red
-      }
-    }, 20_000); // cada 20 segundos
-
-    return () => clearInterval(poll);
-  }, [usuario?.correo]); // eslint-disable-line react-hooks/exhaustive-deps
-
   // ─── Restaurar sesión al montar ──────────────────────────────────
 
   useEffect(() => {

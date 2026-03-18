@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@application/context/AuthContext";
 import { favoritosApi } from "@infrastructure/api/favoritos.api";
+import { supabase } from "@infrastructure/supabase/client";
+import { notificacionesApi } from "@infrastructure/api/notificaciones.api";
 
 /**
  * Hook para gestionar favoritos del usuario autenticado.
@@ -58,6 +60,31 @@ export function useFavorites() {
           await favoritosApi.removeFavorito(usuario.idusuario, idpropiedad);
         } else {
           await favoritosApi.addFavorito(usuario.idusuario, idpropiedad);
+
+          // Notificar al dueño de la propiedad
+          try {
+            const { data: prop } = await supabase
+              .from("propiedades")
+              .select("titulo, idusuario")
+              .eq("idpropiedad", idpropiedad)
+              .single();
+
+            if (prop && prop.idusuario && prop.idusuario !== usuario.idusuario) {
+              const telefonoTexto = usuario.telefono
+                ? ` | Tel: ${usuario.telefono}`
+                : "";
+              await notificacionesApi.crear(
+                prop.idusuario,
+                `❤️ ${usuario.nombre} guardó tu propiedad como favorita`,
+                "favorito",
+                `"${prop.titulo || 'Tu propiedad'}" llamó la atención de un posible comprador.` +
+                  `\nContacto: ${usuario.nombre}${telefonoTexto} \u2014 Revisar perfil del interesado.`
+              );
+            }
+          } catch (notifErr) {
+            // Mostrar el error real para depurar
+            console.error("[useFavorites] Error creando notificación de favorito:", notifErr);
+          }
         }
       } catch {
         // Revertir si falla

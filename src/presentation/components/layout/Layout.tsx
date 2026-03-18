@@ -1,16 +1,14 @@
-import { useState } from "react";
+import {} from "react";
 import Navbar from "../navbar/Navbar";
 import Footer from "../footer/Footer";
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import "./Layout.css";
-import ModalN from "@presentation/pages/notification/Modal/ModalN";
 import { useAuth } from "@application/context/AuthContext";
 
 // Layout Component
 export default function Layout() {
   const location = useLocation();
   const { usuario, loading } = useAuth();
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
   const isAuthPage = location.pathname === "/auth";
   const isAdminPage = location.pathname.startsWith("/admin");
   const isAdminRole = usuario?.rol === "admin";
@@ -39,10 +37,6 @@ export default function Layout() {
       </main>
 
       {!hideLayout && <Footer />}
-
-      {!hideLayout && (
-        <ModalN isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
-      )}
     </>
   );
 }

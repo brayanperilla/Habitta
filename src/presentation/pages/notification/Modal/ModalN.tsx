@@ -1,24 +1,25 @@
 import "./modal.css";
-import { type FC, useEffect, useRef } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@application/context/AuthContext";
-import { useNotificaciones } from "@application/hooks/useNotificaciones";
+import type { Notificacion } from "@infrastructure/api/notificaciones.api";
 
 interface ModalNProps {
   isOpen: boolean;
   onClose: () => void;
+  notificaciones: Notificacion[];
+  noLeidasCount: number;
+  onMarcarTodasLeidas: () => void;
 }
 
-/** Mapa de ícono según el tipo de notificación */
 const TIPO_ICON: Record<string, string> = {
   propiedad_publicada: "🏠",
   estado_propiedad: "📋",
   nueva_coincidencia: "🔍",
   mensaje: "💬",
   cuenta: "🔒",
+  favorito: "❤️",
 };
 
-/** Formato relativo de fecha (hace X min / hace X h) */
 function formatRelativo(iso: string | null): string {
   if (!iso) return "";
   const diff = Date.now() - new Date(iso).getTime();
@@ -30,14 +31,19 @@ function formatRelativo(iso: string | null): string {
   return `Hace ${Math.floor(hrs / 24)} días`;
 }
 
-const ModalN: FC<ModalNProps> = ({ isOpen, onClose }) => {
-  const { usuario } = useAuth();
+const ModalN: FC<ModalNProps> = ({
+  isOpen,
+  onClose,
+  notificaciones,
+  noLeidasCount,
+  onMarcarTodasLeidas,
+}) => {
   const navigate = useNavigate();
   const modalRef = useRef<HTMLDivElement>(null);
-  const { notificaciones, loading, noLeidasCount, marcarTodasLeidas, eliminar } =
-    useNotificaciones(usuario?.idusuario);
+  // IDs descartados localmente del modal — no se borran del DB
+  const [dismissed, setDismissed] = useState<Set<number>>(new Set());
 
-  /** Cerrar al hacer clic fuera */
+  // Cerrar al hacer clic fuera
   useEffect(() => {
     if (!isOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
@@ -49,6 +55,15 @@ const ModalN: FC<ModalNProps> = ({ isOpen, onClose }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, onClose]);
 
+  // Limpiar descartadas cuando el modal se abre de nuevo
+  useEffect(() => {
+    if (isOpen) {
+      setDismissed(new Set());
+      // Marcar todas como leídas → borra el badge
+      if (noLeidasCount > 0) onMarcarTodasLeidas();
+    }
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!isOpen) return null;
 
   const handleVerTodas = () => {
@@ -56,31 +71,22 @@ const ModalN: FC<ModalNProps> = ({ isOpen, onClose }) => {
     navigate("/notification");
   };
 
-  // Mostrar solo las 5 más recientes en el modal
-  const recientes = notificaciones.slice(0, 5);
+  // Excluir las descartadas localmente y mostrar max 5
+  const visibles = notificaciones
+    .filter((n) => !dismissed.has(n.idnotificacion))
+    .slice(0, 5);
+
+  const handleDismiss = (id: number) => {
+    setDismissed((prev) => new Set([...prev, id]));
+  };
 
   return (
-    <div className="modal-content" ref={modalRef}>
+    <div className="modal-content modal-animated" ref={modalRef}>
       <header className="modal-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <h2 className="modal-title">
-          Notificaciones
-          {noLeidasCount > 0 && (
-            <span style={{
-              marginLeft: "8px",
-              background: "#e74c3c",
-              color: "#fff",
-              borderRadius: "12px",
-              padding: "2px 8px",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-            }}>
-              {noLeidasCount}
-            </span>
-          )}
-        </h2>
-        {noLeidasCount > 0 && (
+        <h2 className="modal-title">Notificaciones</h2>
+        {notificaciones.length > 0 && (
           <button
-            onClick={marcarTodasLeidas}
+            onClick={handleVerTodas}
             style={{
               background: "none",
               border: "none",
@@ -91,33 +97,26 @@ const ModalN: FC<ModalNProps> = ({ isOpen, onClose }) => {
               padding: "4px 8px",
             }}
           >
-            Marcar todas
+            Ver todas →
           </button>
         )}
       </header>
 
       <section className="modal-body">
-        {loading && (
-          <p style={{ textAlign: "center", color: "#aaa", padding: "2rem" }}>
-            Cargando...
-          </p>
-        )}
-
-        {!loading && recientes.length === 0 && (
+        {visibles.length === 0 && (
           <p style={{ textAlign: "center", color: "#aaa", padding: "2rem", fontSize: "0.9rem" }}>
-            No tienes notificaciones.
+            No tienes notificaciones nuevas.
           </p>
         )}
 
         <div className="notifications-list">
-          {recientes.map((n) => (
+          {visibles.map((n) => (
             <div
               key={n.idnotificacion}
-              className={`notification-card ${n.leido ? "" : "notification-card--unread"}`}
+              className="notification-card"
               style={{
                 background: n.leido ? "#fafafa" : "#f0fbfc",
                 borderLeft: n.leido ? "4px solid #ddd" : "4px solid #35d2db",
-                cursor: "default",
               }}
             >
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "8px" }}>
@@ -132,15 +131,16 @@ const ModalN: FC<ModalNProps> = ({ isOpen, onClose }) => {
                   )}
                   <p className="notification-time">{formatRelativo(n.fechaEnvio)}</p>
                 </div>
+                {/* × = solo oculta del modal (no borra del DB, sigue en /notification) */}
                 <button
-                  onClick={() => eliminar(n.idnotificacion)}
-                  title="Eliminar"
+                  onClick={() => handleDismiss(n.idnotificacion)}
+                  title="Ocultar del panel"
                   style={{
                     background: "none",
                     border: "none",
                     color: "#ccc",
                     cursor: "pointer",
-                    fontSize: "1.1rem",
+                    fontSize: "1.2rem",
                     padding: "0 4px",
                     lineHeight: 1,
                     flexShrink: 0,
@@ -153,12 +153,6 @@ const ModalN: FC<ModalNProps> = ({ isOpen, onClose }) => {
           ))}
         </div>
       </section>
-
-      <footer className="modal-footer">
-        <button className="modal-view-all-btn" onClick={handleVerTodas}>
-          Ver todas las notificaciones {notificaciones.length > 0 && `(${notificaciones.length})`}
-        </button>
-      </footer>
     </div>
   );
 };
