@@ -32,12 +32,15 @@ function Home() {
   const navigate = useNavigate();
 
   // Estados para el buscador
-  const [tipoOperacion, setTipoOperacion] = useState("Comprar");
+  const [tipoOperacion, setTipoOperacion] = useState("Todos");
   const [tipoPropiedad, setTipoPropiedad] = useState("");
   const [ubicacion, setUbicacion] = useState("");
 
   const handleSearchClick = () => {
     const params = new URLSearchParams();
+    if (tipoOperacion && tipoOperacion !== "Todos") {
+      params.append("tipoOperacion", tipoOperacion.toLowerCase());
+    }
     if (tipoPropiedad) params.append("tipoPropiedad", tipoPropiedad);
     if (ubicacion) params.append("searchTerm", ubicacion);
     navigate(`/properties?${params.toString()}`);
@@ -108,9 +111,9 @@ function Home() {
             <div className="search-card">
               {/* Pestañas de Tipo */}
               <div className="search-tabs">
-                <button className={`tab ${tipoOperacion === 'Comprar' ? 'active' : ''}`} onClick={() => setTipoOperacion('Comprar')}>Comprar</button>
+                <button className={`tab ${tipoOperacion === 'Todos' ? 'active' : ''}`} onClick={() => setTipoOperacion('Todos')}>Todos</button>
                 <button className={`tab ${tipoOperacion === 'Alquilar' ? 'active' : ''}`} onClick={() => setTipoOperacion('Alquilar')}>Alquilar</button>
-                <button className={`tab ${tipoOperacion === 'Vender' ? 'active' : ''}`} onClick={() => setTipoOperacion('Vender')}>Vender</button>
+                <button className={`tab ${tipoOperacion === 'Venta' ? 'active' : ''}`} onClick={() => setTipoOperacion('Venta')}>Venta</button>
               </div>
 
               {/* Campos de Entrada */}
@@ -123,7 +126,6 @@ function Home() {
                     <option value="Apartamento">Apartamento</option>
                     <option value="Casa">Casa</option>
                     <option value="Lote">Lote</option>
-                    <option value="Finca">Finca</option>
                   </select>
                 </div>
 
@@ -215,14 +217,32 @@ function Home() {
 
           {/* Tarjetas de propiedades destacadas desde Supabase */}
           <div className="property-cards-grid">
-            {properties.slice(0, 20).map((property) => (
-              <CardPropetie
-                key={property.idpropiedad}
-                property={property}
-                isFav={isFavorito(property.idpropiedad)}
-                onToggleFav={usuario ? toggleFavorito : undefined}
-              />
-            ))}
+            {properties
+              .filter((p) => {
+                const op = p.tipoOperacion?.toLowerCase();
+                const matchesOp = 
+                  tipoOperacion === "Todos" || 
+                  (tipoOperacion === "Alquilar" && (op === "alquiler" || op === "arriendo")) ||
+                  (tipoOperacion === "Venta" && op === "venta");
+                
+                const matchesType = !tipoPropiedad || p.tipoPropiedad === tipoPropiedad;
+                
+                return matchesOp && matchesType;
+              })
+              .sort((a, b) => {
+                const aPrio = (a.ownerPlan === "premium" || a.estadoPublicacion === "destacada") ? 1 : 0;
+                const bPrio = (b.ownerPlan === "premium" || b.estadoPublicacion === "destacada") ? 1 : 0;
+                return bPrio - aPrio;
+              })
+              .slice(0, 20)
+              .map((property) => (
+                <CardPropetie
+                  key={property.idpropiedad}
+                  property={property}
+                  isFav={isFavorito(property.idpropiedad)}
+                  onToggleFav={usuario ? toggleFavorito : undefined}
+                />
+              ))}
             {properties.length === 0 && !loadingProperties && (
               <p
                 style={{ textAlign: "center", color: "#aaa", padding: "1rem" }}

@@ -11,7 +11,23 @@ function mapPropertyWithPhoto(row: Record<string, unknown>): Property {
   const firstPhoto = fotos.sort((a, b) => (a.orden ?? 99) - (b.orden ?? 99))[0];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { fotospropiedad: _fotos, ...rest } = row;
-  return { ...rest, fotoUrl: firstPhoto?.url ?? null } as Property;
+  
+  // Extraer el plan del dueño si viene en la query (usuarios.plan)
+  // Manejar tanto objeto (single join) como array (select multiple) por seguridad
+  const usuariosRaw = row.usuarios;
+  let ownerPlan: "gratuito" | "premium" | undefined;
+  
+  if (Array.isArray(usuariosRaw)) {
+    ownerPlan = usuariosRaw[0]?.plan;
+  } else if (usuariosRaw && typeof usuariosRaw === 'object') {
+    ownerPlan = (usuariosRaw as any).plan;
+  }
+  
+  return { 
+    ...rest, 
+    fotoUrl: firstPhoto?.url ?? null,
+    ownerPlan: ownerPlan
+  } as Property;
 }
 
 export interface PropertyFilters {
@@ -28,6 +44,7 @@ export interface PropertyFilters {
   estrato?: number;
   /** IDs de características que debe tener la propiedad (AND lógico) */
   caracteristicas?: number[];
+  tipoOperacion?: string;
   sortBy?: "Relevancia" | "Mayor a menor precio" | "Menor a mayor precio";
 }
 
@@ -37,8 +54,8 @@ export const propertyApi = {
   getAll: async (): Promise<Property[]> => {
     const { data, error } = await supabase
       .from("propiedades")
-      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta)`)
-      .ilike("estadoPublicacion", "activa")
+      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta, plan)`)
+      .in("estadoPublicacion", ["activa", "destacada"])
       .eq("usuarios.estadocuenta", "Activa")
       .order("fechacreacion", { ascending: false });
 
@@ -50,10 +67,10 @@ export const propertyApi = {
   getFiltered: async (filters: PropertyFilters): Promise<Property[]> => {
     let query = supabase
       .from("propiedades")
-      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta)`);
+      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta, plan)`);
 
-    // Solo mostrar propiedades activas publicadas por usuarios con cuenta Activa
-    query = query.ilike("estadoPublicacion", "activa").eq("usuarios.estadocuenta", "Activa");
+    // Solo mostrar propiedades activas o destacadas publicadas por usuarios con cuenta Activa
+    query = query.in("estadoPublicacion", ["activa", "destacada"]).eq("usuarios.estadocuenta", "Activa");
 
     if (filters.searchTerm) {
       // Supabase text search
@@ -64,6 +81,10 @@ export const propertyApi = {
     if (filters.tipoPropiedad) {
       // Usaremos comillas dobles enviando las strings literal a PostgREST para forzar el Case Sensitivity de la DB
       query = query.eq('"tipoPropiedad"', filters.tipoPropiedad);
+    }
+
+    if (filters.tipoOperacion) {
+      query = query.eq('"tipoOperacion"', filters.tipoOperacion);
     }
     
     if (filters.precioMin !== undefined) query = query.gte("precio", filters.precioMin);
@@ -148,7 +169,7 @@ export const propertyApi = {
   getByUsuario: async (idusuario: number): Promise<Property[]> => {
     const { data, error } = await supabase
       .from("propiedades")
-      .select(`*, fotospropiedad(url, orden)`)
+      .select(`*, fotospropiedad(url, orden), usuarios(plan)`)
       .eq("idusuario", idusuario)
       .order("fechacreacion", { ascending: false });
 
@@ -169,10 +190,11 @@ export const propertyApi = {
   },
 
   /** Crear propiedad — pasa a revisión (RF22 modificado) */
-  create: async (property: CreatePropertyInput): Promise<Property> => {
+  create: async (property: CreatePropertyInput, isFeatured: boolean = false): Promise<Property> => {
+    const estado = isFeatured ? "destacada" : "pending_manual";
     const { data, error } = await supabase
       .from("propiedades")
-      .insert({ ...property, estadoPublicacion: "pending_manual" })
+      .insert({ ...property, estadoPublicacion: estado })
       .select()
       .single();
 
@@ -184,10 +206,16 @@ export const propertyApi = {
   update: async (
     id: number,
     updates: UpdatePropertyInput,
+    isFeatured?: boolean
   ): Promise<Property> => {
+    const finalUpdates = { ...updates };
+    if (isFeatured !== undefined) {
+      finalUpdates.estadoPublicacion = isFeatured ? "destacada" : "activa";
+    }
+
     const { data, error } = await supabase
       .from("propiedades")
-      .update(updates)
+      .update(finalUpdates)
       .eq("idpropiedad", id)
       .select()
       .single();

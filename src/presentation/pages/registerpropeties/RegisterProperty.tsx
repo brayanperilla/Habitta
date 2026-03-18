@@ -36,6 +36,8 @@ function RegisterPropertyPage() {
     isEditMode,
     loadingEdit,
     setCoordenadas,
+    handleToggle,
+    usuario,
     // Video
     videoPreviews,
     handleVideoChange,
@@ -173,7 +175,7 @@ function RegisterPropertyPage() {
                   Selecciona
                 </option>
                 <option value="venta">Venta</option>
-                <option value="arriendo">Arriendo</option>
+                <option value="alquiler">Alquiler</option>
               </select>
             </div>
 
@@ -191,6 +193,7 @@ function RegisterPropertyPage() {
                   value={form.precio}
                   onChange={handleChange}
                   placeholder="00.00"
+                  min="0"
                 />
               </div>
               <div>
@@ -201,6 +204,7 @@ function RegisterPropertyPage() {
                   value={form.area}
                   onChange={handleChange}
                   placeholder="0"
+                  min="0"
                 />
               </div>
             </div>
@@ -318,6 +322,7 @@ function RegisterPropertyPage() {
                   value={form.habitaciones}
                   onChange={handleChange}
                   placeholder="Ej: 3"
+                  min="0"
                 />
               </div>
               <div>
@@ -330,6 +335,7 @@ function RegisterPropertyPage() {
                   value={form.banos}
                   onChange={handleChange}
                   placeholder="Ej: 2"
+                  min="0"
                 />
               </div>
             </div>
@@ -357,6 +363,7 @@ function RegisterPropertyPage() {
                   value={form.estrato}
                   onChange={handleChange}
                   placeholder="3"
+                  min="0"
                 />
               </div>
             </div>
@@ -462,7 +469,31 @@ function RegisterPropertyPage() {
             )}
           </div>
 
-          <br />
+          {/* Opción de destacar (Premium) */}
+          <div className="card" style={{ 
+            border: form.destacar ? "2px solid #f1b307" : "1px solid #eee",
+            background: form.destacar ? "#fffdf5" : "#fff",
+            padding: "20px"
+          }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "12px", cursor: usuario?.plan === "premium" ? "pointer" : "not-allowed", fontWeight: "bold", fontSize: "1.05rem" }}>
+              <input
+                type="checkbox"
+                checked={form.destacar}
+                disabled={usuario?.plan !== "premium"}
+                onChange={() => handleToggle("destacar")}
+                style={{ width: "20px", height: "20px", accentColor: "#f1b307" }}
+              />
+              Destacar esta propiedad
+            </label>
+            <p style={{ fontSize: "0.85rem", color: "#666", marginTop: "10px", lineHeight: "1.4" }}>
+              Las propiedades destacadas aparecen primero en los resultados del Home y búsquedas, y llevan el listón visual <strong>"DESTACADA"</strong>.
+              {usuario?.plan !== "premium" && (
+                <span style={{ color: "#d35400", display: "block", marginTop: "8px", background: "#fef5e7", padding: "8px", borderRadius: "6px" }}>
+                  💡 <strong>¡Atención!</strong> Solo los usuarios con suscripción <strong>Premium</strong> pueden activar esta opción.
+                </span>
+              )}
+            </p>
+          </div>
 
           <br />
 

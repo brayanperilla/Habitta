@@ -25,12 +25,10 @@
 
 /* --- NUEVOS ESTILOS FIGMA SEARCH BAR --- */
 .search-bar-figma {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
+  background: transparent;
+  border: none;
+  padding: 0;
   margin-top: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .search-top-row {
@@ -46,11 +44,13 @@
   min-width: 300px;
   display: flex;
   align-items: center;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px; /* Barra cuadrada */
-  padding: 0 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 22px; /* Reducido en 2px de 24px */
+  padding: 0 20px;
   background: #ffffff;
   height: 48px;
+  transition: border-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .search-icon-btn {
@@ -76,20 +76,75 @@
   background: transparent;
 }
 
-.select-tipo-figma {
-  height: 48px;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px; /* Consistencia rectangular */
-  padding: 0 16px;
-  background: #ffffff;
-  color: #1e293b;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none;
+.filter-dropdown-figma {
+  flex-shrink: 0;
+  position: relative;
 }
 
-.select-tipo-figma:focus {
-  border-color: #35d2db;
+.select-tipo-figma-custom {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0 16px;
+  height: 48px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 140px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.select-tipo-figma-custom:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+/* Panel Genérico para Dropdowns Custom */
+.custom-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  z-index: 2000;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  min-width: 180px;
+  max-height: 400px;
+  overflow-y: auto;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-dropdown-option {
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #334155;
+  transition: background 0.2s;
+}
+
+.custom-dropdown-option:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.custom-dropdown-option.clear-option {
+  border-top: 1px solid #f1f5f9;
+  margin-top: 4px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .btn-search-figma {
@@ -127,6 +182,20 @@
 
 .grid-icon-btn.active, .grid-icon-btn:hover {
   opacity: 1;
+}
+
+.grid-icon-btn svg {
+  color: white;
+  width: 20px;
+  height: 20px;
+}
+
+.grid-icon-btn:not(.active) svg {
+  color: #1e293b;
+}
+
+.grid-icon-btn:not(.active) {
+  background: #f1f5f9;
 }
 
 .search-mid-row {
@@ -235,12 +304,13 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-width: fit-content; /* Acomodar al texto */
+  min-width: fit-content;
   background: white;
   padding: 10px 16px;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  position: relative; /* Crucial para los dropdowns absolute */
 }
 
 .filter-group-inline label {
@@ -356,16 +426,35 @@
   opacity: 0.9;
 }
 
-.inline-select {
-  padding: 4px 8px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: transparent;
-  color: #0f172a;
-  font-size: 13px;
+.inline-select-custom {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
   font-weight: 600;
+  color: #1e293b;
   cursor: pointer;
-  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  min-width: 100px;
+  justify-content: space-between;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.inline-select-custom:hover {
+  border-color: #cbd5e1;
+}
+
+.estrato-panel {
+  min-width: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.inline-select {
+  display: none;
 }
 
 /* Paginación */
@@ -477,15 +566,15 @@
 
 .caracteristicas-panel {
   position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
+  top: calc(100% + 8px);
+  right: 0; /* Despliega hacia la izquierda */
   z-index: 100;
   background: #fff;
   border: 1.5px solid #e2e8f0;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.13);
-  min-width: 560px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  min-width: 560px; /* Restaurado tamaño original */
   max-width: 95vw;
 }
 
@@ -517,3 +606,83 @@
   color: #0d9488;
   font-weight: 700;
 }
+
+/* === List View Styles === */
+.property-cards-grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.property-cards-grid.list-view .property-card {
+  flex-direction: row;
+  height: min-content;
+  min-height: 240px;
+  align-items: stretch;
+}
+
+.property-cards-grid.list-view .property-card__image-container {
+  width: 340px;
+  height: auto;
+  min-height: 240px;
+  border-radius: 16px 0 0 16px;
+}
+
+.property-cards-grid.list-view .property-card__body {
+  flex: 1;
+  padding: 24px 32px;
+  border-radius: 0 16px 16px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.property-cards-grid.list-view .property-card__expandable {
+  position: static;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  padding: 0;
+  box-shadow: none;
+  border: none;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.property-cards-grid.list-view .property-card__btn-details {
+  width: fit-content;
+  padding: 10px 32px;
+  margin-top: 8px;
+}
+
+.property-cards-grid.list-view .property-card__features {
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+  width: fit-content;
+}
+
+.property-cards-grid.list-view .property-card:hover {
+  transform: translateY(-4px);
+  border-radius: 16px;
+}
+
+/* === Map View Styles === */
+.properties-map-view {
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: #f1f5f9;
+}
+
+@media (max-width: 768px) {
+  .property-cards-grid.list-view .property-card {
+    flex-direction: column;
+    height: auto;
+  }
+  .property-cards-grid.list-view .property-card__image-container {
+    width: 100%;
+    height: 240px;
+    border-radius: 16px 16px 0 0;
+  }
+}
+

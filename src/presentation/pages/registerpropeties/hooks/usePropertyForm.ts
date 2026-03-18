@@ -25,6 +25,8 @@ interface FormState {
   estrato: string;
   latitud: string;
   longitud: string;
+  /** ¿Publicar como destacada? (Premium) */
+  destacar: boolean;
 }
 
 const INITIAL_FORM: FormState = {
@@ -45,6 +47,7 @@ const INITIAL_FORM: FormState = {
   estrato: "",
   latitud: "",
   longitud: "",
+  destacar: false,
 };
 
 /**
@@ -142,6 +145,7 @@ export function usePropertyForm(editId?: number) {
           estrato: propiedad.estrato ? String(propiedad.estrato) : "",
           latitud: propiedad.latitud ? String(propiedad.latitud) : "",
           longitud: propiedad.longitud ? String(propiedad.longitud) : "",
+          destacar: propiedad.estadoPublicacion === "destacada",
         });
 
         // Cargar características seleccionadas
@@ -200,7 +204,19 @@ export function usePropertyForm(editId?: number) {
       value = capitalizeFirst(value);
     }
 
+    // Prevenir valores negativos en campos numéricos
+    const numericFields = ["precio", "area", "habitaciones", "banos", "estrato"];
+    if (numericFields.includes(name) && value !== "") {
+      const numValue = parseFloat(value);
+      if (numValue < 0) value = "0";
+    }
+
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  /** Manejar cambio en checkboxes booleanos (como destacar) */
+  const handleToggle = (name: keyof FormState) => {
+    setForm((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
   /** Alternar característica */
@@ -414,6 +430,9 @@ export function usePropertyForm(editId?: number) {
             usuario?.plan ?? "gratuito",
           );
         }
+        
+        // Actualizar estado de destacado si cambió
+        await propertyService.updateProperty(editId, {}, form.destacar);
       } else {
         // --- MODO CREACIÓN ---
         const nueva = (await Promise.race([
@@ -422,6 +441,7 @@ export function usePropertyForm(editId?: number) {
             caracteristicasSeleccionadas,
             imagenes,
             usuario?.plan ?? "gratuito",
+            form.destacar,
           ),
           timeout,
         ])) as Awaited<
@@ -483,5 +503,7 @@ export function usePropertyForm(editId?: number) {
     isEditMode,
     loadingEdit,
     setCoordenadas,
+    handleToggle,
+    usuario,
   };
 }

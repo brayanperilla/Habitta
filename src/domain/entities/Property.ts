@@ -23,6 +23,8 @@ export interface Property {
   fotoUrl?: string | null;
   latitud?: number;
   longitud?: number;
+  /** Plan del dueño (gratuito | premium) para destacar la propiedad */
+  ownerPlan?: "gratuito" | "premium";
 }
 
 /** Crear propiedad — sin campos auto-generados */

@@ -40,10 +40,19 @@ function CardPropetie({
   // Determinar badges según el estado de publicación y tipo de operación
   const badges = [];
   if (property.estadoPublicacion === "destacada") badges.push("Destacada");
-  if (property.tipoOperacion) badges.push(property.tipoOperacion);
+  if (property.tipoOperacion) {
+    const label = property.tipoOperacion.toLowerCase() === "arriendo" ? "Alquiler" : property.tipoOperacion;
+    badges.push(label);
+  }
 
   return (
     <div className="property-card">
+      {/* Listón de Destacada (Premium o Manual) - Efecto 3D */}
+      {(property.ownerPlan === "premium" || property.estadoPublicacion === "destacada") && (
+        <div className="premium-ribbon">
+          <span>Destacada</span>
+        </div>
+      )}
       <div className="property-card__image-container">
         {/* Si la foto principal es un video MP4, mostrar fallback image para no distorsionar la card */}
         {(() => {
@@ -57,6 +66,9 @@ function CardPropetie({
             />
           );
         })()}
+
+        {/* Listón de Destacada (Premium) se movió al nivel de la card para efecto 3D */}
+
 
         {/* Badges especiales por estado */}
         {property.estadoPublicacion === "pending_manual" && (

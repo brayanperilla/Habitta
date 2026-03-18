@@ -3,12 +3,23 @@ import CardPropetie from "../../components/cardPropetie/Card_propietie";
 import { useProperties } from "@application/hooks/useProperties";
 import { useFavorites } from "@application/hooks/useFavorites";
 import { useAuth } from "@application/context/AuthContext";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { LocationAutocomplete } from "../../components/LocationAutocomplete/LocationAutocomplete";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 import { propertyService } from "@application/services/propertyService";
 import type { Caracteristica } from "@domain/entities/Caracteristica";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "./styleProperties.css";
+
+// Fix Leaflet marker icon issue
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
 
 const ITEMS_PER_PAGE = 20;
 
@@ -20,14 +31,28 @@ const ITEMS_PER_PAGE = 20;
 function PropertiesPage() {
   const { usuario } = useAuth();
   const { isFavorito, toggleFavorito } = useFavorites();
+  const navigate = useNavigate();
   
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Características disponibles y seleccionadas para el filtro
   const [caracteristicas, setCaracteristicas] = useState<Caracteristica[]>([]);
   const [selectedCaracteristicas, setSelectedCaracteristicas] = useState<number[]>([]);
-  const [caracteristicasOpen, setCaracteristicasOpen] = useState(false);
+  
+  // Nuevo estado para manejar qué dropdown está abierto (solo uno a la vez)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  // Cerrar al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".custom-dropdown-container")) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     propertyService.getCaracteristicas().then(setCaracteristicas).catch(() => {});
@@ -38,6 +63,7 @@ function PropertiesPage() {
   const [localFilters, setLocalFilters] = useState({
     searchTerm: searchParams.get("searchTerm") || "",
     tipoPropiedad: searchParams.get("tipoPropiedad") || "",
+    tipoOperacion: searchParams.get("tipoOperacion") || "",
     precioMax: precioMaxFromUrl,
     areaMax: 870,
     habitaciones: undefined as number | undefined,
@@ -46,10 +72,13 @@ function PropertiesPage() {
     sortBy: "Relevancia" as "Relevancia" | "Mayor a menor precio" | "Menor a mayor precio"
   });
 
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
+
   // El hook usará los filtros iniciales desde la URL directamente para evitar un doble fetch
   const { properties, loading, error, updateFilters } = useProperties({
     searchTerm: searchParams.get("searchTerm") || undefined,
     tipoPropiedad: searchParams.get("tipoPropiedad") || undefined,
+    tipoOperacion: searchParams.get("tipoOperacion") || undefined,
     precioMax: precioMaxFromUrl,
     areaMax: 870,
     sortBy: "Relevancia"
@@ -61,6 +90,7 @@ function PropertiesPage() {
     updateFilters({
       searchTerm: localFilters.searchTerm || undefined,
       tipoPropiedad: localFilters.tipoPropiedad || undefined,
+      tipoOperacion: localFilters.tipoOperacion || undefined,
       precioMax: localFilters.precioMax,
       areaMax: localFilters.areaMax,
       habitaciones: localFilters.habitaciones,
@@ -82,6 +112,7 @@ function PropertiesPage() {
     const clear = {
       searchTerm: "",
       tipoPropiedad: "",
+      tipoOperacion: "",
       precioMax: 7560000000,
       areaMax: 870,
       habitaciones: undefined,
@@ -90,6 +121,7 @@ function PropertiesPage() {
       sortBy: "Relevancia" as const
     };
     setLocalFilters(clear);
+    setSelectedCaracteristicas([]); // Limpiar características seleccionadas
     updateFilters({}); // Pasar un objeto vacío recarga todo
     setCurrentPage(1);
   };
@@ -99,9 +131,16 @@ function PropertiesPage() {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(val);
   };
 
-  const totalPages = Math.ceil(properties.length / ITEMS_PER_PAGE);
+  // Ordenar: primero las destacadas (Premium o Manual)
+  const sortedProperties = [...properties].sort((a, b) => {
+    const aPrio = (a.ownerPlan === "premium" || a.estadoPublicacion === "destacada") ? 1 : 0;
+    const bPrio = (b.ownerPlan === "premium" || b.estadoPublicacion === "destacada") ? 1 : 0;
+    return bPrio - aPrio;
+  });
+
+  const totalPages = Math.ceil(sortedProperties.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedProperties = properties.slice(
+  const paginatedProperties = sortedProperties.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE,
   );
@@ -138,26 +177,86 @@ function PropertiesPage() {
               </div>
             </div>
 
-            <div className="filter-dropdown-figma">
-              <select
-                className="select-tipo-figma"
-                value={localFilters.tipoPropiedad}
-                onChange={(e) => setLocalFilters({...localFilters, tipoPropiedad: e.target.value})}
+            <div className="filter-dropdown-figma custom-dropdown-container">
+              <button 
+                className="select-tipo-figma-custom"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveDropdown(activeDropdown === 'tipo' ? null : 'tipo');
+                }}
               >
-                <option value="">Tipo</option>
-                <option value="Casa">Casa</option>
-                <option value="Apartamento">Apartamento</option>
-                <option value="Lote">Lote</option>
-                <option value="Finca">Finca</option>
-              </select>
+                {localFilters.tipoPropiedad || "Tipo"}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: "8px", transform: activeDropdown === 'tipo' ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              {activeDropdown === 'tipo' && (
+                <div className="custom-dropdown-panel">
+                  {["Casa", "Apartamento", "Lote"].map(tipo => (
+                    <div 
+                      key={tipo} 
+                      className="custom-dropdown-option"
+                      onClick={() => {
+                        setLocalFilters({...localFilters, tipoPropiedad: tipo});
+                        setActiveDropdown(null);
+                      }}
+                    >
+                      {tipo}
+                    </div>
+                  ))}
+                  <div 
+                    className="custom-dropdown-option clear-option"
+                    onClick={() => {
+                      setLocalFilters({...localFilters, tipoPropiedad: ""});
+                      setActiveDropdown(null);
+                    }}
+                  >
+                    Cualquiera
+                  </div>
+                </div>
+              )}
             </div>
 
             <button className="btn-search-figma" onClick={handleApplyFilters}>Buscar</button>
             
             <div className="view-toggles-figma">
-              <button className="grid-icon-btn active" aria-label="Vista cuadrícula"></button>
-              <button className="grid-icon-btn" aria-label="Vista lista"></button>
-              <button className="grid-icon-btn map-btn" aria-label="Vista mapa"></button>
+              <button 
+                className={`grid-icon-btn ${viewMode === 'grid' ? 'active' : ''}`} 
+                aria-label="Vista cuadrícula"
+                onClick={() => setViewMode('grid')}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              </button>
+              <button 
+                className={`grid-icon-btn ${viewMode === 'list' ? 'active' : ''}`} 
+                aria-label="Vista lista"
+                onClick={() => setViewMode('list')}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+              </button>
+              <button 
+                className={`grid-icon-btn map-btn ${viewMode === 'map' ? 'active' : ''}`} 
+                aria-label="Vista mapa"
+                onClick={() => setViewMode('map')}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                  <line x1="8" y1="2" x2="8" y2="18"></line>
+                  <line x1="16" y1="6" x2="16" y2="22"></line>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -246,41 +345,68 @@ function PropertiesPage() {
             </div>
             
             {/* Estrato */}
-            <div className="filter-group-inline">
+            <div className="filter-group-inline custom-dropdown-container">
               <label>Estrato</label>
-              <select 
-                className="inline-select"
-                value={localFilters.estrato || ""} 
-                onChange={(e) => {
-                  const val = e.target.value ? Number(e.target.value) : undefined;
-                  setLocalFilters({...localFilters, estrato: val});
+              <button 
+                className="inline-select-custom"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveDropdown(activeDropdown === 'estrato' ? null : 'estrato');
                 }}
               >
-                <option value="">Todos</option>
-                {[1, 2, 3, 4, 5, 6].map(num => (
-                  <option key={num} value={num}>{num}</option>
-                ))}
-              </select>
+                {localFilters.estrato || "Todos"}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: "4px", transform: activeDropdown === 'estrato' ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              {activeDropdown === 'estrato' && (
+                <div className="custom-dropdown-panel estrato-panel">
+                  {[1, 2, 3, 4, 5, 6].map(num => (
+                    <div 
+                      key={num} 
+                      className="custom-dropdown-option"
+                      onClick={() => {
+                        setLocalFilters({...localFilters, estrato: num});
+                        setActiveDropdown(null);
+                      }}
+                    >
+                      {num}
+                    </div>
+                  ))}
+                  <div 
+                    className="custom-dropdown-option clear-option"
+                    onClick={() => {
+                      setLocalFilters({...localFilters, estrato: undefined});
+                      setActiveDropdown(null);
+                    }}
+                  >
+                    Todos
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Características — dropdown estilo AnimeFlv */}
             {caracteristicas.length > 0 && (
-              <div className="filter-group-inline caracteristicas-dropdown-wrapper">
+              <div className="filter-group-inline caracteristicas-dropdown-wrapper custom-dropdown-container">
                 <button
                   type="button"
                   className="caracteristicas-dropdown-btn"
-                  onClick={() => setCaracteristicasOpen(prev => !prev)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveDropdown(activeDropdown === 'car' ? null : 'car');
+                  }}
                 >
                   Características
                   {selectedCaracteristicas.length > 0 && (
                     <span className="car-badge">{selectedCaracteristicas.length}</span>
                   )}
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: "auto", transform: caracteristicasOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: "auto", transform: activeDropdown === 'car' ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
                 </button>
 
-                {caracteristicasOpen && (
+                {activeDropdown === 'car' && (
                   <div className="caracteristicas-panel">
                     <div className="caracteristicas-grid">
                       {caracteristicas.map(c => (
@@ -321,7 +447,7 @@ function PropertiesPage() {
         <div className="content-wrapper full-width-wrapper">
 
           {/* Grilla de Resultados */}
-          <main className="properties-grid">
+          <main className="properties-results">
             {/* Estado de carga */}
             {loading && (
               <p style={{ textAlign: "center", padding: "2rem", color: "#aaa" }}>
@@ -343,45 +469,88 @@ function PropertiesPage() {
               </p>
             )}
 
-            {/* Tarjetas de propiedades paginadas */}
-            <div className="property-cards-grid">
-              {paginatedProperties.map((property) => (
-                <CardPropetie
-                  key={property.idpropiedad}
-                  property={property}
-                  isFav={isFavorito(property.idpropiedad)}
-                  onToggleFav={usuario ? toggleFavorito : undefined}
-                />
-              ))}
-            </div>
+            {!loading && !error && properties.length > 0 && (
+              <>
+                {viewMode === 'map' ? (
+                  <div className="properties-map-view" style={{ height: "600px", borderRadius: "12px", overflow: "hidden", marginBottom: "2rem" }}>
+                    <MapContainer center={[4.5709, -74.2973]} zoom={6} style={{ height: "100%", width: "100%" }}>
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      {sortedProperties.map((property) => {
+                        const lat = property.latitud ?? null;
+                        const lng = property.longitud ?? null;
+                        if (lat !== null && lng !== null) {
+                          const position: [number, number] = [lat, lng];
+                          return (
+                            <Marker key={property.idpropiedad} position={position}>
+                              <Popup>
+                                <div style={{ width: "200px" }}>
+                                  <img 
+                                    src={property.fotoUrl || "/images/auth/dream_home_1.png"} 
+                                    alt={property.titulo || "Propiedad"} 
+                                    style={{ width: "100%", borderRadius: "4px", marginBottom: "8px" }} 
+                                  />
+                                  <h4 style={{ margin: "0 0 4px", fontSize: "0.9rem" }}>{property.titulo}</h4>
+                                  <p style={{ margin: "0 0 8px", fontSize: "0.8rem", color: "#666" }}>{property.ciudad}, {property.departamento}</p>
+                                  <button 
+                                    onClick={() => navigate(`/propertydetailspage/${property.idpropiedad}`)}
+                                    style={{ background: "#2da8bb", color: "white", border: "none", padding: "4px 8px", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem", width: "100%" }}
+                                  >
+                                    Ver detalles
+                                  </button>
+                                </div>
+                              </Popup>
+                            </Marker>
+                          );
+                        }
+                        return null;
+                      })}
+                    </MapContainer>
+                  </div>
+                ) : (
+                  <div className={`property-cards-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
+                    {paginatedProperties.map((property) => (
+                      <CardPropetie
+                        key={property.idpropiedad}
+                        property={property}
+                        isFav={isFavorito(property.idpropiedad)}
+                        onToggleFav={usuario ? toggleFavorito : undefined}
+                      />
+                    ))}
+                  </div>
+                )}
 
-            {/* Paginación */}
-            {totalPages > 1 && (
-              <div className="button-page">
-                <button
-                  className="page-btn"
-                  disabled={currentPage === 1}
-                  onClick={() => {
-                    setCurrentPage((p) => p - 1);
-                    window.scrollTo(0, 0);
-                  }}
-                >
-                  ← Anterior
-                </button>
-                <span style={{ padding: "0.5rem 1rem", fontWeight: 600 }}>
-                  {currentPage} de {totalPages}
-                </span>
-                <button
-                  className="page-btn"
-                  disabled={currentPage === totalPages}
-                  onClick={() => {
-                    setCurrentPage((p) => p + 1);
-                    window.scrollTo(0, 0);
-                  }}
-                >
-                  Siguiente →
-                </button>
-              </div>
+                {/* Paginación (solo si no es mapa, o si prefieres paginar el mapa también) */}
+                {viewMode !== 'map' && totalPages > 1 && (
+                  <div className="button-page">
+                    <button
+                      className="page-btn"
+                      disabled={currentPage === 1}
+                      onClick={() => {
+                        setCurrentPage((p) => p - 1);
+                        window.scrollTo(0, 0);
+                      }}
+                    >
+                      ← Anterior
+                    </button>
+                    <span style={{ padding: "0.5rem 1rem", fontWeight: 600 }}>
+                      {currentPage} de {totalPages}
+                    </span>
+                    <button
+                      className="page-btn"
+                      disabled={currentPage === totalPages}
+                      onClick={() => {
+                        setCurrentPage((p) => p + 1);
+                        window.scrollTo(0, 0);
+                      }}
+                    >
+                      Siguiente →
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </main>
         </div>
