@@ -55,6 +55,7 @@ export const propertyService = {
     idsCaracteristicas: number[],
     imagenes: File[] = [],
     plan: "gratuito" | "premium" = "gratuito",
+    isFeatured: boolean = false,
   ): Promise<Property> => {
     if (!property.titulo?.trim()) throw new Error("El título es obligatorio.");
     if (!property.direccion?.trim())
@@ -69,7 +70,7 @@ export const propertyService = {
     if (property.area === undefined || property.area === null || property.area <= 0)
       throw new Error("El área debe ser un valor válido y mayor a 0.");
 
-    const nueva = await propertyApi.create(property);
+    const nueva = await propertyApi.create(property, isFeatured);
 
     if (idsCaracteristicas.length > 0) {
       await caracteristicasApi.guardarCaracteristicasPropiedad(
@@ -155,8 +156,9 @@ export const propertyService = {
   updateProperty: async (
     id: number,
     updates: UpdatePropertyInput,
+    isFeatured?: boolean,
   ): Promise<Property> => {
-    return await propertyApi.update(id, updates);
+    return await propertyApi.update(id, updates, isFeatured);
   },
 
   /** Eliminar propiedad (con dependencias: fotos y características) */
