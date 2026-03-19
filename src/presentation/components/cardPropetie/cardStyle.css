@@ -364,6 +364,57 @@
   }
 }
 
+/* New columns style */
+.property-card__col1 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.property-card__col2 {
+  display: none;
+}
+
+.col2-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.col2-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.col2-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.col2-info--badges {
+  margin-top: 4px;
+}
+
+.col2-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.col2-badge {
+  background: #f1f5f9;
+  color: #334155;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+}
+
 @media (max-width: 1200px) {
   .property-cards-grid {
     grid-template-columns: repeat(3, 1fr);

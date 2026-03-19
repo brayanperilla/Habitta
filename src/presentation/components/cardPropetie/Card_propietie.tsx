@@ -220,6 +220,7 @@ function CardPropetie({
 
         {/* Contenido expandible en hover */}
         <div className="property-card__expandable">
+          <div className="property-card__col1">
           <p className="property-card__type" style={{ textTransform: 'capitalize' }}>
             {property.tipoPropiedad || "Tipo no especificado"}
           </p>
@@ -331,6 +332,30 @@ function CardPropetie({
           >
             Ver detalles
           </Link>
+          </div>
+
+          <div className="property-card__col2">
+            <div className="col2-info">
+              <span className="col2-label">Dirección:</span>
+              <span className="col2-value" style={{ textTransform: 'capitalize' }}>
+                {property.direccion || "No especificada"}
+              </span>
+            </div>
+            <div className="col2-info">
+              <span className="col2-label">Teléfono:</span>
+              <span className="col2-value">{property.telefonoContacto || "No disponible"}</span>
+            </div>
+            {property.caracteristicasNombres && property.caracteristicasNombres.length > 0 && (
+              <div className="col2-info col2-info--badges">
+                <span className="col2-label">Adicionales:</span>
+                <div className="col2-badges">
+                  {property.caracteristicasNombres.map((c, idx) => (
+                    <span key={idx} className="col2-badge" style={{ textTransform: 'capitalize' }}>{c}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

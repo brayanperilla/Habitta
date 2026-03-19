@@ -225,7 +225,7 @@ function Home() {
                   (tipoOperacion === "Alquilar" && (op === "alquiler" || op === "arriendo")) ||
                   (tipoOperacion === "Venta" && op === "venta");
                 
-                const matchesType = !tipoPropiedad || p.tipoPropiedad === tipoPropiedad;
+                const matchesType = !tipoPropiedad || p.tipoPropiedad?.toLowerCase() === tipoPropiedad.toLowerCase();
                 
                 return matchesOp && matchesType;
               })
@@ -234,7 +234,7 @@ function Home() {
                 const bPrio = (b.ownerPlan === "premium" || b.estadoPublicacion === "destacada") ? 1 : 0;
                 return bPrio - aPrio;
               })
-              .slice(0, 20)
+              .slice(0, 8)
               .map((property) => (
                 <CardPropetie
                   key={property.idpropiedad}

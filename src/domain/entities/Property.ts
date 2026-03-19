@@ -25,6 +25,8 @@ export interface Property {
   longitud?: number;
   /** Plan del dueño (gratuito | premium) para destacar la propiedad */
   ownerPlan?: "gratuito" | "premium";
+  telefonoContacto?: string | null;
+  caracteristicasNombres?: string[];
 }
 
 /** Crear propiedad — sin campos auto-generados */

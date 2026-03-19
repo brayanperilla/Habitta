@@ -10,23 +10,35 @@ function mapPropertyWithPhoto(row: Record<string, unknown>): Property {
   const fotos = (row.fotospropiedad as { url: string; orden: number }[]) || [];
   const firstPhoto = fotos.sort((a, b) => (a.orden ?? 99) - (b.orden ?? 99))[0];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { fotospropiedad: _fotos, ...rest } = row;
+  const { fotospropiedad: _fotos, propiedadcaracteristica: _pc, ...rest } = row;
   
   // Extraer el plan del dueño si viene en la query (usuarios.plan)
   // Manejar tanto objeto (single join) como array (select multiple) por seguridad
   const usuariosRaw = row.usuarios;
   let ownerPlan: "gratuito" | "premium" | undefined;
+  let telefonoContacto: string | null = null;
   
   if (Array.isArray(usuariosRaw)) {
     ownerPlan = usuariosRaw[0]?.plan;
+    telefonoContacto = usuariosRaw[0]?.telefono || null;
   } else if (usuariosRaw && typeof usuariosRaw === 'object') {
     ownerPlan = (usuariosRaw as any).plan;
+    telefonoContacto = (usuariosRaw as any).telefono || null;
   }
+
+  // Extraer nombres de características (si existen)
+  const caracteristicasRaw = (row.propiedadcaracteristica as any[]) || [];
+  const caracteristicasNombres = caracteristicasRaw
+    .map(c => c.caracteristica?.nombre)
+    .filter(Boolean)
+    .slice(0, 2);
   
   return { 
     ...rest, 
     fotoUrl: firstPhoto?.url ?? null,
-    ownerPlan: ownerPlan
+    ownerPlan: ownerPlan,
+    telefonoContacto,
+    caracteristicasNombres
   } as Property;
 }
 
@@ -54,7 +66,7 @@ export const propertyApi = {
   getAll: async (): Promise<Property[]> => {
     const { data, error } = await supabase
       .from("propiedades")
-      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta, plan)`)
+      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta, plan, telefono), propiedadcaracteristica(caracteristica(nombre))`)
       .in("estadoPublicacion", ["activa", "destacada"])
       .eq("usuarios.estadocuenta", "Activa")
       .order("fechacreacion", { ascending: false });
@@ -67,7 +79,7 @@ export const propertyApi = {
   getFiltered: async (filters: PropertyFilters): Promise<Property[]> => {
     let query = supabase
       .from("propiedades")
-      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta, plan)`);
+      .select(`*, fotospropiedad(url, orden), usuarios!inner(estadocuenta, plan, telefono), propiedadcaracteristica(caracteristica(nombre))`);
 
     // Solo mostrar propiedades activas o destacadas publicadas por usuarios con cuenta Activa
     query = query.in("estadoPublicacion", ["activa", "destacada"]).eq("usuarios.estadocuenta", "Activa");
@@ -79,8 +91,8 @@ export const propertyApi = {
     }
 
     if (filters.tipoPropiedad) {
-      // Usaremos comillas dobles enviando las strings literal a PostgREST para forzar el Case Sensitivity de la DB
-      query = query.eq('"tipoPropiedad"', filters.tipoPropiedad);
+      // Usamos ilike enviando las strings literal a PostgREST para forzar case insensitivity en la DB
+      query = query.ilike('"tipoPropiedad"', filters.tipoPropiedad);
     }
 
     if (filters.tipoOperacion) {
@@ -125,7 +137,7 @@ export const propertyApi = {
     // Filtro post-fetch por características (AND lógico)
     if (filters.caracteristicas && filters.caracteristicas.length > 0) {
       const { data: charData } = await supabase
-        .from("propiedad_caracteristicas")
+        .from("propiedadcaracteristica")
         .select("idpropiedad, idcaracteristica")
         .in("idcaracteristica", filters.caracteristicas);
 
@@ -169,7 +181,7 @@ export const propertyApi = {
   getByUsuario: async (idusuario: number): Promise<Property[]> => {
     const { data, error } = await supabase
       .from("propiedades")
-      .select(`*, fotospropiedad(url, orden), usuarios(plan)`)
+      .select(`*, fotospropiedad(url, orden), usuarios(plan, telefono), propiedadcaracteristica(caracteristica(nombre))`)
       .eq("idusuario", idusuario)
       .order("fechacreacion", { ascending: false });
 

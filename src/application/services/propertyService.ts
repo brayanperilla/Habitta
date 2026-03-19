@@ -167,7 +167,7 @@ export const propertyService = {
     await supabase.from("fotospropiedad").delete().eq("idpropiedad", id);
     // 2. Eliminar características asociadas
     await supabase
-      .from("propiedades_caracteristicas")
+      .from("propiedadcaracteristica")
       .delete()
       .eq("idpropiedad", id);
     // 3. Eliminar favoritos (Para evitar error de FK)
