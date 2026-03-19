@@ -206,7 +206,7 @@ function Home() {
         </section>
 
         {/* Sección de Propiedades Destacadas */}
-        <section className="section-container prominent-section">
+        <section className="section-container prominent-section properties-section">
           <div className="section-header">
             <h4>Propiedades destacadas</h4>
             <h5>

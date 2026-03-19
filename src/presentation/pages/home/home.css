@@ -329,6 +329,13 @@ span.text-primary {
   padding: 80px 20px;
 }
 
+/* Sección de propiedades destacadas — ancho completo */
+.section-container.properties-section {
+  max-width: none;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 .section-header {
   text-align: center;
   margin-bottom: 50px;

@@ -212,15 +212,15 @@ function CardPropetie({
         <h3 className="property-card__title" style={{ textTransform: 'capitalize' }}>
           {property.titulo || "Sin título"}
         </h3>
-        <p className="property-card__location" style={{ textTransform: 'capitalize' }}>
-          {[property.ciudad, property.departamento]
-            .filter(Boolean)
-            .join(", ") || "Ubicación no especificada"}
-        </p>
 
         {/* Contenido expandible en hover */}
         <div className="property-card__expandable">
           <div className="property-card__col1">
+          <p className="property-card__location" style={{ textTransform: 'capitalize', margin: 0 }}>
+            {[property.ciudad, property.departamento]
+              .filter(Boolean)
+              .join(", ") || "Ubicación no especificada"}
+          </p>
           <p className="property-card__type" style={{ textTransform: 'capitalize' }}>
             {property.tipoPropiedad || "Tipo no especificado"}
           </p>

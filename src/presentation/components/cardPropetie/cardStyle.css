@@ -6,7 +6,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: 10px 0;
-  align-items: start; /* Evita que cards bajas se estiren por las altas en la misma fila */
+  align-items: stretch; /* Todas las cards de la misma fila tienen igual altura */
 }
 
 /* Card */
@@ -18,6 +18,9 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  z-index: 1;
+  isolation: isolate; /* Contiene z-index del ribbon dentro de la card */
+  overflow: hidden; /* Evita que el ribbon se desborde fuera de la card */
   transition:
     transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     box-shadow 0.3s;
@@ -27,14 +30,15 @@
   transform: translateY(-8px);
   box-shadow: 0 20px 32px rgba(0, 0, 0, 0.12);
   border-radius: 16px 16px 0 0;
-  z-index: 10;
+  z-index: 50;
+  overflow: visible; /* Permite que el expandable se muestre fuera de la card en hover */
 }
 
 /* Image Container */
 .property-card__image-container {
   position: relative;
   width: 100%;
-  height: 280px; /* Imagen más grande */
+  height: 220px;
   background-color: #e5e7eb;
   border-radius: 16px 16px 0 0;
   overflow: hidden;
@@ -163,7 +167,7 @@
 
 /* Card Body */
 .property-card__body {
-  padding: 16px 20px;
+  padding: 10px 14px;
   background: #ffffff;
   border-radius: 0 0 16px 16px;
   position: relative;
@@ -176,19 +180,19 @@
 }
 
 .property-card__title {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #1a1a1a;
   margin: 0;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 2.8em; /* Reserva espacio para 2 líneas siempre */
-  line-height: 1.4;
+  min-height: 2.6em;
+  line-height: 1.3;
 }
 
 .property-card__location {
@@ -241,7 +245,7 @@
 }
 
 .property-card__price {
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: #2dd4bf;
   margin: 0;
@@ -250,11 +254,11 @@
 /* Features */
 .property-card__features {
   display: flex;
-  gap: 20px;
+  gap: 14px;
   align-items: center;
   color: #665c5c;
-  font-size: 1rem;
-  padding: 4px 0 12px;
+  font-size: 0.9rem;
+  padding: 4px 0 8px;
   border-bottom: 1px solid #f3f4f6;
 }
 
