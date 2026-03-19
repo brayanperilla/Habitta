@@ -614,9 +614,27 @@ span.text-primary {
   opacity: 0.8;
 }
 
-/* Diseño Responsivo */
+/* ===== DISEÑO RESPONSIVO — 6 BREAKPOINTS ===== */
 
-/* Tablets y Laptops Pequeñas */
+/* PC Grande — 1440px */
+@media (max-width: 1440px) {
+  .section-container {
+    padding: 60px 20px;
+  }
+}
+
+/* Laptop — 1200px */
+@media (max-width: 1200px) {
+  .hero-section {
+    min-height: auto;
+    padding: 130px 20px 60px;
+  }
+  .section-container {
+    padding: 50px 16px;
+  }
+}
+
+/* Tablet Horizontal — 1024px */
 @media (max-width: 1024px) {
   .hero-section {
     min-height: auto;
@@ -626,9 +644,17 @@ span.text-primary {
   .cards-grid {
     gap: 20px;
   }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .search-card {
+    padding: 24px;
+  }
 }
 
-/* Móviles y Tablets Verticales */
+/* Tablet Vertical — 768px */
 @media (max-width: 768px) {
   .hero-section {
     padding-top: 100px;
@@ -679,14 +705,38 @@ span.text-primary {
   }
 
   .features-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .section-header h4 {
+    font-size: 1.8rem;
   }
 }
 
-/* Móviles Pequeños */
+/* Móvil Estándar — 480px */
 @media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 1.6rem;
+  }
+
+  .hero-content p {
+    font-size: 0.9rem;
+  }
+
   .stat-item {
     width: 100%;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header h4 {
+    font-size: 1.5rem;
+  }
+
+  .section-header h5 {
+    font-size: 0.95rem;
   }
 
   .cert-logos {
@@ -700,5 +750,29 @@ span.text-primary {
 
   .app-card {
     width: 100%;
+  }
+}
+
+/* Móvil Pequeño — 360px */
+@media (max-width: 360px) {
+  .hero-section {
+    padding-top: 80px;
+    padding-bottom: 30px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.4rem;
+  }
+
+  .search-card {
+    padding: 14px;
+  }
+
+  .section-container {
+    padding: 40px 8px;
+  }
+
+  .section-header h4 {
+    font-size: 1.3rem;
   }
 }

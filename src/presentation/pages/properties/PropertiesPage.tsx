@@ -42,6 +42,9 @@ function PropertiesPage() {
   // Nuevo estado para manejar qué dropdown está abierto (solo uno a la vez)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+  // Estado para sidebar colapsable en móvil
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
   // Cerrar al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -155,8 +158,27 @@ function PropertiesPage() {
       {/* Contenedor Principal */}
       <div className="properties-page">
         <div className="properties-page-layout">
+          {/* Botón flotante filtros móvil */}
+          <button
+            className="mobile-filters-btn"
+            onClick={() => setShowMobileFilters(true)}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            Filtros
+          </button>
+
+          {/* Overlay móvil */}
+          {showMobileFilters && (
+            <div
+              className="mobile-filters-overlay"
+              onClick={() => setShowMobileFilters(false)}
+            />
+          )}
+
           {/* Sidebar */}
-          <aside className="filters-sidebar-vertical">
+          <aside className={`filters-sidebar-vertical ${showMobileFilters ? 'filters-sidebar-vertical--open' : ''}`}>
             <h2 className="sidebar-title">Buscar inmuebles</h2>
 
             <div className="sidebar-filter-group">
@@ -412,7 +434,7 @@ function PropertiesPage() {
               </div>
             )}
 
-            <button className="sidebar-btn-search" onClick={handleApplyFilters}>Buscar</button>
+            <button className="sidebar-btn-search" onClick={() => { handleApplyFilters(); setShowMobileFilters(false); }}>Buscar</button>
             <button className="sidebar-btn-clear" onClick={handleClearFilters}>Limpiar Filtros</button>
           </aside>
 

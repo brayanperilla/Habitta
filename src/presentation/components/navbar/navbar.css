@@ -258,9 +258,80 @@
   border-color: transparent;
 }
 
-/* Responsive Design */
+/* Hamburger Button */
+.navbar__hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
 
-/* Medium Screens */
+.navbar__hamburger:hover {
+  background-color: #f1f5f9;
+}
+
+.navbar__hamburger svg {
+  display: block;
+}
+
+/* Mobile Menu */
+.navbar__mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-radius: 0 0 12px 12px;
+  padding: 16px;
+  z-index: 99;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.navbar__mobile-menu--open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.navbar__mobile-menu .navbar_link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.navbar__mobile-menu .navbar_link:hover {
+  background: #f6f7f8;
+}
+
+.navbar__mobile-menu .navbar_link.active {
+  background: #35d2db;
+  color: #fff;
+}
+
+/* Responsive Design — 6 Breakpoints */
+
+/* PC Grande — 1440px */
+@media (max-width: 1440px) {
+  .navbar__inner {
+    padding: 8px 14px;
+  }
+}
+
+/* Laptop — 1200px */
 @media (max-width: 1200px) {
   .navbar__inner {
     max-width: 1000px;
@@ -268,33 +339,138 @@
   }
 
   .navbar__logo-img {
-    max-width: 120px;
+    max-width: min(45px, 8vw);
   }
 
   .navbar__links {
     gap: 12px;
   }
+
+  .navbar__logo-text {
+    font-size: clamp(1.1rem, 3vw, 1.6rem);
+  }
 }
 
-/* Small Screens */
+/* Tablet Horizontal — 1024px */
+@media (max-width: 1024px) {
+  .navbar__inner {
+    padding: 8px 10px;
+  }
+  .navbar__links {
+    gap: 8px;
+  }
+  .navbar_link {
+    font-size: clamp(12px, 1.3vw, 15px);
+    padding: 5px 8px;
+  }
+  .navbar__publish-btn {
+    font-size: clamp(12px, 1.5vw, 15px);
+    padding: 6px 12px;
+  }
+}
+
+/* Tablet Vertical — 768px (Menú hamburguesa) */
 @media (max-width: 768px) {
   .navbar__inner {
     border-radius: 0;
     padding: 8px 10px;
+    height: 70px;
+    position: relative;
   }
 
   .navbar__logo-img {
-    max-width: 100px;
+    max-width: min(40px, 10vw);
+  }
+
+  .navbar__logo-text {
+    font-size: clamp(1rem, 4vw, 1.4rem);
   }
 
   .navbar__links {
-    gap: 8px;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-left: 8px;
+    display: none;
+  }
+
+  .navbar__hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    order: -1;
+    margin-right: 8px;
   }
 
   .navbar__publish-btn {
     display: none;
+  }
+
+  .navbar__user-btn {
+    padding: 3px 8px 3px 3px;
+  }
+
+  .navbar__user-name {
+    display: none;
+  }
+}
+
+/* Móvil Estándar — 480px */
+@media (max-width: 480px) {
+  .navbar__inner {
+    height: 60px;
+    padding: 6px 8px;
+  }
+
+  .navbar__logo-text {
+    display: none;
+  }
+
+  .navbar__logo-img {
+    max-width: 36px;
+  }
+
+  .navbar__actions {
+    gap: 6px;
+    margin-left: 4px;
+  }
+
+  #notificationIcon {
+    width: 28px;
+  }
+
+  .navbar__login-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Móvil Pequeño — 360px */
+@media (max-width: 360px) {
+  .navbar__inner {
+    height: 56px;
+    padding: 4px 6px;
+  }
+
+  .navbar__logo-img {
+    max-width: 30px;
+  }
+
+  .navbar__hamburger {
+    padding: 6px;
+  }
+
+  .navbar__actions {
+    gap: 4px;
+  }
+
+  .navbar__login-btn {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+
+  .navbar__mobile-menu {
+    padding: 12px;
+  }
+
+  .navbar__mobile-menu .navbar_link {
+    padding: 10px 12px;
+    font-size: 0.9rem;
   }
 }

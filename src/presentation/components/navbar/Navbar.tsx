@@ -15,6 +15,7 @@ function Navbar() {
 
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Única instancia del hook — se comparte con ModalN via props
   const { notificaciones, noLeidasCount, marcarTodasLeidas } =
@@ -40,6 +41,28 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar__inner">
+        {/* Botón hamburguesa (visible en móvil) */}
+        <button
+          className="navbar__hamburger"
+          onClick={() => setMobileMenuOpen(prev => !prev)}
+          aria-label="Menú"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a202c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {mobileMenuOpen ? (
+              <>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </>
+            ) : (
+              <>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </>
+            )}
+          </svg>
+        </button>
+
         {/* Logo */}
         <div className="navbar__logo">
           <Link to={usuario?.rol === "admin" ? "/admin" : "/"}>
@@ -168,6 +191,44 @@ function Navbar() {
           )}
         </div>
       </div>
+
+      {/* Menú móvil desplegable */}
+      {usuario?.rol !== "admin" && (
+        <div className={`navbar__mobile-menu ${mobileMenuOpen ? 'navbar__mobile-menu--open' : ''}`}>
+          <Link
+            className={`navbar_link ${location.pathname === "/" ? "active" : ""}`}
+            to="/"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <img className="navbar_icon" src="/icons/UI/navbaricons/house-01-svgrepo-com.svg" alt="Inicio" />
+            Inicio
+          </Link>
+          <Link
+            className={`navbar_link ${location.pathname === "/properties" ? "active" : ""}`}
+            to="/properties"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <img className="navbar_icon" src="/icons/UI/navbaricons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg" alt="Propiedades" />
+            Propiedades
+          </Link>
+          <Link
+            className={`navbar_link ${location.pathname === "/favorites" ? "active" : ""}`}
+            to={usuario ? "/favorites" : "/auth"}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <img className="navbar_icon" src="/icons/UI/navbaricons/hearth-svgrepo-com.svg" alt="Favoritos" />
+            Favoritos
+          </Link>
+          <Link
+            className={`navbar_link ${location.pathname === "/tools" ? "active" : ""}`}
+            to={usuario ? "/tools" : "/auth"}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <img className="navbar_icon" src="/icons/UI/navbaricons/calculator-svgrepo-com.svg" alt="Herramientas" />
+            Herramientas
+          </Link>
+        </div>
+      )}
     </nav>
   );
 }
