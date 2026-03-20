@@ -7,6 +7,7 @@ import { MapSelector } from "@presentation/components/MapSelector/MapSelector";
 import { useFavorites } from "@application/hooks/useFavorites";
 import { useAuth } from "@application/context/AuthContext";
 import { supabase } from "@infrastructure/supabase/client";
+import { Helmet } from "react-helmet-async";
 import "./PropertyDetailsPage.css";
 
 const fallbackImage = "/images/auth/dream_home_1.png";
@@ -48,8 +49,10 @@ function PropertyDetailsPage() {
       .join(" ");
   };
 
-  // Imagen/video seleccionado (primera foto o fallback)
-  const selectedImg = fotos.length > 0 ? fotos[imgIndex] : fallbackImage;
+  // Imagen/video seleccionado (primera foto de galería, foto principal o fallback)
+  const selectedImg = fotos.length > 0 
+    ? fotos[imgIndex] 
+    : (property?.fotoUrl || fallbackImage);
 
   // Detectar si una URL es un video MP4
   const isVideo = (url: string) =>
@@ -107,6 +110,23 @@ function PropertyDetailsPage() {
     cargar();
   }, [id]);
 
+  // RF17 — Re-intentar carga de fotos si la página cargó demasiado rápido después de un registro/edit
+  useEffect(() => {
+    if (loading || !id || fotos.length > 0) return;
+    
+    // Si hay foto principal pero no galería, re-intentamos en 2.5s una sola vez
+    const timer = setTimeout(async () => {
+      try {
+        const imgs = await propertyService.getFotosPropiedad(Number(id));
+        if (imgs.length > 0) {
+          setFotos(imgs);
+        }
+      } catch (e) { console.error("Error en re-intento de fotos:", e); }
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [id, fotos.length, loading]);
+
   // Formatear precio en pesos colombianos
   const formatPrice = (price: number | null) => {
     if (!price) return "Precio no disponible";
@@ -151,7 +171,26 @@ function PropertyDetailsPage() {
 
   return (
     <div className="property-details-container">
-      <div className="property-details-main">
+      {property && (
+        <Helmet>
+          <title>{`${property.titulo || "Propiedad"} | Habitta`}</title>
+          <meta name="description" content={property.descripcion || "Descubre esta increíble propiedad en Habitta."} />
+          
+          {/* Open Graph / Facebook / WhatsApp */}
+          <meta property="og:type" content="website" />
+          <meta property="og:title" content={`${property.titulo || "Propiedad"} - Habitta`} />
+          <meta property="og:description" content={`$${property.precio?.toLocaleString()} - ${property.ciudad}, ${property.departamento}. Miralo en Habitta.`} />
+          <meta property="og:image" content={property.fotoUrl || fallbackImage} />
+          <meta property="og:url" content={window.location.href} />
+
+          {/* Twitter */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={property.titulo || "Propiedad"} />
+          <meta name="twitter:description" content={property.descripcion || ""} />
+          <meta name="twitter:image" content={property.fotoUrl || fallbackImage} />
+        </Helmet>
+      )}
+      <div className="property-details-main" key={fotos.length}>
         {/* Sección de Imágenes */}
         <div className="property-details-image-section">
           {/* Imagen o Video principal */}
@@ -178,50 +217,55 @@ function PropertyDetailsPage() {
               style={{ cursor: "zoom-in" }}
             />
           )}
-          <button
-            className="property-details-arrow left"
-            aria-label="Anterior"
-            onClick={prevImg}
-          >
-            <svg
-              width="64"
-              height="64"
-              viewBox="0 0 64 64"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="32" cy="32" r="32" fill="#fff" />
-              <path
-                d="M40 32H24M24 32l8-8M24 32l8 8"
-                stroke="#1a1a1a"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <button
-            className="property-details-arrow right"
-            aria-label="Siguiente"
-            onClick={nextImg}
-          >
-            <svg
-              width="64"
-              height="64"
-              viewBox="0 0 64 64"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="32" cy="32" r="32" fill="#fff" />
-              <path
-                d="M24 32h16M40 32l-8-8M40 32l-8 8"
-                stroke="#1a1a1a"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          {/* Flechas de Navegación - Solo si hay más de 1 foto */}
+          {fotos.length > 1 && (
+            <>
+              <button
+                className="property-details-arrow left"
+                aria-label="Anterior"
+                onClick={prevImg}
+              >
+                <svg
+                  width="64"
+                  height="64"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="32" cy="32" r="32" fill="#fff" />
+                  <path
+                    d="M40 32H24M24 32l8-8M24 32l8 8"
+                    stroke="#1a1a1a"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <button
+                className="property-details-arrow right"
+                aria-label="Siguiente"
+                onClick={nextImg}
+              >
+                <svg
+                  width="64"
+                  height="64"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="32" cy="32" r="32" fill="#fff" />
+                  <path
+                    d="M24 32h16M40 32l-8-8M40 32l-8 8"
+                    stroke="#1a1a1a"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </>
+          )}
 
           <button
             className="property-details-share"

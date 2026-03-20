@@ -40,7 +40,7 @@ function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number,
 }
 
 export function MapSelector({ initialLat, initialLng, city, department, address, onLocationSelect }: MapSelectorProps) {
-  // Centro por defecto (un lugar promedio de Colombia, Ej. Bogotá)
+  // Centro por defecto (Bogotá)
   const defaultCenter: [number, number] = [4.6097, -74.0817];
 
   const [position, setPosition] = useState<[number, number] | null>(
@@ -53,14 +53,10 @@ export function MapSelector({ initialLat, initialLng, city, department, address,
       : ""
   );
 
-  // Hook para geocodificar la dirección/ciudad dinámicamente
   useEffect(() => {
     const geocodeLocation = async () => {
       if (!city || !department) return;
-
       const query = `${address ? address + ", " : ""}${city}, ${department}, Colombia`;
-
-      // Evitar re-geocodificar si la consulta de texto es idéntica a la última exitosa o a la inicial
       if (query === lastQuery) return;
 
       try {
@@ -71,7 +67,7 @@ export function MapSelector({ initialLat, initialLng, city, department, address,
           const lat = parseFloat(data[0].lat);
           const lon = parseFloat(data[0].lon);
           setPosition([lat, lon]);
-          onLocationSelect(lat, lon); // Pre-seleccionar también en el form
+          onLocationSelect(lat, lon);
           setLastQuery(query);
         }
       } catch (err) {
@@ -80,7 +76,6 @@ export function MapSelector({ initialLat, initialLng, city, department, address,
     };
 
     if (city || department) {
-      // Usar debounce de 1.5s para no hacer request por cada letra del input
       const timeoutId = setTimeout(() => {
         geocodeLocation();
       }, 1500);
@@ -91,9 +86,13 @@ export function MapSelector({ initialLat, initialLng, city, department, address,
   const center = position || defaultCenter;
 
   return (
-    <div style={{ height: "400px", width: "100%", borderRadius: "8px", overflow: "hidden", zIndex: 0 }}>
-      {/* El key fuerza un re-render si por algún motivo Leaflet falla al inicializar div (raro en v3+, pero previene bugs) */}
-      <MapContainer center={center} zoom={position ? 15 : 6} style={{ height: "100%", width: "100%", zIndex: 1 }}>
+    <div style={{ height: "400px", width: "100%", borderRadius: "12px", overflow: "hidden", border: "1px solid #e5e7eb", zIndex: 0 }}>
+      <MapContainer 
+        center={center} 
+        zoom={position ? 15 : 6} 
+        style={{ height: "100%", width: "100%", zIndex: 1 }}
+        scrollWheelZoom={false}
+      >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

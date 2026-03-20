@@ -6,6 +6,7 @@ import { propertyApi } from "@infrastructure/api/properties.api";
 import type { CreatePropertyInput } from "@domain/entities/Property";
 import type { Caracteristica } from "@domain/entities/Caracteristica";
 import { PHOTO_LIMIT, VIDEO_LIMIT, VIDEO_TYPES } from "@domain/entities/FotoPropiedad";
+import { supabase } from "@infrastructure/supabase/client";
 
 /** Estado del formulario */
 interface FormState {
@@ -434,22 +435,40 @@ export function usePropertyForm(editId?: number) {
 
       if (isEditMode && editId) {
         // --- MODO EDICIÓN ---
-        const updated = await Promise.race([
+        await Promise.race([
           propertyService.updateProperty(editId, input),
           timeout,
         ]);
-        propertyId = (updated as { idpropiedad: number }).idpropiedad;
+        propertyId = editId;
 
-        // Subir nuevas imágenes si las hay
+        // --- SOLUCIÓN: Sincronizar imágenes reales en base de datos ---
+        // 1. Identificar fotos que ya estaban (no son blob:)
+        const existingRemainingUrls = previews.filter(u => !u.startsWith("blob:"));
+
+        // 2. Limpiar TODA la relación actual para esta propiedad (Re-sincronizar)
+        await supabase.from("fotospropiedad").delete().eq("idpropiedad", propertyId);
+
+        // 3. Re-insertar las que el usuario NO borró
+        if (existingRemainingUrls.length > 0) {
+          const bulk = existingRemainingUrls.map((url, i) => ({
+            idpropiedad: propertyId,
+            url,
+            orden: i + 1,
+          }));
+          await supabase.from("fotospropiedad").insert(bulk);
+        }
+
+        // 4. Subir las fotos nuevas y añadirlas al final
         if (imagenes.length > 0) {
           await propertyService.uploadPropertyImages(
             propertyId,
             imagenes,
             usuario?.plan ?? "gratuito",
+            existingRemainingUrls.length + 1
           );
         }
-        
-        // Actualizar estado de destacado si cambió
+
+        // Actualizar estado destacado
         await propertyService.updateProperty(editId, {}, form.destacar);
       } else {
         // --- MODO CREACIÓN ---
@@ -486,7 +505,7 @@ export function usePropertyForm(editId?: number) {
       });
 
       setSuccess(true);
-      setTimeout(() => navigate(`/propertydetailspage/${propertyId}`), 1500);
+      setTimeout(() => navigate(`/propertydetailspage/${propertyId}`), 2500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al publicar.");
     } finally {

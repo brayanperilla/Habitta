@@ -100,6 +100,7 @@ export const propertyService = {
     idpropiedad: number,
     files: File[],
     plan: "gratuito" | "premium" = "gratuito",
+    startOrder: number = 1
   ): Promise<void> => {
     const limite =
       plan === "premium" ? PHOTO_LIMIT.premium : PHOTO_LIMIT.free;
@@ -116,12 +117,17 @@ export const propertyService = {
       const { error } = await supabase.from("fotospropiedad").insert({
         idpropiedad,
         url,
-        orden: i + 1,
+        orden: startOrder + i,
       });
 
       if (error) {
         console.error("Error guardando foto en BD:", error);
         throw new Error(`Error guardando foto en BD: ${error.message}`);
+      }
+
+      // Si es la PRIMERA foto (u orden 1), sincronizarla como fotoUrl principal de la propiedad
+      if (startOrder + i === 1) {
+        await supabase.from("propiedades").update({ fotoUrl: url }).eq("idpropiedad", idpropiedad);
       }
     }
   },

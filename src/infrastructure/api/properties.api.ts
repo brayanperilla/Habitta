@@ -7,13 +7,18 @@ import type {
 
 /* Maps a raw Supabase row (with joined fotospropiedad) to a Property with fotoUrl */
 function mapPropertyWithPhoto(row: Record<string, unknown>): Property {
+  // RF17 — Extraer fotos de la galería
   const fotos = (row.fotospropiedad as { url: string; orden: number }[]) || [];
-  const firstPhoto = fotos.sort((a, b) => (a.orden ?? 99) - (b.orden ?? 99))[0];
+  const firstPhotoFromGallery = fotos.sort((a, b) => (a.orden ?? 99) - (b.orden ?? 99))[0];
+  
+  // Extraer el resto de campos (incluyendo el fotoUrl original de la tabla propiedades)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { fotospropiedad: _fotos, propiedadcaracteristica: _pc, ...rest } = row;
   
+  // SOLUCIÓN: Usar la primera foto de la galería, pero si está vacía, RESPETAR el fotoUrl que ya tenga la propiedad
+  const finalFotoUrl = firstPhotoFromGallery?.url || (rest.fotoUrl as string) || null;
+
   // Extraer el plan del dueño si viene en la query (usuarios.plan)
-  // Manejar tanto objeto (single join) como array (select multiple) por seguridad
   const usuariosRaw = row.usuarios;
   let ownerPlan: "gratuito" | "premium" | undefined;
   let telefonoContacto: string | null = null;
@@ -35,7 +40,7 @@ function mapPropertyWithPhoto(row: Record<string, unknown>): Property {
   
   return { 
     ...rest, 
-    fotoUrl: firstPhoto?.url ?? null,
+    fotoUrl: finalFotoUrl,
     ownerPlan: ownerPlan,
     telefonoContacto,
     caracteristicasNombres
