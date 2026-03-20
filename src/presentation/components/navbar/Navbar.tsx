@@ -6,7 +6,6 @@ import { useNotificaciones } from "@application/hooks/useNotificaciones";
 import UserModal from "../userModal/UserModal";
 import ModalN from "../../pages/notification/Modal/ModalN";
 
-const logoSF = "/images/logoCF.png";
 const notificationIcon = "/notification-9-svgrepo-com.svg";
 
 function Navbar() {
@@ -110,9 +109,9 @@ function Navbar() {
             </nav>
           )}
 
-          {/* Botón Publicar Central (Móvil) */}
+          {/* Botón Publicar (Visible en el centro en Desktop y Móvil) */}
           {usuario && usuario.rol !== "admin" && (
-             <Link to="/registerpropeties" className="navbar__publish-btn navbar__publish-btn--center">
+             <Link to="/registerpropeties" className="navbar__publish-btn navbar__publish-btn--central">
                 Publicar
              </Link>
           )}
@@ -164,13 +163,6 @@ function Navbar() {
 
           {usuario ? (
             <div className="navbar__user-actions-container" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {/* Botón Publicar Desktop (se oculta en móvil vía CSS) */}
-              {usuario?.rol !== "admin" && (
-                <Link to="/registerpropeties" className="navbar__publish-btn navbar__publish-btn--desktop">
-                  Publicar
-                </Link>
-              )}
-
               <div style={{ position: 'relative' }}>
                 {/* id="userModalTrigger" allows UserModal to ignore clicks on this button */}
                 <button

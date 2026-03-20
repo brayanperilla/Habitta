@@ -6,10 +6,7 @@ import {
 import { useAuth } from "@application/context/AuthContext";
 import { propertyService } from "@application/services/propertyService";
 import { favoritosApi } from "@infrastructure/api/favoritos.api";
-import { supabase } from "@infrastructure/supabase/client";
 import "./sections.css";
-
-const COLORS = ['#35d2db', '#33bb9d', '#f1b307', '#ec4899', '#8b5cf6'];
 
 const ReportesSection: React.FC = () => {
   const { usuario } = useAuth();
@@ -103,7 +100,7 @@ const ReportesSection: React.FC = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {planDistribution.map((entry, index) => (
+                    {planDistribution.map((_entry, index) => (
                       <Cell key={`cell-${index}`} fill={index === 0 ? '#35d2db' : '#f1f5f9'} />
                     ))}
                   </Pie>
