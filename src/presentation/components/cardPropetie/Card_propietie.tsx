@@ -15,6 +15,8 @@ interface CardPropetieProps {
   isOwner?: boolean;
   /** Callback al hacer click en eliminar */
   onDelete?: (idpropiedad: number) => void;
+  /** ¿Versión compacta para vista de lista? */
+  compact?: boolean;
 }
 
 // Componente de tarjeta de propiedad individual
@@ -24,6 +26,7 @@ function CardPropetie({
   onToggleFav,
   isOwner: _isOwner = false,
   onDelete: _onDelete,
+  compact = false,
 }: CardPropetieProps) {
   const navigate = useNavigate();
 
@@ -46,7 +49,7 @@ function CardPropetie({
   }
 
   return (
-    <div className="property-card">
+    <div className={`property-card ${compact ? 'property-card--compact' : ''}`}>
       {/* Listón de Destacada (Premium o Manual) - Efecto 3D */}
       {property.estadoPublicacion === "destacada" && (
         <div className="premium-ribbon">
