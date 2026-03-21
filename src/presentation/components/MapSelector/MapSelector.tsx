@@ -90,6 +90,9 @@ export function MapSelector({ initialLat, initialLng, city, department, address,
       <MapContainer 
         center={center} 
         zoom={position ? 15 : 6} 
+        minZoom={5}
+        maxBounds={[[-5, -85], [15, -65]]}
+        maxBoundsViscosity={1.0}
         style={{ height: "100%", width: "100%", zIndex: 1 }}
         scrollWheelZoom={false}
       >

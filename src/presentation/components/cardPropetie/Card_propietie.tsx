@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./cardStyle.css";
 import { useNavigate, Link } from "react-router-dom";
 import type { Property } from "@domain/entities/Property";
@@ -29,6 +30,7 @@ function CardPropetie({
   compact = false,
 }: CardPropetieProps) {
   const navigate = useNavigate();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Formatear precio en pesos colombianos
   const formatPrice = (price: number | null) => {
@@ -215,9 +217,18 @@ function CardPropetie({
         <h3 className="property-card__title" style={{ textTransform: 'capitalize' }}>
           {property.titulo || "Sin título"}
         </h3>
+        <button 
+          className="property-card__expand-btn"
+          title="Ver más detalles"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsExpanded(!isExpanded); }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }}>
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
 
         {/* Contenido expandible en hover */}
-        <div className="property-card__expandable">
+        <div className={`property-card__expandable ${isExpanded ? 'expanded' : ''}`}>
           <div className="property-card__col1">
           <p className="property-card__location" style={{ textTransform: 'capitalize', margin: 0 }}>
             {[property.ciudad, property.departamento]

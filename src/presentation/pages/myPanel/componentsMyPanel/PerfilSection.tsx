@@ -18,6 +18,7 @@ const PerfilSection: React.FC = () => {
   const [nombre, setNombre] = useState(usuario?.nombre || "");
   const [biografia, setBiografia] = useState(usuario?.descripcion || "");
   const [telefono, setTelefono] = useState(usuario?.telefono || "");
+  const [correoEdit, setCorreoEdit] = useState(usuario?.correo || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
@@ -84,8 +85,16 @@ const PerfilSection: React.FC = () => {
         descripcion: biografia,
         telefono,
       });
+      if (correoEdit !== usuario?.correo && correoEdit.trim() !== "") {
+        const { error: err } = await supabase.auth.updateUser({
+          email: correoEdit.trim(),
+        });
+        if (err) throw new Error(err.message);
+        showToast("Perfil actualizado. Se envió un correo de confirmación al nuevo email.", "success");
+      } else {
+        showToast("Perfil actualizado correctamente.", "success");
+      }
       setIsEditing(false);
-      showToast("Perfil actualizado correctamente.", "success");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Error al actualizar perfil",
@@ -272,7 +281,6 @@ const PerfilSection: React.FC = () => {
               className="btn-outline-red"
               onClick={() => setIsEditing(false)}
               disabled={loading}
-              style={{ marginLeft: '12px' }}
             >
               Cancelar
             </button>
@@ -331,7 +339,16 @@ const PerfilSection: React.FC = () => {
               >
                 <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
               </svg>
-              <span>{usuario.correo}</span>
+              {isEditing ? (
+                <input
+                  className="edit-input-email"
+                  value={correoEdit}
+                  onChange={(e) => setCorreoEdit(e.target.value)}
+                  placeholder="Tu correo electrónico"
+                />
+              ) : (
+                <span>{usuario.correo}</span>
+              )}
             </div>
 
             <div className="perfil-detalle">
@@ -368,8 +385,8 @@ const PerfilSection: React.FC = () => {
               </svg>
               <span>
                 Miembro desde{" "}
-                {usuario.created_at || usuario.fechalogin
-                  ? new Date((usuario.created_at || usuario.fechalogin)!).toLocaleDateString()
+                {usuario.created_at
+                  ? new Date(usuario.created_at).toLocaleDateString()
                   : "N/A"}
               </span>
             </div>

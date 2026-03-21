@@ -54,12 +54,13 @@ function Navbar() {
             </Link>
           </div>
 
-          <button
-            className="navbar__hamburger"
-            onClick={() => setMobileMenuOpen(prev => !prev)}
-            aria-label="Menú"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a202c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {usuario?.rol !== "admin" && (
+            <button
+              className="navbar__hamburger"
+              onClick={() => setMobileMenuOpen(prev => !prev)}
+              aria-label="Menú"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a202c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               {mobileMenuOpen ? (
                 <>
                   <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -73,7 +74,8 @@ function Navbar() {
                 </>
               )}
             </svg>
-          </button>
+            </button>
+          )}
         </div>
 
         {/* Navegación y Botón Central de Publicar */}
@@ -109,16 +111,15 @@ function Navbar() {
             </nav>
           )}
 
-          {/* Botón Publicar (Visible en el centro en Desktop y Móvil) */}
-          {usuario && usuario.rol !== "admin" && (
-             <Link to="/registerpropeties" className="navbar__publish-btn navbar__publish-btn--central">
-                Publicar
-             </Link>
-          )}
         </div>
 
         {/* User Actions & Notifications */}
         <div className="navbar__actions">
+          {usuario && usuario.rol !== "admin" && (
+             <Link to="/registerpropeties" className="navbar__publish-btn">
+                Publicar
+             </Link>
+          )}
           {/* Notifications */}
           {usuario?.rol !== "admin" && (
             <div style={{ position: "relative" }}>
@@ -186,8 +187,7 @@ function Navbar() {
                 <UserModal isOpen={isUserModalOpen} onClose={closeUserModal} />
               </div>
             </div>
-          ) : (
-            <Link to="/auth" className="navbar__login-btn">
+            <Link to="/auth" className="navbar__login-btn" style={{ whiteSpace: "nowrap" }}>
               Iniciar Sesión
             </Link>
           )}

@@ -69,7 +69,7 @@ const AdminReportsTab: React.FC = () => {
 
   return (
     <div className="admin-reports">
-      <div className="reports-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginTop: '20px' }}>
+      <div className="reports-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: '20px', marginTop: '20px' }}>
         
         {/* Gráfico de Usuarios */}
         <div className="report-card" style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>

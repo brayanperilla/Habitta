@@ -449,12 +449,38 @@ function PropertyDetailsPage() {
               )}
               
               {property.latitud && property.longitud && (
-                <div style={{ marginTop: "1rem" }}>
+                <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "12px", width: "100%", overflow: "hidden" }}>
                   <MapSelector
                     initialLat={property.latitud}
                     initialLng={property.longitud}
                     onLocationSelect={() => {}} /* Solo lectura */
                   />
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${property.latitud},${property.longitud}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      background: "#4285F4",
+                      color: "#fff",
+                      textDecoration: "none",
+                      padding: "10px 16px",
+                      borderRadius: "8px",
+                      fontWeight: "bold",
+                      fontSize: "1rem",
+                      width: "100%",
+                      boxSizing: "border-box"
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Ver en Google Maps
+                  </a>
                 </div>
               )}
             </div>

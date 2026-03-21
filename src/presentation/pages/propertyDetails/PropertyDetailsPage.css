@@ -389,6 +389,9 @@
   padding: 32px;
   max-width: 900px;
   width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .property-details-image-section {
@@ -601,4 +604,18 @@
   font-weight: 800;
   color: #2dd4bf;
   margin: 0;
+}
+
+@media (max-width: 768px) {
+  .property-details-main {
+    padding: 16px;
+  }
+  .property-details-info-box, 
+  .property-details-agent-box, 
+  .property-details-meta-box, 
+  .property-details-description-box {
+    padding: 16px;
+    box-sizing: border-box;
+    word-break: break-word;
+  }
 }
