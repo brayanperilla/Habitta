@@ -94,6 +94,30 @@
   color: #ffffff;
 }
 
+.btn-outline-red {
+  background: transparent;
+  color: #ef4444;
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-family: "Bolt", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-red:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 /* ===== SECCIÓN PROPIEDADES ===== */
 
 /* Filtro por estado (RF26) */
@@ -720,6 +744,15 @@
   .perfil-nombre {
     font-size: 24px;
   }
+
+  .edit-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .edit-actions button {
+    width: 100%;
+  }
 }
 
 /* ===== NOTIFICACIONES PANEL ===== */
@@ -784,7 +817,7 @@
 }
 
 /* Mejoras Formulario Perfil */
-.edit-input-nombre, .edit-input-tel {
+.edit-input-nombre, .edit-input-tel, .edit-input-email {
   width: 50%;
   padding: 12px 16px;
   font-size: 16px;

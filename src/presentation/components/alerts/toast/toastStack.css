@@ -24,7 +24,10 @@
   transform-origin: center center;
   pointer-events: none;
   user-select: none;
-  white-space: nowrap;
+  white-space: normal;
+  max-width: 90vw;
+  box-sizing: border-box;
+  word-break: break-word;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 

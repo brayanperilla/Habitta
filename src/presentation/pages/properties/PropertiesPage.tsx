@@ -529,14 +529,14 @@ function PropertiesPage() {
             {!loading && !error && properties.length > 0 && (
               <>
                 {viewMode === 'map' ? (
-                  <div className="properties-map-view" style={{ height: "calc(100vh - 200px)", minHeight: "500px", borderRadius: "12px", overflow: "hidden", marginBottom: "2rem" }}>
+                  <div className="properties-map-view" style={{ height: "calc(100vh - 200px)", minHeight: "400px", width: "100%", borderRadius: "12px", overflow: "hidden", marginBottom: "2rem", zIndex: 0, position: "relative" }}>
                     <MapContainer 
                       center={[4.5709, -74.2973]} 
                       zoom={6} 
-                      minZoom={2}
-                      maxBounds={[[-90, -180], [90, 180]]}
+                      minZoom={5}
+                      maxBounds={[[-5, -85], [15, -65]]}
                       maxBoundsViscosity={1.0}
-                      style={{ height: "100%", width: "100%" }}
+                      style={{ height: "100%", width: "100%", zIndex: 1 }}
                     >
                       <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
