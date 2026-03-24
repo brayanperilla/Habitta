@@ -198,13 +198,11 @@ function Home() {
                   (tipoOperacion === "Venta" && op === "venta");
                 
                 const matchesType = !tipoPropiedad || p.tipoPropiedad?.toLowerCase() === tipoPropiedad.toLowerCase();
+
+                // Solo propiedades marcadas como destacadas
+                const isDestacada = p.estadoPublicacion === "destacada";
                 
-                return matchesOp && matchesType;
-              })
-              .sort((a, b) => {
-                const aPrio = (a.ownerPlan === "premium" || a.estadoPublicacion === "destacada") ? 1 : 0;
-                const bPrio = (b.ownerPlan === "premium" || b.estadoPublicacion === "destacada") ? 1 : 0;
-                return bPrio - aPrio;
+                return isDestacada && matchesOp && matchesType;
               })
               .slice(0, 8)
               .map((property) => (

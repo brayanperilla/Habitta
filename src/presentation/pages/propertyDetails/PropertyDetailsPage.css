@@ -135,13 +135,13 @@
   transform: translateY(-1px);
 }
 
-.property-details-info-msg-btn {
+.property-details-info-share-btn {
   display: flex;
   align-items: center;
   gap: 6px;
   background: #fff;
-  color: #2dd4bf;
-  border: 1.5px solid #2dd4bf;
+  color: #3b82f6;
+  border: 1.5px solid #3b82f6;
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 700;
@@ -151,8 +151,8 @@
   justify-content: center;
   transition: background 0.2s, transform 0.1s;
 }
-.property-details-info-msg-btn:hover {
-  background: #f0fdfb;
+.property-details-info-share-btn:hover {
+  background: #eff6ff;
   transform: translateY(-1px);
 }
 
@@ -480,27 +480,41 @@
 
 .property-details-thumbnails {
   display: flex;
-  flex-wrap: wrap; /* Permitir que salten de línea si son muchas */
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 12px;
   margin-bottom: 24px;
   max-width: 100%;
+  padding-bottom: 8px; /* Para el scrollbar */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.property-details-thumbnails::-webkit-scrollbar {
+  height: 6px;
+}
+.property-details-thumbnails::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
 }
 
 .property-details-thumbnail {
-  width: 60px;
-  height: 60px;
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
   object-fit: cover;
   border-radius: 12px;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: border 0.2s, opacity 0.2s, filter 0.2s;
-  opacity: 0.45;
-  filter: brightness(0.7);
+  transition: all 0.3s ease;
+  opacity: 0.55;
+  filter: brightness(0.85);
 }
 
 .property-details-thumbnail:hover {
-  opacity: 0.8;
-  filter: brightness(0.9);
+  opacity: 0.9;
+  filter: brightness(1);
+  transform: scale(1.05);
 }
 
 .property-details-thumbnail.selected {
@@ -639,4 +653,12 @@
     width: 16px;
     height: 16px;
   }
+}
+
+/* Animaciones Globales de Botones en esta página */
+button {
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+button:active {
+  transform: scale(0.95);
 }
