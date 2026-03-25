@@ -32,7 +32,12 @@ describe("propertyService", () => {
       habitaciones: 3,
       banos: 2,
       estrato: 3,
-      idusuario: 1
+      idusuario: 1,
+      descripcion: null,
+      tipoPropiedad: null,
+      antiguedad: null,
+      barrio: null,
+      codigopostal: null
     };
 
     it("debería lanzar error si falta el título", async () => {

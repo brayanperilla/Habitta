@@ -136,11 +136,6 @@ function PropertiesPage() {
     setCurrentPage(1);
   };
 
-  // Formateador de moneda
-  const formatCOP = (val: number) => {
-    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(val);
-  };
-
   // Ordenar: primero las destacadas (Premium o Manual)
   const sortedProperties = [...properties].sort((a, b) => {
     const aPrio = (a.ownerPlan === "premium" || a.estadoPublicacion === "destacada") ? 1 : 0;
