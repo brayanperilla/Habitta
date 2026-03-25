@@ -7,6 +7,7 @@ import type { CreatePropertyInput } from "@domain/entities/Property";
 import type { Caracteristica } from "@domain/entities/Caracteristica";
 import { PHOTO_LIMIT, VIDEO_LIMIT, VIDEO_TYPES } from "@domain/entities/FotoPropiedad";
 import { supabase } from "@infrastructure/supabase/client";
+import { auditService } from "@application/services/auditService";
 
 /** Estado del formulario */
 interface FormState {
@@ -503,6 +504,17 @@ export function usePropertyForm(editId?: number) {
       videoPreviews.forEach((url) => {
         if (url.startsWith("blob:")) URL.revokeObjectURL(url);
       });
+
+      // Auditoría
+      if (usuario) {
+        await auditService.logAction(
+          isEditMode ? "modificar" : "crear",
+          "propiedad",
+          propertyId,
+          `El usuario ${usuario.nombre} ${isEditMode ? 'modificó' : 'creó'} la propiedad "${form.titulo.trim()}"`,
+          usuario.idusuario
+        );
+      }
 
       setSuccess(true);
       setTimeout(() => navigate(`/propertydetailspage/${propertyId}`), 2500);

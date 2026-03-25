@@ -886,6 +886,89 @@
   gap: 12px;
 }
 
+/* === Toggle Button Group (Operación: Venta/Alquiler) === */
+.sidebar-toggle-group {
+  display: flex;
+  gap: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.sidebar-toggle-btn {
+  flex: 1;
+  padding: 9px 0;
+  border: none;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sidebar-toggle-btn:not(:last-child) {
+  border-right: 1px solid #e2e8f0;
+}
+
+.sidebar-toggle-btn:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.sidebar-toggle-btn--active {
+  background: linear-gradient(to right, #35d2db, #33bb9d);
+  color: #ffffff;
+}
+
+.sidebar-toggle-btn--active:hover {
+  background: linear-gradient(to right, #2bb8c0, #2ba88a);
+  color: #ffffff;
+}
+
+/* === Range Number Inputs (Precio/Área Min-Max) === */
+.sidebar-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-number-input {
+  flex: 1;
+  min-width: 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: #1e293b;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  -moz-appearance: textfield;
+}
+
+.sidebar-number-input::-webkit-outer-spin-button,
+.sidebar-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.sidebar-number-input:focus {
+  outline: none;
+  border-color: #35d2db;
+}
+
+.sidebar-number-input::placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.sidebar-range-separator {
+  color: #cbd5e1;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
 .sidebar-btn-search {
   background: linear-gradient(to right, #35d2db 0%, #35c8be 54%, #33bb9d 83%, #35d2db 100%);
   color: #ffffff;

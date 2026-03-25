@@ -11,6 +11,7 @@ import { useAuth } from "@application/context/AuthContext";
 import { useToast } from "@application/context/ToastContext";
 import { propertyService } from "@application/services/propertyService";
 import type { Property } from "@domain/entities/Property";
+import { auditService } from "@application/services/auditService";
 import "./sections.css";
 
 /**
@@ -91,6 +92,17 @@ const PropiedadesSection: React.FC = () => {
         prev.filter((p) => p.idpropiedad !== propertyToDelete),
       );
       showToast("Propiedad eliminada correctamente.", "success");
+
+      // Auditoría
+      if (usuario) {
+        await auditService.logAction(
+          "eliminar",
+          "propiedad",
+          propertyToDelete,
+          `El usuario ${usuario.nombre} eliminó la propiedad "${prop?.titulo || propertyToDelete}"`,
+          usuario.idusuario
+        );
+      }
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : "Error al eliminar la propiedad.",
@@ -123,6 +135,17 @@ const PropiedadesSection: React.FC = () => {
       ));
       
       showToast(nuevoEstado ? "Propiedad destacada con éxito" : "Propiedad removida de destacadas", "success");
+
+      // Auditoría
+      if (usuario) {
+         await auditService.logAction(
+           "destacar",
+           "propiedad",
+           id,
+           `El usuario ${usuario.nombre} ${nuevoEstado ? 'destacó' : 'quitó de destacadas'} la propiedad con ID ${id}`,
+           usuario.idusuario
+         );
+      }
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : "Error al actualizar la propiedad.",

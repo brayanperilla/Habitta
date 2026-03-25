@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { usuariosApi } from "@infrastructure/api/usuarios.api";
 import { useToast } from "@application/context/ToastContext";
 import type { Usuario } from "@domain/entities/Usuario";
+import { useAuth } from "@application/context/AuthContext";
+import { auditService } from "@application/services/auditService";
 
 export default function AdminUsersTab() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
+  const { usuario: adminUsuario } = useAuth();
 
   const cargarUsuarios = async () => {
     try {
@@ -32,6 +35,17 @@ export default function AdminUsersTab() {
       
       showToast(`Plan cambiado a ${nuevoPlan} para ${usuario.nombre}.`, "success");
       
+      // Auditoría
+      if (adminUsuario) {
+         await auditService.logAction(
+           "modificar_plan",
+           "usuario",
+           usuario.idusuario,
+           `El administrador ${adminUsuario.nombre} cambió el plan de ${usuario.nombre} a ${nuevoPlan}`,
+           adminUsuario.idusuario
+         );
+      }
+
       cargarUsuarios(); // Recargar datos
     } catch (error: any) {
       showToast(error.message, "error");
@@ -47,6 +61,17 @@ export default function AdminUsersTab() {
       
       showToast(`La cuenta de ${usuario.nombre} ahora está ${nuevoEstado}.`, "success");
       
+      // Auditoría
+      if (adminUsuario) {
+         await auditService.logAction(
+           nuevoEstado === "Activa" ? "reactivar" : "suspender",
+           "usuario",
+           usuario.idusuario,
+           `El administrador ${adminUsuario.nombre} ${nuevoEstado === "Activa" ? 'reactivó' : 'suspendió'} la cuenta de ${usuario.nombre}`,
+           adminUsuario.idusuario
+         );
+      }
+
       cargarUsuarios();
     } catch (error: any) {
       showToast(error.message, "error");

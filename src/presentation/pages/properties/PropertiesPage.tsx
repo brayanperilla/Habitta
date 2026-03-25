@@ -62,13 +62,16 @@ function PropertiesPage() {
   }, []);
 
   // Estado local para los inputs del formulario antes de aplicarlos, inicializado con URL
-  const precioMaxFromUrl = searchParams.get("precioMax") ? Number(searchParams.get("precioMax")) : 7560000000;
+  const precioMaxFromUrl = searchParams.get("precioMax") ? Number(searchParams.get("precioMax")) : undefined;
+  const precioMinFromUrl = searchParams.get("precioMin") ? Number(searchParams.get("precioMin")) : undefined;
   const [localFilters, setLocalFilters] = useState({
     searchTerm: searchParams.get("searchTerm") || "",
     tipoPropiedad: searchParams.get("tipoPropiedad") || "",
     tipoOperacion: searchParams.get("tipoOperacion") || "",
-    precioMax: precioMaxFromUrl,
-    areaMax: 5000,
+    precioMin: precioMinFromUrl as number | undefined,
+    precioMax: precioMaxFromUrl as number | undefined,
+    areaMin: undefined as number | undefined,
+    areaMax: undefined as number | undefined,
     habitaciones: undefined as number | undefined,
     banos: undefined as number | undefined,
     estrato: undefined as number | undefined,
@@ -82,8 +85,8 @@ function PropertiesPage() {
     searchTerm: searchParams.get("searchTerm") || undefined,
     tipoPropiedad: searchParams.get("tipoPropiedad") || undefined,
     tipoOperacion: searchParams.get("tipoOperacion") || undefined,
+    precioMin: precioMinFromUrl,
     precioMax: precioMaxFromUrl,
-    areaMax: 5000,
     sortBy: "Relevancia"
   });
 
@@ -94,7 +97,9 @@ function PropertiesPage() {
       searchTerm: localFilters.searchTerm || undefined,
       tipoPropiedad: localFilters.tipoPropiedad || undefined,
       tipoOperacion: localFilters.tipoOperacion || undefined,
+      precioMin: localFilters.precioMin,
       precioMax: localFilters.precioMax,
+      areaMin: localFilters.areaMin,
       areaMax: localFilters.areaMax,
       habitaciones: localFilters.habitaciones,
       banos: localFilters.banos,
@@ -116,11 +121,13 @@ function PropertiesPage() {
       searchTerm: "",
       tipoPropiedad: "",
       tipoOperacion: "",
-      precioMax: 7560000000,
-      areaMax: 5000,
-      habitaciones: undefined,
-      banos: undefined,
-      estrato: undefined,
+      precioMin: undefined as number | undefined,
+      precioMax: undefined as number | undefined,
+      areaMin: undefined as number | undefined,
+      areaMax: undefined as number | undefined,
+      habitaciones: undefined as number | undefined,
+      banos: undefined as number | undefined,
+      estrato: undefined as number | undefined,
       sortBy: "Relevancia" as const
     };
     setLocalFilters(clear);
@@ -235,30 +242,68 @@ function PropertiesPage() {
               )}
             </div>
 
+            {/* Tipo de Operación */}
             <div className="sidebar-filter-group">
-              <label className="sidebar-label">Precio Max: {formatCOP(localFilters.precioMax)}</label>
-              <input
-                type="range"
-                className="range-slider-inline"
-                min="0"
-                max="7560000000"
-                step="10000000"
-                value={localFilters.precioMax}
-                onChange={(e) => setLocalFilters({...localFilters, precioMax: Number(e.target.value)})}
-              />
+              <label className="sidebar-label">Operación</label>
+              <div className="sidebar-toggle-group">
+                {[
+                  { key: "", label: "Todos" },
+                  { key: "venta", label: "Venta" },
+                  { key: "alquiler", label: "Alquiler" },
+                ].map((op) => (
+                  <button
+                    key={op.key}
+                    className={`sidebar-toggle-btn ${localFilters.tipoOperacion === op.key ? "sidebar-toggle-btn--active" : ""}`}
+                    onClick={() => setLocalFilters({ ...localFilters, tipoOperacion: op.key })}
+                  >
+                    {op.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
+            {/* Rango de Precio */}
             <div className="sidebar-filter-group">
-              <label className="sidebar-label">Área Max: {localFilters.areaMax} m²</label>
-              <input
-                type="range"
-                className="range-slider-inline"
-                min="0"
-                max="5000"
-                step="10"
-                value={localFilters.areaMax}
-                onChange={(e) => setLocalFilters({...localFilters, areaMax: Number(e.target.value)})}
-              />
+              <label className="sidebar-label">Precio</label>
+              <div className="sidebar-range-inputs">
+                <input
+                  type="number"
+                  className="sidebar-number-input"
+                  placeholder="Mínimo"
+                  value={localFilters.precioMin ?? ""}
+                  onChange={(e) => setLocalFilters({...localFilters, precioMin: e.target.value ? Number(e.target.value) : undefined})}
+                />
+                <span className="sidebar-range-separator">—</span>
+                <input
+                  type="number"
+                  className="sidebar-number-input"
+                  placeholder="Máximo"
+                  value={localFilters.precioMax ?? ""}
+                  onChange={(e) => setLocalFilters({...localFilters, precioMax: e.target.value ? Number(e.target.value) : undefined})}
+                />
+              </div>
+            </div>
+
+            {/* Rango de Área */}
+            <div className="sidebar-filter-group">
+              <label className="sidebar-label">Área (m²)</label>
+              <div className="sidebar-range-inputs">
+                <input
+                  type="number"
+                  className="sidebar-number-input"
+                  placeholder="Mín"
+                  value={localFilters.areaMin ?? ""}
+                  onChange={(e) => setLocalFilters({...localFilters, areaMin: e.target.value ? Number(e.target.value) : undefined})}
+                />
+                <span className="sidebar-range-separator">—</span>
+                <input
+                  type="number"
+                  className="sidebar-number-input"
+                  placeholder="Máx"
+                  value={localFilters.areaMax ?? ""}
+                  onChange={(e) => setLocalFilters({...localFilters, areaMax: e.target.value ? Number(e.target.value) : undefined})}
+                />
+              </div>
             </div>
 
             <div className="sidebar-row-2">

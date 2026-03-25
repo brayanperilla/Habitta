@@ -4,6 +4,8 @@ import type { Property } from "@domain/entities/Property";
 import { useToast } from "@application/context/ToastContext";
 import { notificacionesApi } from "@infrastructure/api/notificaciones.api";
 import { supabase } from "@infrastructure/supabase/client";
+import { useAuth } from "@application/context/AuthContext";
+import { auditService } from "@application/services/auditService";
 
 // Tipo extendido para la tabla de Admin
 type PendingProperty = Property & {
@@ -17,6 +19,7 @@ function AdminPropertiesTab() {
   const [properties, setProperties] = useState<PendingProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
+  const { usuario } = useAuth();
 
   const fetchPendingProperties = async () => {
     setLoading(true);
@@ -65,6 +68,17 @@ function AdminPropertiesTab() {
       await propertyService.updateProperty(id, { estadoPublicacion: status });
       showToast(`Propiedad ${status === "activa" ? "aprobada" : "rechazada"} con éxito`, "success");
       setProperties((prev) => prev.filter((p) => p.idpropiedad !== id));
+
+      // Auditoría
+      if (usuario) {
+         await auditService.logAction(
+           status === "activa" ? "aprobar" : "rechazar",
+           "propiedad",
+           id,
+           `El administrador ${usuario.nombre} ${status === "activa" ? 'aprobó' : 'rechazó'} la propiedad "${prop?.titulo || id}"`,
+           usuario.idusuario
+         );
+      }
 
       // Notificar al dueño de la propiedad
       if (prop?.idusuario) {

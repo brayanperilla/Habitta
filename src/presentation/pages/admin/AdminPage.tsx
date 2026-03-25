@@ -3,6 +3,7 @@ import AdminPropertiesTab from "./components/AdminPropertiesTab";
 import AdminUsersTab from "./components/AdminUsersTab";
 import AdminReportsTab from "./components/AdminReportsTab";
 import AdminPqrsTab from "./components/AdminPqrsTab";
+import AdminAuditoriaTab from "./components/AdminAuditoriaTab";
 import "./AdminPage.css";
 
 function AdminPage() {
@@ -57,13 +58,7 @@ function AdminPage() {
 
         {activeTab === "pqrs" && <AdminPqrsTab />}
 
-        {activeTab === "auditoria" && (
-          <div className="admin-tab-content">
-            <h2>Logs de auditoría</h2>
-            <p>Registro de todas las acciones del sistema.</p>
-            <div className="admin-empty-state" style={{marginTop:"30px", border:"1px dashed #e5e7eb", padding:"40px", color:"#aaa", borderRadius:"12px"}}>No hay logs de auditoría.</div>
-          </div>
-        )}
+        {activeTab === "auditoria" && <AdminAuditoriaTab />}
       </div>
     </div>
   );
