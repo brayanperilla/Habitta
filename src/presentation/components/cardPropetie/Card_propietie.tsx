@@ -58,7 +58,17 @@ function CardPropetie({
           <span>Destacada</span>
         </div>
       )}
-      <div className="property-card__image-container">
+      <div 
+        className="property-card__image-container"
+        onClick={(e) => {
+          // Si estamos en móvil/tablet donde no hay hover, permitimos expandir al tocar la imagen
+          if (window.innerWidth <= 1024) {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }
+        }}
+      >
         {/* Si la foto principal es un video MP4, mostrar fallback image para no distorsionar la card */}
         {(() => {
           const src = property.fotoUrl || fallbackImage;

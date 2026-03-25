@@ -22,17 +22,13 @@ const ReportesSection: React.FC = () => {
         // 1. Obtener propiedades del usuario
         const props = await propertyService.getPropertiesByUsuario(usuario.idusuario);
         
-        // 2. Obtener favoritos reales para estas propiedades
+        // 2. Obtener estadísticas reales para estas propiedades
         const stats = await Promise.all(props.map(async (p) => {
           const realLikes = await favoritosApi.getFavoritesCountByProperty(p.idpropiedad);
           
-          // Para las vistas, al no haber tabla real, usamos un multiplicador estable 
-          // basado en el ID y los likes para que no cambie en cada render pero parezca real
-          const stableViews = (p.idpropiedad * 7) % 500 + (realLikes * 12) + 50;
-
           return {
             name: (p.titulo || "Propiedad").substring(0, 15) + "...",
-            views: stableViews,
+            views: p.visitas || 0,
             likes: realLikes,
           };
         }));
@@ -66,7 +62,8 @@ const ReportesSection: React.FC = () => {
         
         {/* Gráfico 1: Rendimiento de Propiedades */}
         <div className="report-card-full" style={{ background: '#fff', padding: '25px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-          <h3 style={{ marginBottom: '20px', fontSize: '1.2rem' }}>Vistas y Favoritos por Propiedad</h3>
+          <h3 style={{ marginBottom: '10px', fontSize: '1.2rem' }}>Vistas y Favoritos por Propiedad</h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '20px' }}>Compara cuántas veces han visto los detalles de tus propiedades frente a cuántas veces las han guardado como favoritas.</p>
           <div style={{ width: '100%', height: 350 }}>
             <ResponsiveContainer>
               <BarChart data={propertyStats}>
@@ -88,7 +85,8 @@ const ReportesSection: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
           {/* Gráfico 2: Salud del Plan */}
           <div className="report-card" style={{ background: '#fff', padding: '25px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <h3 style={{ marginBottom: '15px' }}>Cupo de Publicaciones</h3>
+            <h3 style={{ marginBottom: '10px' }}>Cupo de Publicaciones</h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '15px' }}>Muestra cuántas propiedades has publicado respecto al límite máximo permitido por tu plan actual.</p>
             <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '10px' }}>Plan actual: <strong style={{ color: '#35d2db', textTransform: 'capitalize' }}>{usuario?.plan}</strong></p>
             <div style={{ width: '100%', height: 250 }}>
               <ResponsiveContainer>
@@ -116,7 +114,8 @@ const ReportesSection: React.FC = () => {
 
           {/* Gráfico 3: Tendencia Mensual */}
           <div className="report-card" style={{ background: '#fff', padding: '25px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <h3 style={{ marginBottom: '15px' }}>Tendencia de Crecimiento</h3>
+            <h3 style={{ marginBottom: '10px' }}>Tendencia de Crecimiento</h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '20px' }}>Ilustra el rendimiento histórico de tus propiedades para tu comprensión de exposición y visitas futuras.</p>
             <div style={{ width: '100%', height: 250 }}>
               <ResponsiveContainer>
                 <AreaChart data={propertyStats}>

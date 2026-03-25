@@ -562,7 +562,9 @@ function RegisterPropertyPage() {
               Las propiedades destacadas aparecen primero en los resultados del Home y búsquedas, y llevan el listón visual <strong>"DESTACADA"</strong>.
               {usuario?.plan !== "premium" && (
                 <span style={{ color: "#d35400", display: "block", marginTop: "8px", background: "#fef5e7", padding: "8px", borderRadius: "6px" }}>
-                  💡 <strong>¡Atención!</strong> Solo los usuarios con suscripción <strong>Premium</strong> pueden activar esta opción.
+                  💡 <strong>¡Atiéndete!</strong> Solo los usuarios con suscripción <strong>Premium</strong> pueden activar esta opción.
+                  Házte premium de manera fácil y rápida{" "}
+                  <a href="/promotion" style={{ color: "#f1b307", fontWeight: "bold", textDecoration: "underline" }}>aquí</a>.
                 </span>
               )}
             </p>

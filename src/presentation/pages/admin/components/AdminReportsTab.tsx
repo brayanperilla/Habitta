@@ -73,7 +73,8 @@ const AdminReportsTab: React.FC = () => {
         
         {/* Gráfico de Usuarios */}
         <div className="report-card" style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-          <h3 style={{ marginBottom: '20px', color: '#1a202c' }}>Distribución de Usuarios</h3>
+          <h3 style={{ marginBottom: '10px', color: '#1a202c' }}>Distribución de Usuarios</h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '20px' }}>Visualiza la proporción de usuarios registrados en la plataforma según su tipo de plan (Gratuito vs Premium).</p>
           <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer>
               <PieChart>
@@ -100,7 +101,8 @@ const AdminReportsTab: React.FC = () => {
 
         {/* Crecimiento de Propiedades */}
         <div className="report-card" style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-          <h3 style={{ marginBottom: '20px', color: '#1a202c' }}>Nuevas Publicaciones (Mensual)</h3>
+          <h3 style={{ marginBottom: '10px', color: '#1a202c' }}>Nuevas Publicaciones (Mensual)</h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '20px' }}>Muestra la cantidad de propiedades publicadas y aprobadas en la plataforma organizadas por mes.</p>
           <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer>
               <BarChart data={propertyGrowth}>
@@ -116,7 +118,8 @@ const AdminReportsTab: React.FC = () => {
 
         {/* Resumen Financiero Estimado */}
         <div className="report-card" style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', gridColumn: '1 / -1' }}>
-          <h3 style={{ marginBottom: '20px', color: '#1a202c' }}>Rendimiento de la Plataforma</h3>
+          <h3 style={{ marginBottom: '10px', color: '#1a202c' }}>Rendimiento de la Plataforma</h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '20px' }}>Estima la interacción general y el crecimiento basándose en el volumen de publicaciones recientes mes a mes.</p>
           <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer>
               <LineChart data={propertyGrowth}>

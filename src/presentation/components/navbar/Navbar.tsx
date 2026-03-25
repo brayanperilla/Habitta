@@ -20,21 +20,41 @@ function Navbar() {
   const { notificaciones, noLeidasCount, marcarTodasLeidas } =
     useNotificaciones(usuario?.idusuario);
 
-  // Toggle correcto: si estaba abierto, cerrarlo; si cerrado, abrirlo
+  // Toggle exclusivo para el modal de usuario
   const handleUserBtnClick = () => {
-    setIsUserModalOpen((prev) => !prev);
+    setIsUserModalOpen((prev) => {
+      if (!prev) {
+        setMobileMenuOpen(false);
+        setIsNotificationModalOpen(false);
+      }
+      return !prev;
+    });
   };
 
-  const closeUserModal = () => {
-    setIsUserModalOpen(false);
-  };
+  const closeUserModal = () => setIsUserModalOpen(false);
 
+  // Toggle exclusivo para el modal de notificaciones
   const toggleNotificationModal = () => {
-    setIsNotificationModalOpen((prev) => !prev);
+    setIsNotificationModalOpen((prev) => {
+      if (!prev) {
+        setMobileMenuOpen(false);
+        setIsUserModalOpen(false);
+      }
+      return !prev;
+    });
   };
 
-  const closeNotificationModal = () => {
-    setIsNotificationModalOpen(false);
+  const closeNotificationModal = () => setIsNotificationModalOpen(false);
+
+  // Toggle exclusivo para el menú móvil
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen((prev) => {
+      if (!prev) {
+        setIsUserModalOpen(false);
+        setIsNotificationModalOpen(false);
+      }
+      return !prev;
+    });
   };
 
   return (
@@ -46,7 +66,7 @@ function Navbar() {
             <Link to={usuario?.rol === "admin" ? "/admin" : "/"}>
               <div className="navbar__logo-container">
                 <img
-                  src="/images/logoSF.png"
+                  src="/images/logo_mobile.png"
                   alt="Logo Habitta"
                   className="navbar__logo-img"
                 />
@@ -56,24 +76,15 @@ function Navbar() {
 
           {usuario?.rol !== "admin" && (
             <button
-              className="navbar__hamburger"
-              onClick={() => setMobileMenuOpen(prev => !prev)}
+              className={`navbar__hamburger ${mobileMenuOpen ? 'open' : ''}`}
+              onClick={toggleMobileMenu}
               aria-label="Menú"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a202c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              {mobileMenuOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </>
-              )}
-            </svg>
+              <div className="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
             </button>
           )}
         </div>

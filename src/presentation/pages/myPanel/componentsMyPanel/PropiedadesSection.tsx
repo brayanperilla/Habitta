@@ -11,7 +11,6 @@ import { useAuth } from "@application/context/AuthContext";
 import { useToast } from "@application/context/ToastContext";
 import { propertyService } from "@application/services/propertyService";
 import type { Property } from "@domain/entities/Property";
-import ConfirmModal from "@presentation/components/confirmModal/ConfirmModal";
 import "./sections.css";
 
 /**
@@ -31,6 +30,7 @@ const PropiedadesSection: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
 
   useEffect(() => {
     const cargar = async () => {
@@ -72,11 +72,18 @@ const PropiedadesSection: React.FC = () => {
   // Eliminar propiedad
   const handleDeleteClick = (id: number) => {
     setPropertyToDelete(id);
+    setDeleteConfirmName("");
     setDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
     if (!propertyToDelete) return;
+    const prop = propiedades.find(p => p.idpropiedad === propertyToDelete);
+    const expectedName = (prop?.titulo || "").trim().toLowerCase();
+    if (deleteConfirmName.trim().toLowerCase() !== expectedName) {
+      showToast("El nombre no coincide. Escribe el nombre exacto de la propiedad.", "error");
+      return;
+    }
     setDeleting(true);
     try {
       await propertyService.deleteProperty(propertyToDelete);
@@ -93,6 +100,7 @@ const PropiedadesSection: React.FC = () => {
       setDeleting(false);
       setDeleteModalOpen(false);
       setPropertyToDelete(null);
+      setDeleteConfirmName("");
     }
   };
 
@@ -339,21 +347,53 @@ const PropiedadesSection: React.FC = () => {
         ))}
       </div>
 
-      {/* Modal de confirmación de eliminación */}
-      <ConfirmModal
-        isOpen={deleteModalOpen}
-        title="Eliminar propiedad"
-        message="¿Estás seguro de que deseas eliminar esta propiedad? Esta acción no se puede deshacer."
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        variant="danger"
-        loading={deleting}
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => {
-          setDeleteModalOpen(false);
-          setPropertyToDelete(null);
-        }}
-      />
+      {/* Modal de confirmación de eliminación — tipo GitHub */}
+      {deleteModalOpen && (() => {
+        const prop = propiedades.find(p => p.idpropiedad === propertyToDelete);
+        const propName = prop?.titulo || "";
+        const namesMatch = deleteConfirmName.trim().toLowerCase() === propName.trim().toLowerCase();
+        return (
+          <div className="contact-modal-overlay" onClick={() => { setDeleteModalOpen(false); setPropertyToDelete(null); setDeleteConfirmName(""); }}>
+            <div className="contact-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
+              <button className="contact-modal__close" onClick={() => { setDeleteModalOpen(false); setPropertyToDelete(null); setDeleteConfirmName(""); }}>✕</button>
+              <h3 style={{ color: "#ef4444", marginBottom: "0.5rem" }}>Eliminar propiedad</h3>
+              <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "1rem" }}>
+                Esta acción <strong>no se puede deshacer</strong>. Se eliminarán todos los datos, fotos y registros de esta propiedad.
+              </p>
+              <p style={{ fontSize: "0.9rem", marginBottom: "8px" }}>
+                Escribe <strong style={{ color: "#ef4444" }}>{propName}</strong> para confirmar:
+              </p>
+              <input
+                type="text"
+                value={deleteConfirmName}
+                onChange={(e) => setDeleteConfirmName(e.target.value)}
+                placeholder={propName}
+                style={{
+                  width: "100%", padding: "10px 12px", borderRadius: "8px",
+                  border: namesMatch ? "2px solid #ef4444" : "1px solid #ddd",
+                  fontSize: "0.95rem", marginBottom: "1rem", boxSizing: "border-box"
+                }}
+              />
+              <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                <button
+                  onClick={() => { setDeleteModalOpen(false); setPropertyToDelete(null); setDeleteConfirmName(""); }}
+                  style={{ padding: "10px 20px", borderRadius: "8px", border: "1px solid #ddd", background: "#fff", cursor: "pointer", fontWeight: "600" }}
+                >Cancelar</button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={!namesMatch || deleting}
+                  style={{
+                    padding: "10px 20px", borderRadius: "8px", border: "none",
+                    background: namesMatch ? "#ef4444" : "#fca5a5",
+                    color: "#fff", cursor: namesMatch ? "pointer" : "not-allowed",
+                    fontWeight: "700", opacity: namesMatch ? 1 : 0.5
+                  }}
+                >{deleting ? "Eliminando..." : "Eliminar propiedad"}</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

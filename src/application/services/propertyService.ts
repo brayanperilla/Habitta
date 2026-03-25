@@ -29,6 +29,18 @@ export const propertyService = {
     return await propertyApi.getById(id);
   },
 
+  /** Incrementar el contador contador de visitas de una propiedad */
+  incrementPropertyViews: async (idpropiedad: number): Promise<void> => {
+    try {
+      const { error } = await supabase.rpc('increment_visitas', { prop_id: idpropiedad });
+      if (error) {
+        console.error("Error incrementando vistas:", error);
+      }
+    } catch (err) {
+      console.error("Excepción incrementando vistas:", err);
+    }
+  },
+
   /** Obtener URLs de fotos de una propiedad (ordenadas por `orden`) */
   getFotosPropiedad: async (idpropiedad: number): Promise<string[]> => {
     const { data, error } = await supabase

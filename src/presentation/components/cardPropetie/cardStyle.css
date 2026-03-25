@@ -443,6 +443,10 @@
 
 /* Solo se ve en Móvil/Tablet (y quita el hover natural expander) */
 @media (max-width: 1024px) {
+  .property-card__image-container {
+    cursor: pointer;
+  }
+
   .property-card__expand-btn {
     display: flex;
   }
@@ -528,8 +532,9 @@
 /* --- Propiedades Compactas (Modo Lista / Mi Panel) --- */
 .property-card--compact {
   flex-direction: row !important;
-  height: 140px !important;
-  align-items: center !important;
+  height: auto !important;
+  min-height: 140px !important;
+  align-items: stretch !important;
   gap: 0 !important;
   border-radius: 12px !important;
   overflow: hidden !important;
@@ -544,8 +549,9 @@
 }
 
 .property-card--compact .property-card__image-container {
-  width: 180px !important;
+  width: 360px !important;
   min-width: 180px !important;
+  max-width: 45% !important;
   height: 100% !important;
   border-radius: 0 !important;
 }
@@ -624,6 +630,8 @@
   }
   .property-card--compact .property-card__image-container {
     width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
     height: 160px !important;
   }
 }

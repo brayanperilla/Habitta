@@ -2,10 +2,11 @@ import { useState } from "react";
 import AdminPropertiesTab from "./components/AdminPropertiesTab";
 import AdminUsersTab from "./components/AdminUsersTab";
 import AdminReportsTab from "./components/AdminReportsTab";
+import AdminPqrsTab from "./components/AdminPqrsTab";
 import "./AdminPage.css";
 
 function AdminPage() {
-  const [activeTab, setActiveTab] = useState<"usuarios" | "reportes" | "auditoria" | "propiedades">("propiedades");
+  const [activeTab, setActiveTab] = useState<"usuarios" | "reportes" | "auditoria" | "propiedades" | "pqrs">("propiedades");
 
   return (
     <div className="admin-page">
@@ -34,6 +35,12 @@ function AdminPage() {
           Reportes
         </button>
         <button
+          className={`admin-tab ${activeTab === "pqrs" ? "active" : ""}`}
+          onClick={() => setActiveTab("pqrs")}
+        >
+          PQRS
+        </button>
+        <button
           className={`admin-tab ${activeTab === "auditoria" ? "active" : ""}`}
           onClick={() => setActiveTab("auditoria")}
         >
@@ -47,6 +54,8 @@ function AdminPage() {
         {activeTab === "propiedades" && <AdminPropertiesTab />}
 
         {activeTab === "reportes" && <AdminReportsTab />}
+
+        {activeTab === "pqrs" && <AdminPqrsTab />}
 
         {activeTab === "auditoria" && (
           <div className="admin-tab-content">

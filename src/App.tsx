@@ -28,6 +28,7 @@ const Auth = lazy(() => import("@presentation/pages/auth/Auth"));
 const Favorites = lazy(() => import("@presentation/pages/favorites/Favorites"));
 const PropertyDetailsPage = lazy(() => import("@presentation/pages/propertyDetails/PropertyDetailsPage"));
 const Mypanel = lazy(() => import("@presentation/pages/myPanel/MyPanel"));
+const PqrsPage = lazy(() => import("@presentation/pages/pqrs/PqrsPage"));
 const NotificationPage = lazy(() => import("@presentation/pages/notification/NotificationPage/Notification"));
 const AdminPage = lazy(() => import("@presentation/pages/admin/AdminPage"));
 const TermsPage = lazy(() => import("@presentation/pages/legal/TermsPage"));
@@ -60,6 +61,7 @@ const router = createBrowserRouter(
         <Route path="registerpropeties" element={<Suspense fallback={<PageLoader />}><RegisterPropertyPage /></Suspense>} />
         <Route path="favorites" element={<Suspense fallback={<PageLoader />}><Favorites /></Suspense>} />
         <Route path="mypanel" element={<Suspense fallback={<PageLoader />}><Mypanel /></Suspense>} />
+        <Route path="pqrs" element={<Suspense fallback={<PageLoader />}><PqrsPage /></Suspense>} />
         <Route path="notification" element={<Suspense fallback={<PageLoader />}><NotificationPage /></Suspense>} />
       </Route>
 

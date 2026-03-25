@@ -40,8 +40,16 @@ const ModalN: FC<ModalNProps> = ({
 }) => {
   const navigate = useNavigate();
   const modalRef = useRef<HTMLDivElement>(null);
-  // IDs descartados localmente del modal — no se borran del DB
-  const [dismissed, setDismissed] = useState<Set<number>>(new Set());
+  
+  // IDs descartados localmente del modal — persisten al recargar usando localStorage
+  const [dismissed, setDismissed] = useState<Set<number>>(() => {
+    try {
+      const saved = localStorage.getItem("habitta_dismissed_notifications");
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
 
   // Cerrar al hacer clic fuera
   useEffect(() => {
@@ -58,7 +66,6 @@ const ModalN: FC<ModalNProps> = ({
   // Limpiar descartadas cuando el modal se abre de nuevo
   useEffect(() => {
     if (isOpen) {
-      setDismissed(new Set());
       // Marcar todas como leídas → borra el badge
       if (noLeidasCount > 0) onMarcarTodasLeidas();
     }
@@ -77,7 +84,12 @@ const ModalN: FC<ModalNProps> = ({
     .slice(0, 5);
 
   const handleDismiss = (id: number) => {
-    setDismissed((prev) => new Set([...prev, id]));
+    setDismissed((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem("habitta_dismissed_notifications", JSON.stringify([...next]));
+      return next;
+    });
   };
 
   return (
@@ -131,10 +143,13 @@ const ModalN: FC<ModalNProps> = ({
                   )}
                   <p className="notification-time">{formatRelativo(n.fechaEnvio)}</p>
                 </div>
-                {/* × = solo oculta del modal (no borra del DB, sigue en /notification) */}
+                {/* × = solo oculta del modal persistentemente (no borra del DB, sigue en /notification) */}
                 <button
-                  onClick={() => handleDismiss(n.idnotificacion)}
-                  title="Ocultar del panel"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDismiss(n.idnotificacion);
+                  }}
+                  title="Ocultar notificación de este panel"
                   style={{
                     background: "none",
                     border: "none",

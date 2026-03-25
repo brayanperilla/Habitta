@@ -127,18 +127,13 @@ export const notificacionesApi = {
     tipo: Notificacion["tipo"],
     descripcion?: string
   ): Promise<Notificacion> => {
-    const { data, error } = await supabase
-      .from("notificaciones")
-      .insert({
-        idusuario,
-        titulo,
-        tipo,
-        descripcion: descripcion ?? null,
-        fechaEnvio: new Date().toISOString(),
-        leido: false,
-      })
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc("insert_notificacion", {
+      p_idusuario: idusuario,
+      p_titulo: titulo,
+      p_tipo: tipo,
+      p_descripcion: descripcion ?? null,
+    });
+    
     if (error) throw new Error(`Error creando notificación: ${error.message}`);
     return data as Notificacion;
   },

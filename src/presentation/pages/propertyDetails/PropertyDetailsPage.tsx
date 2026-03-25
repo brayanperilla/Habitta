@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { propertyService } from "@application/services/propertyService";
 import type { Property } from "@domain/entities/Property";
@@ -22,7 +22,6 @@ function PropertyDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [imgIndex, setImgIndex] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
-
   // Tabs
   const [activeTab, setActiveTab] = useState("Descripción");
   const [showLightbox, setShowLightbox] = useState(false);
@@ -86,6 +85,9 @@ function PropertyDetailsPage() {
           setCaracteristicas(cars);
           setFotos(imgs);
 
+          // Registrar visita real (ignoramos await para no bloquear la UI)
+          propertyService.incrementPropertyViews(Number(id));
+
           // Obtener el teléfono del vendedor
           if (prop.idusuario) {
             const { data: seller } = await supabase
@@ -126,6 +128,48 @@ function PropertyDetailsPage() {
 
     return () => clearTimeout(timer);
   }, [id, fotos.length, loading]);
+  // SEO Básico y Metadatos Dinámicos
+  useEffect(() => {
+    if (property) {
+      document.title = `${property.titulo || 'Propiedad'} | Habitta`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', property.descripcion || 'Encuentra tu próximo hogar.');
+    }
+    return () => { document.title = "Habitta | App Inmobiliaria"; };
+  }, [property]);
+
+  // Handler para compartir
+  const handleShare = async () => {
+    const shareData = {
+      title: `${property?.titulo || 'Propiedad'} - Habitta`,
+      text: `Usuario te envió algo que te podría gustar: "${property?.titulo}"`,
+      url: window.location.href
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error("Error al compartir", err);
+      }
+    } else {
+      navigator.clipboard.writeText(shareData.url);
+      alert("Enlace copiado al portapapeles.");
+    }
+  };
+
+  // Referencia al contenedor de miniaturas
+  const thumbnailsRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll del carrusel cuando cambie el índice de la imagen
+  useEffect(() => {
+    if (thumbnailsRef.current && thumbnailsRef.current.children[imgIndex]) {
+      thumbnailsRef.current.children[imgIndex].scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [imgIndex]);
 
   // Formatear precio en pesos colombianos
   const formatPrice = (price: number | null) => {
@@ -267,73 +311,10 @@ function PropertyDetailsPage() {
             </>
           )}
 
-          <button
-            className="property-details-share"
-            aria-label="Compartir"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: property.titulo ?? "Propiedad",
-                  text: `Mira esta propiedad: ${property.titulo ?? ""}`,
-                  url: window.location.origin + `/propertydetailspage/${property.idpropiedad}`,
-                });
-              }
-            }}
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="18"
-                cy="5"
-                r="3"
-                stroke="#1a1a1a"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle
-                cx="6"
-                cy="12"
-                r="3"
-                stroke="#1a1a1a"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle
-                cx="18"
-                cy="19"
-                r="3"
-                stroke="#1a1a1a"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M8.59 13.51L15.42 17.49"
-                stroke="#1a1a1a"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M15.41 6.51L8.59 10.49"
-                stroke="#1a1a1a"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
         </div>
 
         {/* Miniaturas */}
-        <div className="property-details-thumbnails">
+        <div className="property-details-thumbnails" ref={thumbnailsRef}>
           {fotos.map((media, idx) => (
             isVideo(media) ? (
               <div
@@ -523,72 +504,6 @@ function PropertyDetailsPage() {
                 />
               </svg>
             </button>
-            <button
-              className="property-details-share-btn"
-              aria-label="Compartir"
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: property?.titulo ?? "Propiedad",
-                    text: `Mira esta propiedad de Habitta: ${property?.titulo}`,
-                    url: window.location.href,
-                  });
-                }
-              }}
-            >
-              <svg
-                width="44"
-                height="44"
-                viewBox="0 0 44 44"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="22" cy="22" r="20" fill="#fff" />
-                <g transform="translate(10, 10) scale(1)">
-                  <circle
-                    cx="18"
-                    cy="5"
-                    r="3"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle
-                    cx="6"
-                    cy="12"
-                    r="3"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle
-                    cx="18"
-                    cy="19"
-                    r="3"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M8.59 13.51L15.42 17.49"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M15.41 6.51L8.59 10.49"
-                    stroke="#1a1a1a"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </g>
-              </svg>
-            </button>
           </div>
           <h2 className="property-details-info-price">
             {formatPrice(property.precio)}
@@ -662,17 +577,23 @@ function PropertyDetailsPage() {
               Llamar
             </button>
 
-            {/* Botón Mensaje interno */}
+            {/* Botón Compartir */}
             <button
-              className="property-details-info-msg-btn"
-              onClick={() => navigate(`/messages?property=${property.idpropiedad}`)}
-              aria-label="Enviar mensaje al vendedor"
+              className="property-details-info-share-btn"
+              onClick={handleShare}
+              aria-label="Compartir propiedad"
+              title="Compartir"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
               </svg>
-              Mensaje
+              Compartir
             </button>
+
           </div>
 
           {/* Modal de contacto (cuando no hay teléfono registrado o sí hay) */}
@@ -785,6 +706,7 @@ function PropertyDetailsPage() {
           )}
         </div>
       )}
+
     </div>
   );
 }
