@@ -263,17 +263,21 @@ function PropertiesPage() {
               <div className="sidebar-range-inputs">
                 <input
                   type="number"
+                  min="0"
                   className="sidebar-number-input"
                   placeholder="Mínimo"
                   value={localFilters.precioMin ?? ""}
+                  onInput={(e) => { if (Number((e.target as HTMLInputElement).value) < 0) (e.target as HTMLInputElement).value = '0'; }}
                   onChange={(e) => setLocalFilters({...localFilters, precioMin: e.target.value ? Number(e.target.value) : undefined})}
                 />
                 <span className="sidebar-range-separator">—</span>
                 <input
                   type="number"
+                  min="0"
                   className="sidebar-number-input"
                   placeholder="Máximo"
                   value={localFilters.precioMax ?? ""}
+                  onInput={(e) => { if (Number((e.target as HTMLInputElement).value) < 0) (e.target as HTMLInputElement).value = '0'; }}
                   onChange={(e) => setLocalFilters({...localFilters, precioMax: e.target.value ? Number(e.target.value) : undefined})}
                 />
               </div>
@@ -285,17 +289,21 @@ function PropertiesPage() {
               <div className="sidebar-range-inputs">
                 <input
                   type="number"
+                  min="0"
                   className="sidebar-number-input"
                   placeholder="Mín"
                   value={localFilters.areaMin ?? ""}
+                  onInput={(e) => { if (Number((e.target as HTMLInputElement).value) < 0) (e.target as HTMLInputElement).value = '0'; }}
                   onChange={(e) => setLocalFilters({...localFilters, areaMin: e.target.value ? Number(e.target.value) : undefined})}
                 />
                 <span className="sidebar-range-separator">—</span>
                 <input
                   type="number"
+                  min="0"
                   className="sidebar-number-input"
                   placeholder="Máx"
                   value={localFilters.areaMax ?? ""}
+                  onInput={(e) => { if (Number((e.target as HTMLInputElement).value) < 0) (e.target as HTMLInputElement).value = '0'; }}
                   onChange={(e) => setLocalFilters({...localFilters, areaMax: e.target.value ? Number(e.target.value) : undefined})}
                 />
               </div>

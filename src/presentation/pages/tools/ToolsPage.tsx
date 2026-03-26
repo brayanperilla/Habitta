@@ -76,7 +76,7 @@ function ToolsPage() {
 
   return (
     <div className="tools-page">
-      <h1 className="tools-title">Herramientas financieras</h1>
+      <h1 className="tools-title">Calculadora financiera</h1>
       <p className="tools-subtitle">
         Calcula tu capacidad de crédito y descubre propiedades dentro de tu presupuesto
       </p>

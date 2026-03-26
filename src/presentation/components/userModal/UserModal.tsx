@@ -85,7 +85,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose }) => {
     },
     {
       id: 2,
-      label: "Promociones",
+      label: "Planes de pago",
       icon: "/icons/UI/navbaricons/star-alt-4-svgrepo-com.svg",
       link: "/promotion",
       showForAdmin: false,

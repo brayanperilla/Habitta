@@ -148,3 +148,15 @@
 .modal-body::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
+
+@media (max-width: 768px) {
+  .modal-content {
+    position: fixed;
+    top: 70px;
+    right: 5%;
+    left: 5%;
+    width: 90%;
+    max-width: none;
+    margin-top: 0;
+  }
+}

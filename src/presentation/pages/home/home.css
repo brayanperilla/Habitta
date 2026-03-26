@@ -708,11 +708,11 @@ span.text-primary {
   }
 
   .stat-item {
-    width: 100%;
+    width: 45%;
   }
 
   .features-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .section-header h4 {
@@ -724,7 +724,9 @@ span.text-primary {
   }
 
   .cert-logos {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
     gap: 16px;
   }
 

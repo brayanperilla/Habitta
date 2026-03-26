@@ -63,7 +63,13 @@ function Register() {
           type="text"
           id="fullName"
           value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          onChange={(e) => {
+            const formattedName = e.target.value
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+            setFullName(formattedName);
+          }}
           placeholder="Juan Pérez"
           required
           disabled={loading}

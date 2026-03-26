@@ -105,10 +105,13 @@ function Home() {
             {/* Tarjeta de Búsqueda */}
             <div className="search-card">
               {/* Pestañas de Tipo */}
+              <p className="search-tabs-description" style={{ fontSize: '0.95rem', color: '#555', marginBottom: '12px', fontWeight: '600' }}>
+                ¿Qué tipo de operación buscas?
+              </p>
               <div className="search-tabs">
                 <button className={`tab ${tipoOperacion === 'Todos' ? 'active' : ''}`} onClick={() => setTipoOperacion('Todos')}>Todos</button>
-                <button className={`tab ${tipoOperacion === 'Alquilar' ? 'active' : ''}`} onClick={() => setTipoOperacion('Alquilar')}>Alquilar</button>
-                <button className={`tab ${tipoOperacion === 'Venta' ? 'active' : ''}`} onClick={() => setTipoOperacion('Venta')}>Venta</button>
+                <button className={`tab ${tipoOperacion === 'alquiler' ? 'active' : ''}`} onClick={() => setTipoOperacion('alquiler')}>Alquilar</button>
+                <button className={`tab ${tipoOperacion === 'venta' ? 'active' : ''}`} onClick={() => setTipoOperacion('venta')}>Venta</button>
               </div>
 
               {/* Campos de Entrada */}
@@ -155,25 +158,7 @@ function Home() {
 
             </div>
 
-            {/* Estadísticas Rápidas */}
-            <div className="hero-stats">
-              <div className="stat-item">
-                <span className="stat-number">25,000+</span>
-                <span className="stat-label">Propiedades</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">150+</span>
-                <span className="stat-label">Ciudades</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">50,000+</span>
-                <span className="stat-label">Usuarios activos</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">12,000+</span>
-                <span className="stat-label">Transacciones exitosas</span>
-              </div>
-            </div>
+            
           </div>
         </section>
 
@@ -194,8 +179,8 @@ function Home() {
                 const op = p.tipoOperacion?.toLowerCase();
                 const matchesOp = 
                   tipoOperacion === "Todos" || 
-                  (tipoOperacion === "Alquilar" && (op === "alquiler" || op === "arriendo")) ||
-                  (tipoOperacion === "Venta" && op === "venta");
+                  (tipoOperacion === "alquiler" && (op === "alquiler" || op === "arriendo")) ||
+                  (tipoOperacion === "venta" && op === "venta");
                 
                 const matchesType = !tipoPropiedad || p.tipoPropiedad?.toLowerCase() === tipoPropiedad.toLowerCase();
 

@@ -119,7 +119,7 @@ function Navbar() {
                 </li>
                 <li>
                   <Link className={`navbar_link ${location.pathname === "/properties" ? "active" : ""}`} to="/properties">
-                    <img className="navbar_icon" src="/icons/UI/navbaricons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg" alt="Propiedades" />
+                    <img className="navbar_icon" src="/icons/UI/navbaricons/building-property-svgrepo-com.svg" alt="Propiedades" />
                     Propiedades
                   </Link>
                 </li>
@@ -131,8 +131,8 @@ function Navbar() {
                 </li>
                 <li>
                   <Link className={`navbar_link ${location.pathname === "/tools" ? "active" : ""}`} to={usuario ? "/tools" : "/auth"}>
-                    <img className="navbar_icon" src="/icons/UI/navbaricons/calculator-svgrepo-com.svg" alt="Herramientas" />
-                    Herramientas
+                    <img className="navbar_icon" src="/icons/UI/navbaricons/coin-dollar-svgrepo-com.svg" alt="Calculadora financiera" />
+                    Calculadora financiera
                   </Link>
                 </li>
               </ul>
@@ -210,7 +210,12 @@ function Navbar() {
                       usuario.nombre.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
                     )}
                   </span>
-                  <span className="navbar__user-name">{usuario.nombre}</span>
+                  <span className="navbar__user-name">
+                    {usuario.nombre
+                      .split(" ")
+                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                      .join(" ")}
+                  </span>
                 </button>
                 <UserModal isOpen={isUserModalOpen} onClose={closeUserModal} />
               </div>
@@ -239,7 +244,7 @@ function Navbar() {
             to="/properties"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <img className="navbar_icon" src="/icons/UI/navbaricons/glass-magnifier-search-zoom-alert-notification-svgrepo-com.svg" alt="Propiedades" />
+            <img className="navbar_icon" src="/icons/UI/navbaricons/building-property-svgrepo-com.svg" alt="Propiedades" />
             Propiedades
           </Link>
           <Link
@@ -255,8 +260,8 @@ function Navbar() {
             to={usuario ? "/tools" : "/auth"}
             onClick={() => setMobileMenuOpen(false)}
           >
-            <img className="navbar_icon" src="/icons/UI/navbaricons/calculator-svgrepo-com.svg" alt="Herramientas" />
-            Herramientas
+            <img className="navbar_icon" src="/icons/UI/navbaricons/coin-dollar-svgrepo-com.svg" alt="Calculadora financiera" />
+            Calculadora financiera
           </Link>
         </div>
       )}
