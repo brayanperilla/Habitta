@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRegisterForm } from "./hooks/useRegisterForm";
 import { useToast } from "@application/context/ToastContext";
 import { useWarnIfUnsavedChanges } from "@application/hooks/useWarnIfUnsavedChanges";
@@ -34,6 +34,8 @@ function Register() {
     passwordsMatch,
   } = useRegisterForm();
 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -54,11 +56,18 @@ function Register() {
   );
   useWarnIfUnsavedChanges(hasUnsavedChanges && !successMessage);
 
+  const EyeOpen = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+  );
+
+  const EyeClosed = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+  );
+
   return (
     <form className="register-form" onSubmit={handleSubmit}>
       {/* Nombre Completo */}
-      <div className="form-group">
-        <label htmlFor="fullName">Nombre Completo</label>
+      <div className="form-group-outlined">
         <input
           type="text"
           id="fullName"
@@ -70,14 +79,24 @@ function Register() {
               .join(' ');
             setFullName(formattedName);
           }}
-          placeholder="Juan Pérez"
+          placeholder=" "
           required
           disabled={loading}
         />
+        <label htmlFor="fullName">Nombre Completo</label>
       </div>
 
       {/* Correo Electrónico */}
-      <div className="form-group email-group">
+      <div className="form-group-outlined email-group">
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder=" "
+          required
+          disabled={loading}
+        />
         <label htmlFor="email">
           Correo Electrónico
           {checkingEmail && <span className="email-status info"> 🔄</span>}
@@ -88,65 +107,56 @@ function Register() {
             <span className="email-status error"> ❌ (Ya registrado)</span>
           )}
         </label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="tu@email.com"
-          required
-          disabled={loading}
-        />
       </div>
 
       {/* Confirmar Correo Electrónico */}
-      <div className="form-group">
-        <label htmlFor="confirmationEmail">Confirmar Correo Electrónico</label>
+      <div className="form-group-outlined">
         <input
           type="email"
           id="confirmationEmail"
           value={confirmationEmail}
           onChange={(e) => setConfirmationEmail(e.target.value)}
-          placeholder="tu@email.com"
+          placeholder=" "
           required
           disabled={loading}
         />
+        <label htmlFor="confirmationEmail">Confirmar Correo Electrónico</label>
       </div>
 
       {/* Teléfono */}
-      <div className="form-group">
-        <label htmlFor="phone">Teléfono</label>
+      <div className="form-group-outlined">
         <input
           type="tel"
           id="phone"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="3001234567"
+          placeholder=" "
           required
           disabled={loading}
         />
+        <label htmlFor="phone">Teléfono</label>
       </div>
 
       {/* Contraseña */}
-      <div className="form-group">
-        <label htmlFor="password">Contraseña</label>
+      <div className="form-group-outlined">
         <div className="password-input">
           <input
             type={showPassword ? "text" : "password"}
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
+            placeholder=" "
             minLength={8}
             required
             disabled={loading}
           />
+          <label htmlFor="password">Contraseña</label>
           <button
             type="button"
             className="toggle-password"
             onClick={togglePasswordVisibility}
           >
-            {showPassword ? "👁️" : "👁️‍🗨️"}
+            {showPassword ? <EyeOpen /> : <EyeClosed />}
           </button>
         </div>
         {password.length > 0 && (
@@ -171,25 +181,25 @@ function Register() {
       </div>
 
       {/* Confirmar Contraseña */}
-      <div className="form-group">
-        <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+      <div className="form-group-outlined">
         <div className="password-input">
           <input
-            type={showPassword ? "text" : "password"}
+            type={showConfirmPassword ? "text" : "password"}
             id="confirmPassword"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="••••••••"
+            placeholder=" "
             minLength={8}
             required
             disabled={loading}
           />
+          <label htmlFor="confirmPassword">Confirmar Contraseña</label>
           <button
             type="button"
             className="toggle-password"
-            onClick={togglePasswordVisibility}
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           >
-            {showPassword ? "👁️" : "👁️‍🗨️"}
+            {showConfirmPassword ? <EyeOpen /> : <EyeClosed />}
           </button>
         </div>
         {confirmPassword.length > 0 && (

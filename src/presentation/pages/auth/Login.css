@@ -7,6 +7,27 @@
   gap: 20px;
 }
 
+/* Grupo de Formulario con Label Flotante (Outlined) */
+.form-group-outlined {
+  position: relative;
+  margin-bottom: 24px;
+  margin-top: 10px;
+}
+
+.form-group-outlined label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 4px;
+  font-size: 15px;
+  color: #718096;
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+  background: transparent;
+  z-index: 10;
+}
+
 /* Grupo de Formulario */
 .form-group {
   display: flex;
@@ -22,7 +43,7 @@
 }
 
 /* Campos de Entrada */
-.form-group input {
+input {
   width: 100%;
   box-sizing: border-box;
   padding: 14px 16px;
@@ -34,8 +55,28 @@
   background: #f7fafc;
 }
 
+/* Ajuste al flotar: Centrado en la línea del borde */
+.form-group-outlined input:focus + label,
+.form-group-outlined input:not(:placeholder-shown) + label,
+.form-group-outlined .password-input input:focus ~ label,
+.form-group-outlined .password-input input:not(:placeholder-shown) ~ label {
+  top: 0;
+  left: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #35c8be;
+  background: white; /* Cubre la línea del borde */
+  transform: translateY(-50%);
+}
+
+.form-group-outlined input:not(:focus):not(:placeholder-shown) + label,
+.form-group-outlined .password-input input:not(:focus):not(:placeholder-shown) ~ label {
+    color: #4a5568;
+    background: white;
+}
+
 /* Estado de Foco */
-.form-group input:focus {
+input:focus {
   border-color: #35c8be;
   background: white;
   box-shadow: 0 0 0 3px rgba(53, 200, 190, 0.1);
@@ -60,13 +101,22 @@
 .toggle-password {
   position: absolute;
   right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  color: #cbd5e0;
   padding: 4px;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 11;
+}
+
+.toggle-password:hover {
+  color: #35c8be;
 }
 
 /* Efecto Hover */
